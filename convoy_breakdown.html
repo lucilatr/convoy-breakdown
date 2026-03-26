@@ -1066,7 +1066,11 @@ function getImages(id) {
 function buildCarousel(id) {
   const imgs = getImages(id);
   if(imgs.length === 0) {
-    return `<div class="carousel-empty" onclick="triggerFile('${id}')">
+    return `<div class="carousel-empty" 
+      onclick="triggerFile('${id}')"
+      ondragover="event.preventDefault(); this.style.borderColor='var(--pink)'"
+      ondragleave="this.style.borderColor=''"
+      ondrop="handleDrop(event, '${id}')">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
         <rect x="3" y="3" width="18" height="18" rx="2"/>
         <path d="M3 16l5-5 4 4 4-5 5 6"/>
@@ -1121,6 +1125,27 @@ function slideCarousel(id, dir) {
 
 function triggerFile(id) {
   document.getElementById('file-'+id)?.click();
+}
+
+function handleDrop(e, id) {
+  e.preventDefault();
+  e.stopPropagation();
+  const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+  if(!files.length) { showToast('Solo imágenes permitidas.'); return; }
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      if(!imageData[id]) imageData[id] = { images: [] };
+      if(!imageData[id].images) imageData[id].images = [];
+      const idx = imageData[id].images.length;
+      imageData[id].images.push({ url: ev.target.result, cloudinaryUrl: '' });
+      saveLocal();
+      refreshCarousel(id);
+      showToast('Subiendo a Cloudinary...');
+      uploadCloudinaryFile(id, file, idx);
+    };
+    reader.readAsDataURL(file);
+  });
 }
 
 function handleFile(event, id) {

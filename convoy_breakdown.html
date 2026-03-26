@@ -827,7 +827,8 @@ function init() {
   updateTabCounts();
   renderActive();
   updateStats();
-  loadJSONBin();
+  // Load from JSONBin — slight delay to ensure DOM is ready
+  setTimeout(loadJSONBin, 300);
 }
 
 function loadLocal() {
@@ -1320,19 +1321,26 @@ async function loadJSONBin() {
   if(!pipeline.binId || !pipeline.binKey) return;
   try {
     const res = await fetch('https://api.jsonbin.io/v3/b/' + pipeline.binId + '/latest', {
-      headers:{ 'X-Master-Key': pipeline.binKey }
+      method: 'GET',
+      headers:{
+        'X-Master-Key': pipeline.binKey,
+        'X-Bin-Meta': 'false'
+      }
     });
-    if(!res.ok) return;
+    if(!res.ok) {
+      console.warn('JSONBin load HTTP error:', res.status);
+      return;
+    }
     const data = await res.json();
-    const record = data.record;
+    const record = data.record || data;
     if(!record) return;
-    // Merge notes from JSONBin (remote wins over local)
+    // Merge notes — remote wins
     if(record.notes) {
       Object.entries(record.notes).forEach(([k,v]) => {
         if(v) notesData[k] = v;
       });
     }
-    // Merge cloudinary URLs from JSONBin
+    // Merge cloudinary URLs
     if(record.images) {
       Object.entries(record.images).forEach(([k,v]) => {
         const urls = Array.isArray(v) ? v : (typeof v === 'string' ? [v] : []);
@@ -1350,7 +1358,10 @@ async function loadJSONBin() {
     saveLocal();
     renderActive();
     updateStats();
-  } catch(e) { console.warn('JSONBin load failed', e); }
+    console.log('JSONBin loaded OK');
+  } catch(e) {
+    console.warn('JSONBin load failed:', e);
+  }
 }
 
 // ════════════════════════════════════════

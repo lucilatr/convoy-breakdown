@@ -307,6 +307,7 @@
     position: relative; width: 100%; background: var(--bg-card2);
     border-bottom: 1px solid var(--border);
   }
+  .carousel-wrap.drag-over { outline: 2px dashed var(--pink); }
   .carousel-track-outer {
     overflow: hidden; width: 100%;
   }
@@ -968,7 +969,11 @@ function buildItemCard(item) {
       </div>
       <span class="card-badge ${badgeClass}">${badgeLabel}</span>
     </div>
-    <div class="carousel-wrap" id="carousel-wrap-${item.id}">${buildCarousel(item.id)}</div>
+    <div class="carousel-wrap" id="carousel-wrap-${item.id}"
+      ondragover="event.preventDefault(); this.classList.add('drag-over')"
+      ondragleave="this.classList.remove('drag-over')"
+      ondrop="this.classList.remove('drag-over'); handleDrop(event, '${item.id}')"
+    >${buildCarousel(item.id)}</div>
     <div class="upload-status" id="status-${item.id}"></div>
     <input type="file" id="file-${item.id}" accept="image/*" multiple onchange="handleFile(event, '${item.id}')">
     <div class="card-body">
@@ -1012,7 +1017,11 @@ function buildEnvCard(item) {
       </div>
       <span class="card-badge ${badgeClass}">Environment</span>
     </div>
-    <div class="carousel-wrap" id="carousel-wrap-${item.id}">${buildCarousel(item.id)}</div>
+    <div class="carousel-wrap" id="carousel-wrap-${item.id}"
+      ondragover="event.preventDefault(); this.classList.add('drag-over')"
+      ondragleave="this.classList.remove('drag-over')"
+      ondrop="this.classList.remove('drag-over'); handleDrop(event, '${item.id}')"
+    >${buildCarousel(item.id)}</div>
     <div class="upload-status" id="status-${item.id}"></div>
     <input type="file" id="file-${item.id}" accept="image/*" multiple onchange="handleFile(event, '${item.id}')">
     <div class="card-body">

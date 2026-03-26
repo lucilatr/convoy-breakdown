@@ -195,7 +195,9 @@
   .card-vehicle {
     font-size: 13px; color: var(--pink); margin-top:5px;
     font-family: var(--fontb); font-weight: 500; letter-spacing:.3px;
+    cursor: pointer; display: inline-block;
   }
+  .card-vehicle:hover { text-decoration: underline; opacity: .8; }
   .card-badge {
     font-size: 10px; font-weight: 700; letter-spacing: 2px;
     text-transform: uppercase; padding: 3px 8px;
@@ -965,7 +967,7 @@ function buildItemCard(item) {
       <div>
         <div class="card-name">${item.name}</div>
         <div class="card-role">${item.role || item.sku || ''}</div>
-        ${item.vehicle ? `<div class="card-vehicle">${item.vehicle}</div>` : ''}
+        ${item.vehicle ? `<div class="card-vehicle" onclick="goToVehicle('${item.id}')">${item.vehicle}</div>` : ''}
       </div>
       <span class="card-badge ${badgeClass}">${badgeLabel}</span>
     </div>
@@ -1413,6 +1415,38 @@ function showToast(msg) {
   t.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(()=> t.classList.remove('show'), 3000);
+}
+
+// ════════════════════════════════════════
+// VEHICLE LINK — click vehicle name to jump to its card
+// ════════════════════════════════════════
+const VEHICLE_LINKS = {
+  'sean':       ['rover-6x6'],
+  'von-steele': ['dodge-durango'],
+};
+
+function goToVehicle(charId) {
+  const ids = VEHICLE_LINKS[charId];
+  if(!ids || !ids.length) return;
+  // Switch to vehicles tab
+  const vehicleBtn = document.querySelector('.tab-btn[onclick*="vehicles"]');
+  if(vehicleBtn) switchTab('vehicles', vehicleBtn);
+  // Reset chapter filter to show all
+  const allBtn = document.querySelector('.chapter-btn[onclick*="all"]');
+  if(allBtn) filterChapter('all', allBtn);
+  // Scroll to first vehicle card
+  setTimeout(() => {
+    const target = document.getElementById('card-' + ids[0]);
+    if(target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      target.style.borderColor = 'var(--pink)';
+      target.style.boxShadow = '0 0 0 2px var(--pink)';
+      setTimeout(() => {
+        target.style.borderColor = '';
+        target.style.boxShadow = '';
+      }, 2000);
+    }
+  }, 100);
 }
 
 // ════════════════════════════════════════

@@ -967,30 +967,15 @@ function buildItemCard(item) {
       </div>
       <span class="card-badge ${badgeClass}">${badgeLabel}</span>
     </div>
-    <div class="drop-zone ${hasImg ? 'has-image' : ''}" id="drop-${item.id}"
-         onclick="triggerFile('${item.id}')"
-         ondragover="onDragOver(event, '${item.id}')"
-         ondragleave="onDragLeave('${item.id}')"
-         ondrop="onDrop(event, '${item.id}')">
-      ${hasImg ? `<img src="${imgUrl}" alt="${item.name}">` : ''}
-      <svg class="drop-zone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 16l5-5 4 4 4-5 5 6"/><circle cx="8.5" cy="8.5" r="1.5"/>
-      </svg>
-      <div class="drop-zone-label">${hasImg ? 'Cambiar imagen' : 'Drop imagen o click'}</div>
-      <input type="file" id="file-${item.id}" accept="image/*" onchange="handleFile(event, '${item.id}')">
-    </div>
-    <div class="upload-status" id="status-${item.id}">
-      ${imageData[item.id]?.cloudinaryUrl ? '<span style="color:#00dc78">✓ Cloudinary</span>' : (hasImg ? 'Local — no subido' : '')}
-    </div>
+    <div class="carousel-wrap" id="carousel-wrap-${item.id}">${buildCarousel(item.id)}</div>
+    <div class="upload-status" id="status-${item.id}"></div>
+    <input type="file" id="file-${item.id}" accept="image/*" multiple onchange="handleFile(event, '${item.id}')">
     <div class="card-body">
       <div class="card-appearances">${epTags}</div>
       <div class="card-detail">${item.detail}</div>
       ${item.sku ? `<div class="card-sku">SKU: ${item.sku}</div>` : ''}
       <textarea class="notes-area" id="notes-${item.id}" placeholder="Notas de producción..."
         onblur="saveNotes('${item.id}')">${savedNotes}</textarea>
-    </div>
-    <div class="card-actions">
-      <button class="card-action-btn" onclick="triggerFile('${item.id}')">+ Imagen</button>
     </div>
   </div>`;
 }
@@ -1026,22 +1011,9 @@ function buildEnvCard(item) {
       </div>
       <span class="card-badge ${badgeClass}">Environment</span>
     </div>
-    <div class="drop-zone ${hasImg ? 'has-image' : ''}" id="drop-${item.id}"
-         style="height:180px"
-         onclick="triggerFile('${item.id}')"
-         ondragover="onDragOver(event, '${item.id}')"
-         ondragleave="onDragLeave('${item.id}')"
-         ondrop="onDrop(event, '${item.id}')">
-      ${hasImg ? `<img src="${imgUrl}" alt="${item.name}">` : ''}
-      <svg class="drop-zone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/>
-      </svg>
-      <div class="drop-zone-label">${hasImg ? 'Cambiar imagen' : 'Drop reference art'}</div>
-      <input type="file" id="file-${item.id}" accept="image/*" onchange="handleFile(event, '${item.id}')">
-    </div>
-    <div class="upload-status" id="status-${item.id}">
-      ${imageData[item.id]?.cloudinaryUrl ? '<span style="color:#00dc78">✓ Cloudinary</span>' : (hasImg ? 'Local — no subido' : '')}
-    </div>
+    <div class="carousel-wrap" id="carousel-wrap-${item.id}">${buildCarousel(item.id)}</div>
+    <div class="upload-status" id="status-${item.id}"></div>
+    <input type="file" id="file-${item.id}" accept="image/*" multiple onchange="handleFile(event, '${item.id}')">
     <div class="card-body">
       <div class="card-appearances">${epTags}</div>
       <div class="card-detail">${item.detail}</div>

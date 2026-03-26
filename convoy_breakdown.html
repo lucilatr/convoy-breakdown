@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CONVOY — Production Breakdown</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pink: #FF0066;
+    --pink-dim: rgba(255,0,102,0.15);
+    --pink-glow: rgba(255,0,102,0.4);
+    --bg: #0a0a0a;
+    --bg-card: #111111;
+    --bg-card2: #181818;
+    --border: rgba(255,255,255,0.08);
+    --border-pink: rgba(255,0,102,0.3);
+    --text: #f0f0f0;
+    --text-dim: #888;
+    --text-muted: #555;
+    --font: 'Barlow Condensed', sans-serif;
+    --fontb: 'Barlow', sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── PASSWORD SCREEN ─── */
+  #lock-screen {
+    position: fixed; inset:0; z-index:1000;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 32px;
+  }
+  .lock-logo {
+    font-size: 72px; font-weight: 900; letter-spacing: -2px;
+    color: var(--text);
+    line-height: 1;
+  }
+  .lock-logo span { color: var(--pink); }
+  .lock-sub {
+    font-size: 13px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--text-dim); font-family: var(--fontb); font-weight: 400;
+  }
+  .lock-form { display:flex; flex-direction:column; gap:12px; width:280px; }
+  .lock-form input {
+    background: var(--bg-card); border: 1px solid var(--border);
+    color: var(--text); font-family: var(--font); font-size: 18px;
+    letter-spacing: 6px; padding: 14px 18px; text-align:center;
+    outline: none; transition: border-color .2s;
+  }
+  .lock-form input:focus { border-color: var(--pink); }
+  .lock-form input::placeholder { letter-spacing: 2px; color: var(--text-muted); font-size:14px; }
+  .lock-btn {
+    background: var(--pink); color: #fff; border:none;
+    font-family: var(--font); font-size: 16px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase; padding: 14px;
+    cursor: pointer; transition: opacity .2s;
+  }
+  .lock-btn:hover { opacity: .85; }
+  .lock-err { font-size:13px; color:var(--pink); text-align:center; font-family:var(--fontb); min-height:18px; }
+  .lock-divider {
+    width: 280px; height: 1px; background: var(--border);
+    position: relative; margin: 8px 0;
+  }
+
+  /* ─── MAIN APP ─── */
+  #app { display:none; }
+
+  /* TOP BAR */
+  .topbar {
+    position: sticky; top:0; z-index:100;
+    background: rgba(10,10,10,0.95); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px; height: 56px;
+  }
+  .topbar-logo {
+    font-size: 28px; font-weight: 900; letter-spacing: -1px;
+    color: var(--text);
+  }
+  .topbar-logo span { color: var(--pink); }
+  .topbar-meta {
+    font-size: 12px; letter-spacing: 3px; color: var(--text-dim);
+    text-transform: uppercase; font-family: var(--fontb);
+  }
+  .topbar-right { display:flex; align-items:center; gap:16px; }
+  .topbar-export {
+    background: transparent; border: 1px solid var(--pink);
+    color: var(--pink); font-family: var(--font); font-size: 13px;
+    font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    padding: 7px 16px; cursor: pointer; transition: all .2s;
+  }
+  .topbar-export:hover { background: var(--pink); color: #fff; }
+
+  /* CHAPTER FILTER */
+  .chapter-bar {
+    padding: 20px 32px 0;
+    display: flex; align-items: center; gap: 8px; flex-wrap:wrap;
+  }
+  .chapter-label {
+    font-size: 11px; letter-spacing: 3px; text-transform:uppercase;
+    color: var(--text-muted); font-family: var(--fontb); margin-right:4px;
+  }
+  .chapter-btn {
+    background: var(--bg-card); border: 1px solid var(--border);
+    color: var(--text-dim); font-family: var(--font); font-size: 13px;
+    font-weight: 600; letter-spacing: 1px; padding: 5px 14px;
+    cursor: pointer; transition: all .15s; text-transform: uppercase;
+  }
+  .chapter-btn:hover { border-color: var(--pink); color: var(--pink); }
+  .chapter-btn.active {
+    background: var(--pink); border-color: var(--pink);
+    color: #fff;
+  }
+
+  /* TAB NAV */
+  .tab-nav {
+    padding: 24px 32px 0;
+    display: flex; align-items: flex-end; gap: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .tab-btn {
+    background: transparent; border: none; border-bottom: 2px solid transparent;
+    color: var(--text-muted); font-family: var(--font); font-size: 16px;
+    font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    padding: 10px 24px 12px; cursor: pointer; transition: all .15s;
+    position: relative; bottom: -1px;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active {
+    color: var(--pink); border-bottom-color: var(--pink);
+  }
+  .tab-count {
+    display:inline-block; background: var(--bg-card2);
+    border: 1px solid var(--border); color: var(--text-dim);
+    font-size: 11px; padding: 1px 6px; margin-left:6px;
+    font-weight: 600; vertical-align: middle;
+  }
+  .tab-btn.active .tab-count { background: var(--pink-dim); border-color: var(--border-pink); color: var(--pink); }
+
+  /* SECTION CONTENT */
+  .section-content { padding: 28px 32px 48px; }
+
+  /* STATS ROW */
+  .stats-row {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    padding: 16px 20px;
+  }
+  .stat-label {
+    font-size: 10px; letter-spacing: 3px; text-transform:uppercase;
+    color: var(--text-muted); font-family: var(--fontb); margin-bottom:6px;
+  }
+  .stat-num {
+    font-size: 36px; font-weight: 900; color: var(--text); line-height:1;
+  }
+  .stat-num.pink { color: var(--pink); }
+
+  /* GRID LAYOUT */
+  .cards-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  /* CHARACTER / ASSET CARD */
+  .item-card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    transition: border-color .2s; overflow: hidden;
+  }
+  .item-card:hover { border-color: var(--border-pink); }
+
+  .card-header {
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 8px;
+  }
+  .card-name {
+    font-size: 20px; font-weight: 800; letter-spacing: .5px;
+    color: var(--text); text-transform: uppercase; line-height:1.1;
+  }
+  .card-role {
+    font-size: 12px; color: var(--text-muted); margin-top:3px;
+    font-family: var(--fontb); text-transform: uppercase; letter-spacing:2px;
+  }
+  .card-vehicle {
+    font-size: 13px; color: var(--pink); margin-top:5px;
+    font-family: var(--fontb); font-weight: 500; letter-spacing:.3px;
+  }
+  .card-badge {
+    font-size: 10px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; padding: 3px 8px;
+    white-space: nowrap; flex-shrink:0;
+  }
+  .badge-character { background: var(--pink-dim); color: var(--pink); border: 1px solid var(--border-pink); }
+  .badge-vehicle { background: rgba(0,180,255,0.1); color: #00b4ff; border: 1px solid rgba(0,180,255,0.25); }
+  .badge-env { background: rgba(0,220,120,0.1); color: #00dc78; border: 1px solid rgba(0,220,120,0.25); }
+  .badge-villain { background: rgba(255,80,0,0.1); color: #ff5000; border: 1px solid rgba(255,80,0,0.25); }
+
+  /* IMAGE DROP ZONE */
+  .drop-zone {
+    width: 100%; height: 140px;
+    background: var(--bg-card2); border: 1px dashed var(--border);
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 6px; cursor: pointer;
+    transition: all .2s; position: relative; overflow: hidden;
+  }
+  .drop-zone:hover { border-color: var(--pink); background: rgba(255,0,102,0.04); }
+  .drop-zone.drag-over { border-color: var(--pink); background: var(--pink-dim); }
+  .drop-zone.has-image { border-style: solid; border-color: var(--border); }
+  .drop-zone img {
+    position: absolute; inset:0; width:100%; height:100%;
+    object-fit: contain; opacity:1; padding: 8px;
+  }
+  .drop-zone-label {
+    font-size: 11px; color: var(--text-muted); letter-spacing:2px;
+    text-transform: uppercase; font-family: var(--fontb); text-align:center;
+    position: relative; z-index:1; pointer-events: none;
+  }
+  .drop-zone-icon {
+    width: 24px; height: 24px; position: relative; z-index:1;
+    opacity: .4;
+  }
+  .drop-zone:hover .drop-zone-label, .drop-zone:hover .drop-zone-icon { opacity:.9; }
+  .drop-zone.has-image .drop-zone-label { background: rgba(0,0,0,0.6); padding:3px 8px; }
+  .drop-zone input[type=file] { display:none; }
+
+  /* CARD BODY */
+  .card-body { padding: 14px 18px; }
+  .card-appearances {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px;
+  }
+  .ep-tag {
+    font-size: 10px; font-weight: 700; letter-spacing: 1px;
+    background: var(--bg-card2); border: 1px solid var(--border);
+    color: var(--text-muted); padding: 2px 7px; text-transform: uppercase;
+  }
+  .ep-tag.present { border-color: var(--border-pink); color: var(--pink); background: var(--pink-dim); }
+
+  .card-detail {
+    font-size: 13px; color: var(--text-dim); font-family: var(--fontb);
+    line-height: 1.5; margin-bottom: 10px;
+  }
+  .card-sku {
+    font-size: 11px; color: var(--text-muted); font-family: var(--fontb);
+    letter-spacing: 1px; font-weight: 500;
+  }
+  .card-actions {
+    display: flex; gap: 8px; padding: 12px 18px;
+    border-top: 1px solid var(--border);
+  }
+  .card-action-btn {
+    flex:1; background: transparent; border: 1px solid var(--border);
+    color: var(--text-muted); font-family: var(--font); font-size: 12px;
+    font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    padding: 7px; cursor: pointer; transition: all .15s;
+  }
+  .card-action-btn:hover { border-color: var(--pink); color: var(--pink); }
+  .card-action-btn.primary { background: var(--pink); border-color: var(--pink); color:#fff; }
+  .card-action-btn.primary:hover { opacity:.85; }
+
+  /* UPLOAD STATUS */
+  .upload-status {
+    font-size: 11px; text-align:center; padding: 4px 18px 8px;
+    font-family: var(--fontb); min-height: 22px;
+    color: var(--text-muted);
+  }
+  .upload-status.ok { color: #00dc78; }
+  .upload-status.err { color: var(--pink); }
+
+  /* ENV CARD - wider */
+  .env-card { background: var(--bg-card); border: 1px solid var(--border); }
+  .env-header {
+    padding: 16px 18px 12px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .env-name { font-size: 20px; font-weight: 800; text-transform: uppercase; }
+  .env-drop {
+    width: 100%; height: 180px;
+    background: var(--bg-card2); border-bottom: 1px solid var(--border);
+    display: flex; align-items:center; justify-content:center;
+    flex-direction:column; gap:6px; cursor:pointer; transition: all .2s;
+    position: relative; overflow:hidden;
+  }
+  .env-drop:hover { background: rgba(255,0,102,0.04); }
+  .env-drop img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:.65; }
+  .env-drop input[type=file] { display:none; }
+  .env-body { padding: 14px 18px; }
+  .env-eps {
+    display: flex; flex-wrap:wrap; gap:5px; margin-bottom: 10px;
+  }
+  .env-detail { font-size:13px; color:var(--text-dim); font-family:var(--fontb); line-height:1.5; }
+
+  /* NOTES TEXTAREA */
+  .notes-area {
+    width:100%; background: var(--bg-card2); border: 1px solid var(--border);
+    color: var(--text); font-family: var(--fontb); font-size: 13px;
+    padding: 10px 14px; resize: vertical; min-height: 60px; outline:none;
+    transition: border-color .2s; margin-top:10px;
+  }
+  .notes-area:focus { border-color: var(--pink); }
+
+  /* NOTIFICATION TOAST */
+  #toast {
+    position: fixed; bottom: 28px; right: 28px; z-index:9999;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-left: 3px solid var(--pink);
+    padding: 14px 20px; font-family: var(--fontb); font-size: 13px;
+    color: var(--text); max-width: 320px; opacity:0;
+    transform: translateY(12px); transition: all .3s;
+    pointer-events: none;
+  }
+  #toast.show { opacity:1; transform:translateY(0); }
+
+  /* SEARCH */
+  .search-bar {
+    display:flex; gap:10px; align-items:center; margin-bottom: 20px;
+  }
+  .search-input {
+    flex:1; background: var(--bg-card); border: 1px solid var(--border);
+    color: var(--text); font-family: var(--fontb); font-size: 14px;
+    padding: 9px 16px; outline:none; transition: border-color .2s;
+  }
+  .search-input:focus { border-color: var(--pink); }
+  .search-input::placeholder { color: var(--text-muted); }
+
+  /* PROGRESS BAR */
+  .progress-row { display:flex; align-items:center; gap:10px; margin-bottom: 20px; }
+  .progress-bar-wrap {
+    flex:1; height:3px; background: var(--border);
+  }
+  .progress-bar-fill {
+    height:100%; background: var(--pink); transition: width .5s;
+  }
+  .progress-label { font-size:12px; color:var(--text-muted); font-family:var(--fontb); white-space:nowrap; }
+
+  /* SECTION DIVIDER */
+  .section-title {
+    font-size: 11px; letter-spacing:4px; text-transform:uppercase;
+    color: var(--text-muted); font-family: var(--fontb);
+    padding-bottom: 12px; border-bottom: 1px solid var(--border);
+    margin-bottom: 16px; margin-top: 28px;
+  }
+  .section-title:first-child { margin-top:0; }
+
+  /* PIPELINE CONFIG MODAL */
+  .modal-overlay {
+    position:fixed; inset:0; z-index:500; background:rgba(0,0,0,.75);
+    display:none; align-items:center; justify-content:center;
+  }
+  .modal-overlay.open { display:flex; }
+  .modal-box {
+    background: var(--bg-card); border: 1px solid var(--border);
+    width: 520px; max-width: 95vw; max-height: 85vh; overflow-y:auto;
+  }
+  .modal-header {
+    padding: 20px 24px; border-bottom: 1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .modal-title { font-size:22px; font-weight:800; letter-spacing:1px; text-transform:uppercase; }
+  .modal-close {
+    background:transparent; border:none; color:var(--text-muted);
+    font-size:24px; cursor:pointer; line-height:1; padding:4px;
+  }
+  .modal-close:hover { color:var(--pink); }
+  .modal-body { padding: 24px; display:flex; flex-direction:column; gap:18px; }
+  .modal-field label {
+    display:block; font-size:11px; letter-spacing:3px; text-transform:uppercase;
+    color:var(--text-muted); font-family:var(--fontb); margin-bottom:7px;
+  }
+  .modal-field input, .modal-field select {
+    width:100%; background:var(--bg-card2); border:1px solid var(--border);
+    color:var(--text); font-family:var(--fontb); font-size:14px;
+    padding:10px 14px; outline:none; transition:border-color .2s;
+  }
+  .modal-field input:focus, .modal-field select:focus { border-color:var(--pink); }
+  .modal-field select { cursor:pointer; }
+  .modal-field select option { background:var(--bg-card); }
+  .modal-save {
+    width:100%; background:var(--pink); color:#fff; border:none;
+    font-family:var(--font); font-size:16px; font-weight:800;
+    letter-spacing:3px; text-transform:uppercase; padding:14px;
+    cursor:pointer; transition:opacity .2s;
+  }
+  .modal-save:hover { opacity:.85; }
+  .pipeline-status {
+    display:flex; gap:8px; align-items:center;
+    padding: 12px 14px; background: var(--bg-card2); border:1px solid var(--border);
+  }
+  .pipe-dot {
+    width:8px; height:8px; border-radius:50%; background:var(--text-muted);
+  }
+  .pipe-dot.ok { background:#00dc78; }
+  .pipe-dot.err { background:var(--pink); }
+  .pipe-text { font-size:12px; color:var(--text-dim); font-family:var(--fontb); }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width:4px; height:4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--pink); }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .topbar { padding: 0 16px; }
+    .chapter-bar, .section-content, .tab-nav { padding-left:16px; padding-right:16px; }
+    .stats-row { grid-template-columns: repeat(2,1fr); }
+    .cards-grid { grid-template-columns: 1fr; }
+  }
+
+  /* HIDDEN */
+  .hidden { display:none !important; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════ LOCK SCREEN ══════════════ -->
+<div id="lock-screen">
+  <div class="lock-logo">CONV<span>O</span>Y</div>
+  <div class="lock-sub">Production Breakdown — Confidential</div>
+  <div class="lock-divider"></div>
+  <div class="lock-form">
+    <input type="password" id="pwd-input" placeholder="Enter password" autocomplete="off">
+    <button class="lock-btn" onclick="checkPwd()">Enter</button>
+    <div class="lock-err" id="pwd-err"></div>
+  </div>
+</div>
+
+<!-- ══════════════ MAIN APP ══════════════ -->
+<div id="app">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-logo">CONV<span>O</span>Y</div>
+    <div class="topbar-meta">Matchbox Adventure Squad · S01 · v1.0</div>
+    <div class="topbar-right">
+      <button class="topbar-export" onclick="openPipeline()">⚙ Pipeline</button>
+      <button class="topbar-export" onclick="exportZip()">↓ Export ZIP</button>
+      <button class="topbar-export" style="border-color:rgba(255,255,255,0.2);color:rgba(255,255,255,0.4);" onclick="resetAll()">↺ Limpiar</button>
+    </div>
+  </div>
+
+  <!-- CHAPTER FILTER -->
+  <div class="chapter-bar">
+    <span class="chapter-label">Capítulo</span>
+    <button class="chapter-btn active" onclick="filterChapter('all', this)">Todos</button>
+    <button class="chapter-btn" onclick="filterChapter('ep101', this)">Ep 101 — Bridge of Super Spies</button>
+    <button class="chapter-btn" onclick="filterChapter('ep102', this)">Ep 102 — The Jungle Chase</button>
+    <button class="chapter-btn" onclick="filterChapter('ep103', this)">Ep 103 — Fireworks Firefighting</button>
+  </div>
+
+  <!-- TAB NAV -->
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('characters', this)">
+      Characters <span class="tab-count" id="tc-chars">6</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('vehicles', this)">
+      Vehicles <span class="tab-count" id="tc-vehicles">0</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('environments', this)">
+      Environments <span class="tab-count" id="tc-envs">0</span>
+    </button>
+  </div>
+
+  <!-- SECTION CONTENT -->
+  <div class="section-content">
+
+    <!-- STATS -->
+    <div class="stats-row" id="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Total Assets</div>
+        <div class="stat-num pink" id="stat-total">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Con Imagen</div>
+        <div class="stat-num" id="stat-imaged">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pendientes</div>
+        <div class="stat-num" id="stat-pending">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Capítulos</div>
+        <div class="stat-num">3 / 8</div>
+      </div>
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="progress-row">
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="progress-label" id="progress-label">0% completado</div>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="search-bar">
+      <input class="search-input" type="text" id="search-input" placeholder="Buscar personaje, vehículo, ambiente..." oninput="renderActive()">
+    </div>
+
+    <!-- CHARACTERS TAB -->
+    <div id="tab-characters" class="tab-panel">
+      <div id="chars-grid" class="cards-grid"></div>
+    </div>
+
+    <!-- VEHICLES TAB -->
+    <div id="tab-vehicles" class="tab-panel hidden">
+      <div id="vehicles-grid" class="cards-grid"></div>
+    </div>
+
+    <!-- ENVIRONMENTS TAB -->
+    <div id="tab-environments" class="tab-panel hidden">
+      <div id="envs-grid" class="cards-grid"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════ PIPELINE MODAL ══════════════ -->
+<div class="modal-overlay" id="pipeline-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">Pipeline Config</div>
+      <button class="modal-close" onclick="closePipeline()">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:13px;color:var(--text-muted);font-family:var(--fontb);">
+        Configurá las integraciones de almacenamiento. Los cambios se guardan en localStorage.
+      </div>
+
+      <div class="modal-field">
+        <label>Cloudinary Cloud Name</label>
+        <input type="text" id="cf-cloud" placeholder="my-cloud-name">
+      </div>
+      <div class="modal-field">
+        <label>Cloudinary Upload Preset (unsigned)</label>
+        <input type="text" id="cf-preset" placeholder="breakdown_preset">
+      </div>
+      <div class="modal-field">
+        <label>JSONBin Bin ID</label>
+        <input type="text" id="jb-bin" placeholder="64abc123def456...">
+      </div>
+      <div class="modal-field">
+        <label>JSONBin API Key</label>
+        <input type="text" id="jb-key" placeholder="$2a$10$...">
+      </div>
+
+      <div class="pipeline-status">
+        <div class="pipe-dot" id="pipe-dot-cf"></div>
+        <div class="pipe-text" id="pipe-text-cf">Cloudinary: no configurado</div>
+      </div>
+      <div class="pipeline-status">
+        <div class="pipe-dot" id="pipe-dot-jb"></div>
+        <div class="pipe-text" id="pipe-text-jb">JSONBin: no configurado</div>
+      </div>
+
+      <button class="modal-save" onclick="savePipeline()">Guardar Configuración</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════
+const EPISODES = ['ep101','ep102','ep103'];
+const EP_LABELS = { ep101:'Ep 101', ep102:'Ep 102', ep103:'Ep 103' };
+
+const CHARACTERS = [
+  {
+    id:'sean', name:'Sean', role:'Lead — The Spy Kid',
+    vehicle:'Drives Rover 6x6',
+    badge:'character',
+    detail:'Protagonist. Plays as both himself and villain Von Steele (eyepatch). Recurring across all episodes.',
+    episodes: ['ep101','ep102','ep103'],
+    notes: ''
+  },
+  {
+    id:'ted', name:'Ted', role:'Fire & Rescue Lead',
+    vehicle:'Drives Blaze Blaster III & Triumph Scrambler',
+    badge:'character',
+    detail:'Commands fire rescue ops. Wears full firefighter gear including helmet.',
+    episodes: ['ep101','ep102','ep103'],
+    notes: ''
+  },
+  {
+    id:'charmaine', name:'Charmaine', role:'Air Support',
+    vehicle:'Pilots Rescue Helicopter & Super Hercules',
+    badge:'character',
+    detail:'Aerial recon, water bucket drops and cargo extractions. Uses headset.',
+    episodes: ['ep101','ep102','ep103'],
+    notes: ''
+  },
+  {
+    id:'aimee', name:'Aimee', role:'Speed & Logistics',
+    vehicle:'Drives Ambulance, Toyota Tacoma & Chevy Stock Car',
+    badge:'character',
+    detail:'Fast and resourceful. Handles crowd control, medical support and high-speed chases.',
+    episodes: ['ep101','ep102','ep103'],
+    notes: ''
+  },
+  {
+    id:'crosby', name:'Crosby', role:'Construction & Heavy',
+    vehicle:'Operates Excavator & Turf Hauler',
+    badge:'character',
+    detail:'Engineering mindset. Demolition and heavy construction rigs. Wears orange hard hat.',
+    episodes: ['ep101','ep102','ep103'],
+    notes: ''
+  },
+  {
+    id:'von-steele', name:'Von Steele', role:'Villain — Super-Spy Criminal',
+    vehicle:'Drives black Dodge Durango',
+    badge:'villain',
+    detail:'Sean playing villain with eyepatch. Recurring antagonist across all episodes.',
+    episodes: ['ep101','ep102','ep103'],
+    notes: ''
+  }
+];
+
+const VEHICLES = [
+  // Ep 101
+  { id:'rover-6x6', name:'Rover 6x6', sku:'JKH28', badge:'vehicle', detail:"Sean's primary pursuit vehicle. Appears in all 3 episodes.", episodes:['ep101','ep102','ep103'], notes:'' },
+  { id:'rescue-heli', name:'Rescue Helicopter', sku:'JKH39', badge:'vehicle', detail:'Charmaine. Air support, cargo drops, water bucket. Appears in all 3 eps.', episodes:['ep101','ep102','ep103'], notes:'' },
+  { id:'dodge-durango', name:'Dodge Durango', sku:'HFP46', badge:'vehicle', detail:"Von Steele's black villain vehicle. Recurring across all eps.", episodes:['ep101','ep102','ep103'], notes:'' },
+  { id:'plowverizer', name:'Plowverizer', sku:'JHN22', badge:'vehicle', detail:'Heavy plow truck. Ep 101 bridge chase. Von Steele escape vehicle.', episodes:['ep101'], notes:'' },
+  { id:'f650-rollback', name:'F-650 Rollback', sku:'JKH49', badge:'vehicle', detail:'Tow truck. Ep 101 bridge construction sequence.', episodes:['ep101'], notes:'' },
+  { id:'skidster', name:'Skidster', sku:'JBW03', badge:'vehicle', detail:'Compact loader. Ep 101 bridge gap creation.', episodes:['ep101'], notes:'' },
+  { id:'excavator', name:'Excavator', sku:'JKH38', badge:'vehicle', detail:'Crosby. Ep 101 bridge demolition and pursuit. Key to trap.', episodes:['ep101'], notes:'' },
+  { id:'turf-hauler', name:'Turf Hauler', sku:'HFB90', badge:'vehicle', detail:'Construction hauler. Ep 101 bridge rubble.', episodes:['ep101'], notes:'' },
+  { id:'mustang-fastback', name:'Mustang Fastback', sku:'JKH34', badge:'vehicle', detail:"Aimee's signature vehicle. Ep 101.", episodes:['ep101'], notes:'' },
+  { id:'triumph-scrambler', name:'Triumph Scrambler', sku:'JKH31', badge:'vehicle', detail:"Ted's motorcycle. Eps 101 & 102. Used for jungle rescue.", episodes:['ep101','ep102'], notes:'' },
+  // Ep 102
+  { id:'toyota-tacoma', name:'Toyota Tacoma', sku:'JMB54', badge:'vehicle', detail:"Aimee's jungle truck. Carries the secret crate. Ep 102.", episodes:['ep102'], notes:'' },
+  { id:'chevy-stock', name:'Chevy Stock Car', sku:'JKH33', badge:'vehicle', detail:"Aimee's fast car swap. Ep 102 jungle sprint.", episodes:['ep102'], notes:'' },
+  { id:'polaris-rzr', name:'Polaris RZR', sku:'BL251', badge:'vehicle', detail:"Von Steele's lumberjack henchmen. Chainsaw attachments (paperclip). Ep 102.", episodes:['ep102'], notes:'' },
+  { id:'super-hercules', name:'Super Hercules', sku:'JKH51', badge:'vehicle', detail:"Charmaine's cargo plane. Ep 102 extraction mission.", episodes:['ep102'], notes:'' },
+  { id:'mountain-escape', name:'Mountain Escape Getaway', sku:'JMG57', badge:'vehicle', detail:'Playset. Multi-level ramp chase. Ep 102 finale.', episodes:['ep102'], notes:'' },
+  // Ep 103
+  { id:'blaze-blaster', name:'Blaze Blaster III', sku:'JHN10', badge:'vehicle', detail:"Ted's primary fire engine. Ep 103.", episodes:['ep103'], notes:'' },
+  { id:'blaze-buster', name:'Blaze Buster', sku:'HVP56', badge:'vehicle', detail:"Crosby's fire engine. Ep 103.", episodes:['ep103'], notes:'' },
+  { id:'dodge-ambulance', name:'2019 Dodge Ambulance', sku:'JKH45', badge:'vehicle', detail:"Aimee's medical/crowd control. Ep 103.", episodes:['ep103'], notes:'' },
+  { id:'mountain-convoy', name:'Mountain Convoy Pursuit', sku:'JJB32', badge:'vehicle', detail:"Sean's massive truck / Secret Hideout. Ep 103 water tower sequence.", episodes:['ep103'], notes:'' },
+];
+
+const ENVIRONMENTS = [
+  {
+    id:'smalleys-garage', name:"Smalley's Garage", badge:'env',
+    detail:'INT. Hub location. Professional mechanic garage converted into ultimate Matchbox play space. Large central diorama table. Appears in ALL episodes as Real World framing device.',
+    episodes:['ep101','ep102','ep103'], notes:''
+  },
+  {
+    id:'matchbox-bridge', name:'Matchbox Bridge', badge:'env',
+    detail:'EXT. Under-construction highway bridge over river. Two-lane narrows, construction debris, Excavators, rebar, missing sections. Matchbox City skyline in BG. Ep 101.',
+    episodes:['ep101'], notes:''
+  },
+  {
+    id:'matchbox-city', name:'Matchbox City', badge:'env',
+    detail:'EXT. Clean metropolitan skyline. End destination for bridge chase. Background presence in multiple eps.',
+    episodes:['ep101','ep103'], notes:''
+  },
+  {
+    id:'jungle', name:'Adventure World Jungle', badge:'env',
+    detail:'EXT. Dense tropical jungle. Wet dirt roads, dilapidated bridges, airfield clearing, cliff edges, bamboo walls. Ep 102 primary location.',
+    episodes:['ep102'], notes:''
+  },
+  {
+    id:'airfield', name:'Jungle Airfield', badge:'env',
+    detail:'EXT. Narrow clearing in jungle. Makeshift landing strip. Tree obstacles, dirt runway. Ep 102.',
+    episodes:['ep102'], notes:''
+  },
+  {
+    id:'lower-roadway', name:'Lower Roadway / Underground', badge:'env',
+    detail:'EXT. Industrial underground road level (Upper/Lower Wacker concept). Car elevator entrance. Von Steele secret hideout. Ep 103.',
+    episodes:['ep103'], notes:''
+  },
+  {
+    id:'fireworks-factory', name:'Fireworks Factory', badge:'env',
+    detail:'EXT. Industrial building on fire. Steep San Francisco-style hill approach. Water tower nearby. Ep 103 primary action location.',
+    episodes:['ep103'], notes:''
+  },
+];
+
+// ════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════
+let currentChapter = 'all';
+let currentTab = 'characters';
+let imageData = {}; // id -> { url, cloudinaryUrl }
+let notesData = {}; // id -> string
+let pipeline = {
+  cloudName: 'duvgxho7s',
+  preset: 'convoy_preset',
+  binId: '69c55584b7ec241ddca7651b',
+  binKey: '$2a$10$G/S5QC8pq2vpHyiOEdxjp.rmJOR4deLMjyDvs1.Zq7W9dMQt9uqQq'
+};
+
+// ════════════════════════════════════════
+// AUTH
+// ════════════════════════════════════════
+const PASS = 'Matchbox';
+function checkPwd() {
+  const v = document.getElementById('pwd-input').value;
+  if(v === PASS) {
+    document.getElementById('lock-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    init();
+  } else {
+    document.getElementById('pwd-err').textContent = 'Contraseña incorrecta.';
+    document.getElementById('pwd-input').value = '';
+    setTimeout(()=> document.getElementById('pwd-err').textContent='', 2000);
+  }
+}
+document.getElementById('pwd-input').addEventListener('keydown', e => {
+  if(e.key === 'Enter') checkPwd();
+});
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+function init() {
+  loadLocal();
+  loadPipelineConfig();
+  updateTabCounts();
+  renderActive();
+  updateStats();
+  loadJSONBin();
+}
+
+function loadLocal() {
+  try {
+    const img = localStorage.getItem('convoy_images');
+    if(img) {
+      const parsed = JSON.parse(img);
+      Object.entries(parsed).forEach(([k,v]) => {
+        imageData[k] = {
+          cloudinaryUrl: v.cloudinaryUrl||'',
+          url: v.cloudinaryUrl||''
+        };
+      });
+    }
+    const nts = localStorage.getItem('convoy_notes');
+    if(nts) notesData = JSON.parse(nts);
+    const pipe = localStorage.getItem('convoy_pipeline');
+    if(pipe) pipeline = JSON.parse(pipe);
+  } catch(e) {}
+}
+
+function saveLocal() {
+  // Strip base64 before saving to localStorage — only keep cloudinary URLs
+  const lightImages = {};
+  Object.entries(imageData).forEach(([k,v]) => {
+    lightImages[k] = { cloudinaryUrl: v.cloudinaryUrl||'' };
+  });
+  localStorage.setItem('convoy_images', JSON.stringify(lightImages));
+  localStorage.setItem('convoy_notes', JSON.stringify(notesData));
+}
+
+// ════════════════════════════════════════
+// FILTERS & TABS
+// ════════════════════════════════════════
+function filterChapter(ch, btn) {
+  currentChapter = ch;
+  document.querySelectorAll('.chapter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  updateTabCounts();
+  renderActive();
+  updateStats();
+}
+
+function switchTab(tab, btn) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+  document.getElementById('tab-'+tab).classList.remove('hidden');
+  renderActive();
+}
+
+function filterByChapter(arr) {
+  if(currentChapter === 'all') return arr;
+  return arr.filter(item => item.episodes.includes(currentChapter));
+}
+
+function filterBySearch(arr) {
+  const q = document.getElementById('search-input').value.toLowerCase().trim();
+  if(!q) return arr;
+  return arr.filter(item =>
+    item.name.toLowerCase().includes(q) ||
+    item.detail.toLowerCase().includes(q) ||
+    (item.sku && item.sku.toLowerCase().includes(q)) ||
+    (item.role && item.role.toLowerCase().includes(q))
+  );
+}
+
+function getFiltered(arr) {
+  return filterBySearch(filterByChapter(arr));
+}
+
+function updateTabCounts() {
+  document.getElementById('tc-chars').textContent = getFiltered(CHARACTERS).length;
+  document.getElementById('tc-vehicles').textContent = getFiltered(VEHICLES).length;
+  document.getElementById('tc-envs').textContent = getFiltered(ENVIRONMENTS).length;
+}
+
+function renderActive() {
+  updateTabCounts();
+  if(currentTab === 'characters') renderCharacters();
+  if(currentTab === 'vehicles') renderVehicles();
+  if(currentTab === 'environments') renderEnvironments();
+  updateStats();
+}
+
+// ════════════════════════════════════════
+// STATS & PROGRESS
+// ════════════════════════════════════════
+function updateStats() {
+  const all = [...getFiltered(CHARACTERS), ...getFiltered(VEHICLES), ...getFiltered(ENVIRONMENTS)];
+  const total = all.length;
+  const imaged = all.filter(a => imageData[a.id]?.url).length;
+  const pending = total - imaged;
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-imaged').textContent = imaged;
+  document.getElementById('stat-pending').textContent = pending;
+  const pct = total > 0 ? Math.round((imaged/total)*100) : 0;
+  document.getElementById('progress-fill').style.width = pct+'%';
+  document.getElementById('progress-label').textContent = pct+'% completado';
+}
+
+// ════════════════════════════════════════
+// RENDER CHARACTER CARDS
+// ════════════════════════════════════════
+function renderCharacters() {
+  const grid = document.getElementById('chars-grid');
+  const items = getFiltered(CHARACTERS);
+  if(!items.length) { grid.innerHTML = '<div style="color:var(--text-muted);font-family:var(--fontb);padding:20px;">Sin resultados.</div>'; return; }
+  grid.innerHTML = items.map(c => buildItemCard(c)).join('');
+  attachCardEvents(items);
+}
+
+function renderVehicles() {
+  const grid = document.getElementById('vehicles-grid');
+  const items = getFiltered(VEHICLES);
+  if(!items.length) { grid.innerHTML = '<div style="color:var(--text-muted);font-family:var(--fontb);padding:20px;">Sin resultados.</div>'; return; }
+  grid.innerHTML = items.map(v => buildItemCard(v)).join('');
+  attachCardEvents(items);
+}
+
+function buildItemCard(item) {
+  const imgUrl = imageData[item.id]?.url || '';
+  const hasImg = !!imgUrl;
+  const savedNotes = notesData[item.id] || '';
+  const epTags = EPISODES.map(ep =>
+    `<span class="ep-tag ${item.episodes.includes(ep) ? 'present' : ''}">${EP_LABELS[ep]}</span>`
+  ).join('');
+  const badgeClass = `badge-${item.badge}`;
+  const badgeLabel = item.badge === 'villain' ? 'Villain' :
+                     item.badge === 'vehicle' ? 'Vehicle' : 'Character';
+
+  return `
+  <div class="item-card" id="card-${item.id}">
+    <div class="card-header">
+      <div>
+        <div class="card-name">${item.name}</div>
+        <div class="card-role">${item.role || item.sku || ''}</div>
+        ${item.vehicle ? `<div class="card-vehicle">${item.vehicle}</div>` : ''}
+      </div>
+      <span class="card-badge ${badgeClass}">${badgeLabel}</span>
+    </div>
+    <div class="drop-zone ${hasImg ? 'has-image' : ''}" id="drop-${item.id}"
+         onclick="triggerFile('${item.id}')"
+         ondragover="onDragOver(event, '${item.id}')"
+         ondragleave="onDragLeave('${item.id}')"
+         ondrop="onDrop(event, '${item.id}')">
+      ${hasImg ? `<img src="${imgUrl}" alt="${item.name}">` : ''}
+      <svg class="drop-zone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 16l5-5 4 4 4-5 5 6"/><circle cx="8.5" cy="8.5" r="1.5"/>
+      </svg>
+      <div class="drop-zone-label">${hasImg ? 'Cambiar imagen' : 'Drop imagen o click'}</div>
+      <input type="file" id="file-${item.id}" accept="image/*" onchange="handleFile(event, '${item.id}')">
+    </div>
+    <div class="upload-status" id="status-${item.id}">
+      ${imageData[item.id]?.cloudinaryUrl ? '<span style="color:#00dc78">✓ Cloudinary</span>' : (hasImg ? 'Local — no subido' : '')}
+    </div>
+    <div class="card-body">
+      <div class="card-appearances">${epTags}</div>
+      <div class="card-detail">${item.detail}</div>
+      ${item.sku ? `<div class="card-sku">SKU: ${item.sku}</div>` : ''}
+      <textarea class="notes-area" id="notes-${item.id}" placeholder="Notas de producción..."
+        onblur="saveNotes('${item.id}')">${savedNotes}</textarea>
+    </div>
+    <div class="card-actions">
+      <button class="card-action-btn" onclick="triggerFile('${item.id}')">+ Imagen</button>
+    </div>
+  </div>`;
+}
+
+function attachCardEvents(items) {
+  // Events are handled via onclick attributes inline
+}
+
+// ════════════════════════════════════════
+// RENDER ENVIRONMENTS
+// ════════════════════════════════════════
+function renderEnvironments() {
+  const grid = document.getElementById('envs-grid');
+  const items = getFiltered(ENVIRONMENTS);
+  if(!items.length) { grid.innerHTML = '<div style="color:var(--text-muted);font-family:var(--fontb);padding:20px;">Sin resultados.</div>'; return; }
+  grid.innerHTML = items.map(e => buildEnvCard(e)).join('');
+}
+
+function buildEnvCard(item) {
+  const imgUrl = imageData[item.id]?.url || '';
+  const hasImg = !!imgUrl;
+  const savedNotes = notesData[item.id] || '';
+  const badgeClass = 'badge-env';
+  const epTags = EPISODES.map(ep =>
+    `<span class="ep-tag ${item.episodes.includes(ep) ? 'present' : ''}">${EP_LABELS[ep]}</span>`
+  ).join('');
+
+  return `
+  <div class="item-card env-card" id="card-${item.id}">
+    <div class="card-header">
+      <div>
+        <div class="card-name">${item.name}</div>
+      </div>
+      <span class="card-badge ${badgeClass}">Environment</span>
+    </div>
+    <div class="drop-zone ${hasImg ? 'has-image' : ''}" id="drop-${item.id}"
+         style="height:180px"
+         onclick="triggerFile('${item.id}')"
+         ondragover="onDragOver(event, '${item.id}')"
+         ondragleave="onDragLeave('${item.id}')"
+         ondrop="onDrop(event, '${item.id}')">
+      ${hasImg ? `<img src="${imgUrl}" alt="${item.name}">` : ''}
+      <svg class="drop-zone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/>
+      </svg>
+      <div class="drop-zone-label">${hasImg ? 'Cambiar imagen' : 'Drop reference art'}</div>
+      <input type="file" id="file-${item.id}" accept="image/*" onchange="handleFile(event, '${item.id}')">
+    </div>
+    <div class="upload-status" id="status-${item.id}">
+      ${imageData[item.id]?.cloudinaryUrl ? '<span style="color:#00dc78">✓ Cloudinary</span>' : (hasImg ? 'Local — no subido' : '')}
+    </div>
+    <div class="card-body">
+      <div class="card-appearances">${epTags}</div>
+      <div class="card-detail">${item.detail}</div>
+      <textarea class="notes-area" id="notes-${item.id}" placeholder="Notas de arte, paleta de color..."
+        onblur="saveNotes('${item.id}')">${savedNotes}</textarea>
+    </div>
+    <div class="card-actions">
+      <button class="card-action-btn" onclick="triggerFile('${item.id}')">+ Imagen</button>
+    </div>
+  </div>`;
+}
+
+// ════════════════════════════════════════
+// FILE HANDLING
+// ════════════════════════════════════════
+function triggerFile(id) {
+  document.getElementById('file-'+id)?.click();
+}
+
+function handleFile(event, id) {
+  const file = event.target.files[0];
+  if(!file) return;
+  if(!file.type.startsWith('image/')) { showToast('Solo imágenes permitidas.'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    if(!imageData[id]) imageData[id] = {};
+    imageData[id].url = e.target.result;
+    imageData[id].cloudinaryUrl = '';
+    saveLocal();
+    renderActive();
+    showToast('Subiendo a Cloudinary...');
+    uploadCloudinaryFile(id, file);
+  };
+  reader.readAsDataURL(file);
+}
+
+function onDragOver(e, id) {
+  e.preventDefault();
+  document.getElementById('drop-'+id)?.classList.add('drag-over');
+}
+function onDragLeave(id) {
+  document.getElementById('drop-'+id)?.classList.remove('drag-over');
+}
+function onDrop(e, id) {
+  e.preventDefault();
+  document.getElementById('drop-'+id)?.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if(!file || !file.type.startsWith('image/')) { showToast('Solo imágenes permitidas.'); return; }
+  const reader = new FileReader();
+  reader.onload = ev => {
+    if(!imageData[id]) imageData[id] = {};
+    imageData[id].url = ev.target.result;
+    imageData[id].cloudinaryUrl = '';
+    saveLocal();
+    renderActive();
+    showToast('Subiendo a Cloudinary...');
+    uploadCloudinaryFile(id, file);
+  };
+  reader.readAsDataURL(file);
+}
+
+// ════════════════════════════════════════
+// NOTES
+// ════════════════════════════════════════
+function saveNotes(id) {
+  const el = document.getElementById('notes-'+id);
+  if(!el) return;
+  notesData[id] = el.value;
+  saveLocal();
+  saveJSONBin();
+  showToast('Nota guardada.');
+}
+
+// ════════════════════════════════════════
+// CLOUDINARY UPLOAD
+// ════════════════════════════════════════
+async function uploadCloudinaryFile(id, file) {
+  setStatus(id, 'Subiendo...', '');
+  try {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('upload_preset', pipeline.preset);
+    fd.append('folder', 'convoy_breakdown');
+    fd.append('public_id', 'convoy_' + id);
+    const res = await fetch('https://api.cloudinary.com/v1_1/' + pipeline.cloudName + '/image/upload', {
+      method:'POST', body:fd
+    });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
+    imageData[id].cloudinaryUrl = data.secure_url;
+    saveLocal();
+    setStatus(id, '✓ Cloudinary', 'ok');
+    saveJSONBin();
+    showToast('✓ Subido: ' + id);
+  } catch(err) {
+    setStatus(id, '✗ Error: '+err.message, 'err');
+    showToast('Error: '+err.message);
+  }
+}
+
+async function uploadCloudinary(id) {
+  if(!pipeline.cloudName || !pipeline.preset) {
+    showToast('Configurá Cloudinary en Pipeline primero.');
+    return;
+  }
+  if(!imageData[id]?.url) {
+    showToast('No hay imagen para subir.');
+    return;
+  }
+  setStatus(id, 'Subiendo...', '');
+  try {
+    const blob = await (await fetch(imageData[id].url)).blob();
+    const fd = new FormData();
+    fd.append('file', blob);
+    fd.append('upload_preset', pipeline.preset);
+    fd.append('folder', 'convoy_breakdown');
+    fd.append('public_id', `convoy_${id}`);
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${pipeline.cloudName}/image/upload`, {
+      method:'POST', body:fd
+    });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
+    imageData[id].cloudinaryUrl = data.secure_url;
+    saveLocal();
+    setStatus(id, '✓ Cloudinary: '+data.secure_url.slice(0,40)+'...', 'ok');
+    saveJSONBin();
+    showToast(`✓ Subido a Cloudinary: ${id}`);
+  } catch(err) {
+    setStatus(id, '✗ Error: '+err.message, 'err');
+    showToast('Error Cloudinary: '+err.message);
+  }
+}
+
+function setStatus(id, msg, type) {
+  const el = document.getElementById('status-'+id);
+  if(!el) return;
+  el.textContent = msg;
+  el.className = 'upload-status '+(type||'');
+}
+
+// ════════════════════════════════════════
+// JSONBIN SYNC
+// ════════════════════════════════════════
+async function saveJSONBin() {
+  if(!pipeline.binId || !pipeline.binKey) return;
+  try {
+    // Only store cloudinary URLs (never base64) and notes — keeps payload tiny
+    const images = {};
+    Object.entries(imageData).forEach(([k,v]) => {
+      if(v.cloudinaryUrl) images[k] = v.cloudinaryUrl;
+    });
+    const payload = {
+      project:'CONVOY',
+      timestamp: new Date().toISOString(),
+      images,
+      notes: notesData
+    };
+    await fetch('https://api.jsonbin.io/v3/b/' + pipeline.binId, {
+      method:'PUT',
+      headers:{ 'Content-Type':'application/json', 'X-Master-Key': pipeline.binKey },
+      body: JSON.stringify(payload)
+    });
+  } catch(e) { console.warn('JSONBin sync failed', e); }
+}
+
+// ════════════════════════════════════════
+// PIPELINE MODAL
+// ════════════════════════════════════════
+function loadPipelineConfig() {
+  try {
+    const p = localStorage.getItem('convoy_pipeline');
+    if(p) pipeline = JSON.parse(p);
+  } catch(e){}
+}
+function openPipeline() {
+  document.getElementById('cf-cloud').value = pipeline.cloudName||'';
+  document.getElementById('cf-preset').value = pipeline.preset||'';
+  document.getElementById('jb-bin').value = pipeline.binId||'';
+  document.getElementById('jb-key').value = pipeline.binKey||'';
+  updatePipeStatus();
+  document.getElementById('pipeline-modal').classList.add('open');
+}
+function closePipeline() {
+  document.getElementById('pipeline-modal').classList.remove('open');
+}
+function savePipeline() {
+  pipeline.cloudName = document.getElementById('cf-cloud').value.trim();
+  pipeline.preset = document.getElementById('cf-preset').value.trim();
+  pipeline.binId = document.getElementById('jb-bin').value.trim();
+  pipeline.binKey = document.getElementById('jb-key').value.trim();
+  localStorage.setItem('convoy_pipeline', JSON.stringify(pipeline));
+  updatePipeStatus();
+  showToast('Pipeline guardado.');
+  setTimeout(()=>{ closePipeline(); renderActive(); }, 800);
+}
+function updatePipeStatus() {
+  const cfOk = pipeline.cloudName && pipeline.preset;
+  const jbOk = pipeline.binId && pipeline.binKey;
+  document.getElementById('pipe-dot-cf').className = 'pipe-dot '+(cfOk?'ok':'err');
+  document.getElementById('pipe-text-cf').textContent = cfOk
+    ? `Cloudinary: ${pipeline.cloudName} / ${pipeline.preset}`
+    : 'Cloudinary: no configurado';
+  document.getElementById('pipe-dot-jb').className = 'pipe-dot '+(jbOk?'ok':'err');
+  document.getElementById('pipe-text-jb').textContent = jbOk
+    ? `JSONBin: ${pipeline.binId.slice(0,12)}...`
+    : 'JSONBin: no configurado';
+}
+
+// ════════════════════════════════════════
+// JSONBIN LOAD
+// ════════════════════════════════════════
+async function loadJSONBin() {
+  if(!pipeline.binId || !pipeline.binKey) return;
+  try {
+    const res = await fetch('https://api.jsonbin.io/v3/b/' + pipeline.binId + '/latest', {
+      headers:{ 'X-Master-Key': pipeline.binKey }
+    });
+    if(!res.ok) return;
+    const data = await res.json();
+    const record = data.record;
+    if(!record) return;
+    // Merge notes from JSONBin (remote wins over local)
+    if(record.notes) {
+      Object.entries(record.notes).forEach(([k,v]) => {
+        if(v) notesData[k] = v;
+      });
+    }
+    // Merge cloudinary URLs from JSONBin
+    if(record.images) {
+      Object.entries(record.images).forEach(([k,v]) => {
+        const url = typeof v === 'string' ? v : (v.cloudinaryUrl||'');
+        if(url) {
+          if(!imageData[k]) imageData[k] = {};
+          imageData[k].cloudinaryUrl = url;
+          imageData[k].url = url;
+        }
+      });
+    }
+    saveLocal();
+    renderActive();
+    updateStats();
+  } catch(e) { console.warn('JSONBin load failed', e); }
+}
+
+// ════════════════════════════════════════
+// EXPORT ZIP
+// ════════════════════════════════════════
+function exportZip() {
+  const allItems = [...CHARACTERS, ...VEHICLES, ...ENVIRONMENTS];
+  const rows = ['ID,NAME,TYPE,EPISODES,SKU,HAS_IMAGE,CLOUDINARY_URL,NOTES'];
+  allItems.forEach(item => {
+    const img = imageData[item.id];
+    rows.push([
+      item.id,
+      `"${item.name}"`,
+      item.badge,
+      `"${item.episodes.join('|')}"`,
+      item.sku||'',
+      img?.url ? '1' : '0',
+      `"${img?.cloudinaryUrl||''}"`,
+      `"${(notesData[item.id]||'').replace(/"/g,'""')}"`
+    ].join(','));
+  });
+  const csv = rows.join('\n');
+
+  const manifest = {
+    project: 'CONVOY — Matchbox Adventure Squad S01',
+    exportDate: new Date().toISOString(),
+    totalItems: allItems.length,
+    imagesUploaded: allItems.filter(i => imageData[i.id]?.cloudinaryUrl).length,
+    pipeline: { cloudName: pipeline.cloudName||'not set', binId: pipeline.binId||'not set' },
+    breakdown: {
+      characters: CHARACTERS.map(c => ({ id:c.id, name:c.name, role:c.role, episodes:c.episodes, notes:notesData[c.id]||'', image:imageData[c.id]?.cloudinaryUrl||'' })),
+      vehicles: VEHICLES.map(v => ({ id:v.id, name:v.name, sku:v.sku, episodes:v.episodes, notes:notesData[v.id]||'', image:imageData[v.id]?.cloudinaryUrl||'' })),
+      environments: ENVIRONMENTS.map(e => ({ id:e.id, name:e.name, episodes:e.episodes, notes:notesData[e.id]||'', image:imageData[e.id]?.cloudinaryUrl||'' }))
+    }
+  };
+
+  // Create manifest JSON blob
+  const jsonBlob = new Blob([JSON.stringify(manifest, null, 2)], {type:'application/json'});
+  const csvBlob = new Blob([csv], {type:'text/csv'});
+
+  // Download both
+  dlBlob(jsonBlob, 'convoy_breakdown_manifest.json');
+  setTimeout(()=> dlBlob(csvBlob, 'convoy_breakdown_assets.csv'), 200);
+  showToast('Exportado: manifest.json + assets.csv');
+}
+
+function dlBlob(blob, name) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> t.classList.remove('show'), 3000);
+}
+
+// ════════════════════════════════════════
+// RESET ALL
+// ════════════════════════════════════════
+function resetAll() {
+  if(!confirm('¿Borrar todas las imágenes y notas guardadas localmente? Esta acción no se puede deshacer.')) return;
+  localStorage.removeItem('convoy_images');
+  localStorage.removeItem('convoy_notes');
+  imageData = {};
+  notesData = {};
+  renderActive();
+  updateStats();
+  showToast('Todo limpiado. Podés empezar de cero.');
+}
+
+// Close modal on outside click
+document.getElementById('pipeline-modal').addEventListener('click', function(e) {
+  if(e.target === this) closePipeline();
+});
+</script>
+</body>
+</html>

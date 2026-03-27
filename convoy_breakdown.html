@@ -924,9 +924,8 @@ function updateStats() {
   const total = all.length;
   const imaged = all.filter(a => getImages(a.id).length > 0).length;
   const pending = total - imaged;
-  document.getElementById('stat-total').textContent = total;
-  document.getElementById('stat-imaged').textContent = imaged;
-  document.getElementById('stat-pending').textContent = pending;
+  const elTotal = document.getElementById('stat-total');
+  if(elTotal) elTotal.textContent = total;
   const pct = total > 0 ? Math.round((imaged/total)*100) : 0;
   document.getElementById('progress-fill').style.width = pct+'%';
   document.getElementById('progress-label').textContent = pct+'% completado';

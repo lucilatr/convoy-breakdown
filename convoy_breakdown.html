@@ -143,6 +143,14 @@
     font-size: 13px; color: var(--text-dim); font-family: var(--fontb);
     line-height: 1.6;
   }
+  .synopsis-script-link {
+    color: var(--text); text-decoration: none;
+    transition: color .15s;
+  }
+  .synopsis-script-link:hover { color: var(--pink); }
+  .synopsis-script-icon {
+    font-size: 14px; color: var(--pink); margin-left: 4px;
+  }
   .synopsis-panels {
     font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
     color: var(--text-muted); font-family: var(--fontb); margin-top: 4px;
@@ -728,6 +736,7 @@ const EP_SYNOPSES = {
     label: 'Episode 101',
     title: 'Bridge of Super Spies!',
     panels: 45,
+    script: 'https://drive.google.com/file/d/1APD1aFCQmrCvaGeNMsMhy34hei8Na8db/view?usp=drive_link',
     en: "Sean chases super-criminal Von Steele across a bridge under construction over the river leading to Matchbox City. The team must use heavy construction vehicles — excavators, plowverizers and haulers — to set a trap and stop him before he escapes. A battle of wits on an unfinished structure where every piece of machinery plays a key role.",
     es: 'Sean persigue al supercriminal Von Steele por un puente en construcción sobre el río que lleva a Matchbox City. El equipo debe usar vehículos de construcción — excavadoras, demoledoras y tractores — para tender una trampa y detenerlo antes de que escape. Un duelo de ingenio sobre una estructura incompleta donde cada pieza de maquinaria tiene un rol clave.'
   },
@@ -735,6 +744,7 @@ const EP_SYNOPSES = {
     label: 'Episode 102',
     title: 'The Jungle Chase!',
     panels: 46,
+    script: 'https://drive.google.com/file/d/1wNxis4QV6E2WDu_SstxoLhQMa-QIsJU0/view?usp=drive_link',
     en: "Aimee races to recover a top-secret crate deep in the jungle and deliver it to the plane before time runs out. Von Steele and his chainsaw-wielding lumberjacks block her path, felling trees and sabotaging the airstrip. With the team's help and the Mountain Escape Getaway, Aimee must prove that speed and resourcefulness can overcome any obstacle.",
     es: 'Aimee recupera una caja secreta en la jungla y debe llevarla hasta el avión antes de que sea demasiado tarde. Von Steele y sus leñadores con motosierras le cierran el paso, tumban árboles y bloquean la pista de aterrizaje. Con la ayuda del equipo y el Mountain Escape Getaway, Aimee deberá demostrar que la velocidad y el ingenio pueden superar cualquier obstáculo.'
   },
@@ -742,6 +752,7 @@ const EP_SYNOPSES = {
     label: 'Episode 103',
     title: 'Fireworks Firefighting!',
     panels: 45,
+    script: 'https://drive.google.com/file/d/1nvvJd4C2lv9zKdNOAu_7042REAHTVoYE/view?usp=drive_link',
     en: "A massive fire breaks out at the fireworks factory, threatening the entire city. Ted leads the rescue team to battle the blaze while Sean pursues Von Steele — the criminal responsible. The mission culminates in a daring maneuver: using the Mountain Convoy Pursuit truck to topple the water tower and douse the fire once and for all.",
     es: 'Un incendio masivo en la fábrica de fuegos artificiales pone en peligro toda la ciudad. Ted lidera al equipo de rescate para combatir las llamas mientras Sean persigue a Von Steele, el responsable del siniestro. La misión culmina con una maniobra audaz: derribar la torre de agua para apagar el fuego de una vez por todas.'
   }
@@ -965,7 +976,9 @@ function renderSynopsis(ch) {
   const s = EP_SYNOPSES[ep];
   if(!s) return;
   document.getElementById('synopsis-ep').textContent = s.label;
-  document.getElementById('synopsis-title').textContent = s.title;
+  document.getElementById('synopsis-title').innerHTML = s.script
+    ? '<a href="' + s.script + '" target="_blank" class="synopsis-script-link">' + s.title + ' <span class="synopsis-script-icon">↗</span></a>'
+    : s.title;
   document.getElementById('synopsis-panels').innerHTML = 'Panels: <span>' + s.panels + '</span>';
   document.getElementById('synopsis-text').textContent = synopsisLang === 'en' ? s.en : s.es;
   const btn = document.getElementById('synopsis-lang-btn');

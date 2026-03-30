@@ -119,6 +119,39 @@
     color: #fff;
   }
 
+  /* SYNOPSIS BOX */
+  .synopsis-box {
+    margin: 16px 32px 0;
+    padding: 16px 20px;
+    background: var(--bg-card);
+    border-left: 3px solid var(--pink);
+    border-top: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    display: none;
+  }
+  .synopsis-box.visible { display: block; }
+  .synopsis-ep {
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--pink); font-family: var(--fontb); margin-bottom: 6px;
+  }
+  .synopsis-title {
+    font-size: 20px; font-weight: 800; text-transform: uppercase;
+    color: var(--text); margin-bottom: 8px; font-family: var(--font);
+  }
+  .synopsis-text {
+    font-size: 13px; color: var(--text-dim); font-family: var(--fontb);
+    line-height: 1.6;
+  }
+  .synopsis-lang-btn {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text-muted); font-family: var(--font); font-size: 12px;
+    font-weight: 700; letter-spacing: 2px; padding: 4px 10px;
+    cursor: pointer; transition: all .15s; flex-shrink: 0; margin-top: 2px;
+  }
+  .synopsis-lang-btn:hover { border-color: var(--pink); color: var(--pink); }
+  .synopsis-lang-btn.active { background: var(--pink); border-color: var(--pink); color: #fff; }
+
   /* TAB NAV */
   .tab-nav {
     padding: 24px 32px 0;
@@ -311,11 +344,12 @@
   }
   .carousel-wrap.drag-over { outline: 2px dashed var(--pink); }
   .carousel-track-outer {
-    overflow: hidden; width: 100%;
+    overflow-x: auto; overflow-y: hidden; width: 100%;
+    scrollbar-width: none;
   }
+  .carousel-track-outer::-webkit-scrollbar { display: none; }
   .carousel-track {
     display: flex; gap: 4px; padding: 4px;
-    transition: transform .3s ease;
   }
   .carousel-thumb {
     flex: 0 0 80px; height: 72px; cursor: pointer;
@@ -538,7 +572,7 @@
     <div class="topbar-right">
       <button class="topbar-export" onclick="openPipeline()">⚙ Pipeline</button>
       <button class="topbar-export" onclick="exportZip()">↓ Export ZIP</button>
-      <button class="topbar-export" style="border-color:rgba(255,255,255,0.2);color:rgba(255,255,255,0.4);" onclick="resetAll()">↺ Limpiar</button>
+
     </div>
   </div>
 
@@ -549,6 +583,17 @@
     <button class="chapter-btn" onclick="filterChapter('ep101', this)">Ep 101 — Bridge of Super Spies</button>
     <button class="chapter-btn" onclick="filterChapter('ep102', this)">Ep 102 — The Jungle Chase</button>
     <button class="chapter-btn" onclick="filterChapter('ep103', this)">Ep 103 — Fireworks Firefighting</button>
+  </div>
+
+  <div class="synopsis-box" id="synopsis-box">
+    <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px;">
+      <div>
+        <div class="synopsis-ep" id="synopsis-ep"></div>
+        <div class="synopsis-title" id="synopsis-title"></div>
+      </div>
+      <button class="synopsis-lang-btn" id="synopsis-lang-btn" onclick="toggleSynopsisLang()">ES</button>
+    </div>
+    <div class="synopsis-text" id="synopsis-text"></div>
   </div>
 
   <!-- TAB NAV -->
@@ -669,6 +714,29 @@
 // ════════════════════════════════════════
 const EPISODES = ['ep101','ep102','ep103'];
 const EP_LABELS = { ep101:'Ep 101', ep102:'Ep 102', ep103:'Ep 103' };
+
+const EP_SYNOPSES = {
+  ep101: {
+    label: 'Episode 101',
+    title: 'Bridge of Super Spies!',
+    en: 'Sean chases super-criminal Von Steele across a bridge under construction over the river leading to Matchbox City. The team must use heavy construction vehicles — excavators, plowverizers and haulers — to set a trap and stop him before he escapes. A battle of wits on an unfinished structure where every piece of machinery plays a key role.',
+    es: 'Sean persigue al supercriminal Von Steele por un puente en construcción sobre el río que lleva a Matchbox City. El equipo debe usar vehículos de construcción — excavadoras, demoledoras y tractores — para tender una trampa y detenerlo antes de que escape. Un duelo de ingenio sobre una estructura incompleta donde cada pieza de maquinaria tiene un rol clave.'
+  },
+  ep102: {
+    label: 'Episode 102',
+    title: 'The Jungle Chase!',
+    en: 'Aimee races to recover a top-secret crate deep in the jungle and deliver it to the plane before time runs out. Von Steele and his chainsaw-wielding lumberjacks block her path, felling trees and sabotaging the airstrip. With the team's help and the Mountain Escape Getaway, Aimee must prove that speed and resourcefulness can overcome any obstacle.',
+    es: 'Aimee recupera una caja secreta en la jungla y debe llevarla hasta el avión antes de que sea demasiado tarde. Von Steele y sus leñadores con motosierras le cierran el paso, tumban árboles y bloquean la pista de aterrizaje. Con la ayuda del equipo y el Mountain Escape Getaway, Aimee deberá demostrar que la velocidad y el ingenio pueden superar cualquier obstáculo.'
+  },
+  ep103: {
+    label: 'Episode 103',
+    title: 'Fireworks Firefighting!',
+    en: 'A massive fire breaks out at the fireworks factory, threatening the entire city. Ted leads the rescue team to battle the blaze while Sean pursues Von Steele — the criminal responsible. The mission culminates in a daring maneuver: using the Mountain Convoy Pursuit truck to topple the water tower and douse the fire once and for all.',
+    es: 'Un incendio masivo en la fábrica de fuegos artificiales pone en peligro toda la ciudad. Ted lidera al equipo de rescate para combatir las llamas mientras Sean persigue a Von Steele, el responsable del siniestro. La misión culmina con una maniobra audaz: derribar la torre de agua para apagar el fuego de una vez por todas.'
+  }
+};
+
+let synopsisLang = 'en';
 
 const CHARACTERS = [
   {
@@ -871,6 +939,33 @@ function filterChapter(ch, btn) {
   updateTabCounts();
   renderActive();
   updateStats();
+  // Show/hide synopsis
+  const box = document.getElementById('synopsis-box');
+  if(ch === 'all') {
+    box.classList.remove('visible');
+  } else {
+    renderSynopsis(ch);
+    box.classList.add('visible');
+  }
+}
+
+function renderSynopsis(ch) {
+  const ep = ch || currentChapter;
+  const s = EP_SYNOPSES[ep];
+  if(!s) return;
+  document.getElementById('synopsis-ep').textContent = s.label;
+  document.getElementById('synopsis-title').textContent = s.title;
+  document.getElementById('synopsis-text').textContent = synopsisLang === 'en' ? s.en : s.es;
+  const btn = document.getElementById('synopsis-lang-btn');
+  if(btn) {
+    btn.textContent = synopsisLang === 'en' ? 'ES' : 'EN';
+    btn.classList.toggle('active', synopsisLang === 'es');
+  }
+}
+
+function toggleSynopsisLang() {
+  synopsisLang = synopsisLang === 'en' ? 'es' : 'en';
+  renderSynopsis(currentChapter);
 }
 
 function switchTab(tab, btn) {
@@ -1098,13 +1193,10 @@ function updateCarouselBtns(id) {
 
 const carouselPos = {};
 function slideCarousel(id, dir) {
-  const track = document.getElementById('track-'+id);
-  if(!track) return;
-  if(!carouselPos[id]) carouselPos[id] = 0;
-  const step = 84;
-  const maxScroll = track.scrollWidth - track.parentElement.clientWidth;
-  carouselPos[id] = Math.max(0, Math.min(carouselPos[id] + dir * step * 2, maxScroll));
-  track.style.transform = 'translateX(-' + carouselPos[id] + 'px)';
+  const outer = document.getElementById('track-outer-'+id);
+  if(!outer) return;
+  const step = 176;
+  outer.scrollBy({ left: dir * step, behavior: 'smooth' });
 }
 
 function triggerFile(id) {

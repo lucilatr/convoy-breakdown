@@ -598,6 +598,7 @@
     <button class="chapter-btn" onclick="filterChapter('ep101', this)">Ep 101 — Bridge of Super Spies</button>
     <button class="chapter-btn" onclick="filterChapter('ep102', this)">Ep 102 — The Jungle Chase</button>
     <button class="chapter-btn" onclick="filterChapter('ep103', this)">Ep 103 — Fireworks Firefighting</button>
+    <button class="chapter-btn" onclick="filterChapter('ep104', this)">Ep 104 — Dog Race Rescue!</button>
   </div>
 
   <div class="synopsis-box" id="synopsis-box">
@@ -637,7 +638,7 @@
 
       <div class="stat-card">
         <div class="stat-label">Capítulos</div>
-        <div class="stat-num">3 / 8</div>
+        <div class="stat-num">4 / 8</div>
       </div>
     </div>
 
@@ -728,8 +729,8 @@
 // ════════════════════════════════════════
 // DATA
 // ════════════════════════════════════════
-const EPISODES = ['ep101','ep102','ep103'];
-const EP_LABELS = { ep101:'Ep 101', ep102:'Ep 102', ep103:'Ep 103' };
+const EPISODES = ['ep101','ep102','ep103','ep104'];
+const EP_LABELS = { ep101:'Ep 101', ep102:'Ep 102', ep103:'Ep 103', ep104:'Ep 104' };
 
 const EP_SYNOPSES = {
   ep101: {
@@ -755,6 +756,14 @@ const EP_SYNOPSES = {
     script: 'https://drive.google.com/file/d/1nvvJd4C2lv9zKdNOAu_7042REAHTVoYE/view?usp=drive_link',
     en: "A massive fire breaks out at the fireworks factory, threatening the entire city. Ted leads the rescue team to battle the blaze while Sean pursues Von Steele — the criminal responsible. The mission culminates in a daring maneuver: using the Mountain Convoy Pursuit truck to topple the water tower and douse the fire once and for all.",
     es: 'Un incendio masivo en la fábrica de fuegos artificiales pone en peligro toda la ciudad. Ted lidera al equipo de rescate para combatir las llamas mientras Sean persigue a Von Steele, el responsable del siniestro. La misión culmina con una maniobra audaz: derribar la torre de agua para apagar el fuego de una vez por todas.'
+  },
+  ep104: {
+    label: 'Episode 104',
+    title: 'Dog Race Rescue!',
+    panels: 43,
+    script: 'https://drive.google.com/file/d/1ngC373Xxvl8DdeRTfHvkDmK_2hO8rCoz/view?usp=drive_link',
+    en: "The Matchbox Grand Prix turns from a race into a rescue when a runaway mobile dog washing van full of wet pups pulls into the lead. Aimee must use a dog bone as bait to guide the driverless van to the finish line, while the rest of the squad converts the Smalley's Garage car crusher into a soft landing zone using pillows. A dog-gone rescue race unlike anything the squad has tackled before.",
+    es: 'El Gran Premio Matchbox se convierte en una misión de rescate cuando una furgoneta de baño canino sin conductor llena de perros mojados toma la delantera. Aimee debe usar un hueso como señuelo para guiar la furgoneta hasta la meta, mientras el resto del equipo convierte la aplastadora del garage Smalley en una zona de aterrizaje con almohadas. Una carrera de rescate perruna como nunca antes había enfrentado el equipo.'
   }
 };
 
@@ -766,15 +775,11 @@ const CHARACTERS = [
     vehicle:'Drives Rover 6x6',
     badge:'character',
     detail:'Protagonist. Plays as both himself and villain Von Steele (eyepatch). Recurring across all episodes.',
-    episodes: ['ep101','ep102','ep103'],
-    notes: ''
-  },
-  {
-    id:'ted', name:'Ted', role:'Fire & Rescue Lead',
+    episodes: ['ep101','ep102','ep103','ep104'],
     vehicle:'Drives Blaze Blaster III & Triumph Scrambler',
     badge:'character',
     detail:'Commands fire rescue ops. Wears full firefighter gear including helmet.',
-    episodes: ['ep101','ep102','ep103'],
+    episodes: ['ep101','ep102','ep103','ep104'],
     notes: ''
   },
   {
@@ -782,7 +787,7 @@ const CHARACTERS = [
     vehicle:'Pilots Rescue Helicopter & Super Hercules',
     badge:'character',
     detail:'Aerial recon, water bucket drops and cargo extractions. Uses headset.',
-    episodes: ['ep101','ep102','ep103'],
+    episodes: ['ep101','ep102','ep103','ep104'],
     notes: ''
   },
   {
@@ -790,7 +795,7 @@ const CHARACTERS = [
     vehicle:'Drives Ambulance, Toyota Tacoma & Chevy Stock Car',
     badge:'character',
     detail:'Fast and resourceful. Handles crowd control, medical support and high-speed chases.',
-    episodes: ['ep101','ep102','ep103'],
+    episodes: ['ep101','ep102','ep103','ep104'],
     notes: ''
   },
   {
@@ -798,7 +803,7 @@ const CHARACTERS = [
     vehicle:'Operates Excavator & Turf Hauler',
     badge:'character',
     detail:'Engineering mindset. Demolition and heavy construction rigs. Wears orange hard hat.',
-    episodes: ['ep101','ep102','ep103'],
+    episodes: ['ep101','ep102','ep103','ep104'],
     notes: ''
   },
   {
@@ -814,7 +819,7 @@ const CHARACTERS = [
 const VEHICLES = [
   // Ep 101
   { id:'rover-6x6', name:'Rover 6x6', sku:'JKH28', badge:'vehicle', detail:"Sean's primary pursuit vehicle. Appears in all 3 episodes.", episodes:['ep101','ep102','ep103'], notes:'' },
-  { id:'rescue-heli', name:'Rescue Helicopter', sku:'JKH39', badge:'vehicle', detail:'Charmaine. Air support, cargo drops, water bucket. Appears in all 3 eps.', episodes:['ep101','ep102','ep103'], notes:'' },
+  { id:'rescue-heli', name:'Rescue Helicopter', sku:'JKH39', badge:'vehicle', detail:'Charmaine. Air support, cargo drops, water bucket. Appears in all eps.', episodes:['ep101','ep102','ep103','ep104'], notes:'' },
   { id:'dodge-durango', name:'Dodge Durango', sku:'HFP46', badge:'vehicle', detail:"Von Steele's black villain vehicle. Recurring across all eps.", episodes:['ep101','ep102','ep103'], notes:'' },
   { id:'plowverizer', name:'Plowverizer', sku:'JHN22', badge:'vehicle', detail:'Heavy plow truck. Ep 101 bridge chase. Von Steele escape vehicle.', episodes:['ep101'], notes:'' },
   { id:'f650-rollback', name:'F-650 Rollback', sku:'JKH49', badge:'vehicle', detail:'Tow truck. Ep 101 bridge construction sequence.', episodes:['ep101'], notes:'' },
@@ -822,10 +827,10 @@ const VEHICLES = [
   { id:'excavator', name:'Excavator', sku:'JKH38', badge:'vehicle', detail:'Crosby. Ep 101 bridge demolition and pursuit. Key to trap.', episodes:['ep101'], notes:'' },
   { id:'turf-hauler', name:'Turf Hauler', sku:'HFB90', badge:'vehicle', detail:'Construction hauler. Ep 101 bridge rubble.', episodes:['ep101'], notes:'' },
   { id:'mustang-fastback', name:'Mustang Fastback', sku:'JKH34', badge:'vehicle', detail:"Aimee's signature vehicle. Ep 101.", episodes:['ep101'], notes:'' },
-  { id:'triumph-scrambler', name:'Triumph Scrambler', sku:'JKH31', badge:'vehicle', detail:"Ted's motorcycle. Eps 101 & 102. Used for jungle rescue.", episodes:['ep101','ep102'], notes:'' },
+  { id:'triumph-scrambler', name:'Triumph Scrambler', sku:'JKH31', badge:'vehicle', detail:"Ted's motorcycle. Eps 101, 102 & 104. Used for jungle rescue and city race.", episodes:['ep101','ep102','ep104'], notes:'' },
   // Ep 102
   { id:'toyota-tacoma', name:'Toyota Tacoma', sku:'JMB54', badge:'vehicle', detail:"Aimee's jungle truck. Carries the secret crate. Ep 102.", episodes:['ep102'], notes:'' },
-  { id:'chevy-stock', name:'Chevy Stock Car', sku:'JKH33', badge:'vehicle', detail:"Aimee's fast car swap. Ep 102 jungle sprint.", episodes:['ep102'], notes:'' },
+  { id:'chevy-stock', name:'Chevy Stock Car', sku:'JKH33', badge:'vehicle', detail:"Aimee's fast car. Ep 102 jungle sprint, Ep 104 city race rescue.", episodes:['ep102','ep104'], notes:'' },
   { id:'polaris-rzr', name:'Polaris RZR', sku:'BL251', badge:'vehicle', detail:"Von Steele's lumberjack henchmen. Chainsaw attachments (paperclip). Ep 102.", episodes:['ep102'], notes:'' },
   { id:'super-hercules', name:'Super Hercules', sku:'JKH51', badge:'vehicle', detail:"Charmaine's cargo plane. Ep 102 extraction mission.", episodes:['ep102'], notes:'' },
   { id:'mountain-escape', name:'Mountain Escape Getaway', sku:'JMG57', badge:'vehicle', detail:'Playset. Multi-level ramp chase. Ep 102 finale.', episodes:['ep102'], notes:'' },
@@ -834,13 +839,19 @@ const VEHICLES = [
   { id:'blaze-buster', name:'Blaze Buster', sku:'HVP56', badge:'vehicle', detail:"Crosby's fire engine. Ep 103.", episodes:['ep103'], notes:'' },
   { id:'dodge-ambulance', name:'2019 Dodge Ambulance', sku:'JKH45', badge:'vehicle', detail:"Aimee's medical/crowd control. Ep 103.", episodes:['ep103'], notes:'' },
   { id:'mountain-convoy', name:'Mountain Convoy Pursuit', sku:'JJB32', badge:'vehicle', detail:"Sean's massive truck / Secret Hideout. Ep 103 water tower sequence.", episodes:['ep103'], notes:'' },
+  // Ep 104
+  { id:'nissan-nismo', name:'2020 Nissan Nismo', sku:'JKH44', badge:'vehicle', detail:"Crosby's race car. Ep 104 Matchbox Grand Prix.", episodes:['ep104'], notes:'' },
+  { id:'vw-bus', name:'VW Bus Moving Parts', sku:'JHV23', badge:'vehicle', detail:'Runaway mobile dog washing van. Three wet sheepdogs inside. No driver. Ep 104 central MacGuffin.', episodes:['ep104'], notes:'' },
+  { id:'porsche-911', name:'Porsche 911', sku:'BL252', badge:'vehicle', detail:"Charmaine's race car. Ep 104 Grand Prix.", episodes:['ep104'], notes:'' },
+  { id:'ford-gt40', name:'Ford GT40 Moving Parts', sku:'JKH53', badge:'vehicle', detail:"Sean's race car. Ep 104 Grand Prix.", episodes:['ep104'], notes:'' },
+  { id:'smalleys-crusher', name:"Smalley's Garage Crusher Playset", sku:'JMG56', badge:'vehicle', detail:'Car crusher converted into padded car catcher using pillows. Ep 104 finish line trap.', episodes:['ep104'], notes:'' },
 ];
 
 const ENVIRONMENTS = [
   {
     id:'smalleys-garage', name:"Smalley's Garage", badge:'env',
     detail:'INT. Hub location. Professional mechanic garage converted into ultimate Matchbox play space. Large central diorama table. Appears in ALL episodes as Real World framing device.',
-    episodes:['ep101','ep102','ep103'], notes:''
+    episodes:['ep101','ep102','ep103','ep104'], notes:''
   },
   {
     id:'matchbox-bridge', name:'Matchbox Bridge', badge:'env',
@@ -871,6 +882,11 @@ const ENVIRONMENTS = [
     id:'fireworks-factory', name:'Fireworks Factory', badge:'env',
     detail:'EXT. Industrial building on fire. Steep San Francisco-style hill approach. Water tower nearby. Ep 103 primary action location.',
     episodes:['ep103'], notes:''
+  },
+  {
+    id:'city-race-course', name:'City Race Course', badge:'env',
+    detail:'EXT. Street-level road circuit through Matchbox City. Curved sections, downtown chicanes, hay bale barriers, spectators behind safety barriers. Finish line at Smalley\'s Garage. Ep 104 primary location.',
+    episodes:['ep104'], notes:''
   },
 ];
 

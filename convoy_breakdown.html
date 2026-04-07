@@ -598,25 +598,25 @@
   .p-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .p-thumb-ph { opacity: .12; color: var(--text-muted); }
   .p-num {
-    position: absolute; top: 5px; left: 7px; font-size: 10px; font-weight: 900;
+    position: absolute; top: 5px; left: 7px; font-size: 18px; font-weight: 900;
     color: var(--pink); letter-spacing: .5px; font-family: var(--font);
   }
   .p-world {
-    position: absolute; top: 5px; right: 6px; font-size: 8px; font-weight: 700;
-    letter-spacing: 1px; text-transform: uppercase; padding: 1px 4px; font-family: var(--font);
+    position: absolute; top: 5px; right: 6px; font-size: 14px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase; padding: 2px 6px; font-family: var(--font);
   }
   .p-world-rw { background: rgba(255,180,0,.15); color: #ffb400; }
   .p-world-aw { background: rgba(0,180,255,.12); color: #00b4ff; }
-  .p-info { padding: 8px 9px 9px; }
+  .p-info { padding: 10px 10px 11px; }
   .p-desc {
-    font-size: 10px; color: var(--text-dim); line-height: 1.35; font-family: var(--fontb);
-    margin-bottom: 5px; display: -webkit-box; -webkit-line-clamp: 2;
+    font-size: 18px; color: var(--text-dim); line-height: 1.35; font-family: var(--fontb);
+    margin-bottom: 7px; display: -webkit-box; -webkit-line-clamp: 2;
     -webkit-box-orient: vertical; overflow: hidden;
   }
-  .p-tags { display: flex; flex-wrap: wrap; gap: 2px; }
+  .p-tags { display: flex; flex-wrap: wrap; gap: 3px; }
   .ptag {
-    font-size: 8px; font-weight: 700; letter-spacing: .5px;
-    padding: 1px 5px; text-transform: uppercase; font-family: var(--font);
+    font-size: 14px; font-weight: 700; letter-spacing: .5px;
+    padding: 2px 7px; text-transform: uppercase; font-family: var(--font);
   }
   .ptag-char { background: var(--pink-dim); color: var(--pink); border: 1px solid var(--border-pink); }
   .ptag-env  { background: rgba(0,220,120,.08); color: #00dc78; border: 1px solid rgba(0,220,120,.2); }
@@ -647,6 +647,13 @@
     transition: all .15s; opacity: .6;
   }
   .pd-upload-btn:hover { opacity: 1; border-style: solid; }
+  .pd-delete-btn {
+    width: 100%; background: transparent; border: 1px solid rgba(255,0,102,.25);
+    color: var(--pink); font-family: var(--font); font-size: 11px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; padding: 7px; cursor: pointer;
+    transition: all .15s; opacity: .5;
+  }
+  .pd-delete-btn:hover { opacity: 1; background: rgba(255,0,102,.08); }
   .pd-status { font-size: 10px; text-align: center; font-family: var(--fontb); min-height: 16px; color: var(--text-muted); }
   .pd-status.ok { color: #00dc78; }
   .pd-status.err { color: var(--pink); }
@@ -694,7 +701,7 @@
   <!-- CHAPTER FILTER -->
   <div class="chapter-bar">
     <span class="chapter-label">Capítulo</span>
-    <button class="chapter-btn active" onclick="filterChapter('all', this)">Todos</button>
+    <button class="chapter-btn active" onclick="filterChapter('all', this)">All</button>
     <button class="chapter-btn" onclick="filterChapter('ep101', this)">Ep 101 — Bridge of Super Spies</button>
     <button class="chapter-btn" onclick="filterChapter('ep102', this)">Ep 102 — The Jungle Chase</button>
     <button class="chapter-btn" onclick="filterChapter('ep103', this)">Ep 103 — Fireworks Firefighting</button>
@@ -740,7 +747,7 @@
       </div>
 
       <div class="stat-card">
-        <div class="stat-label">Capítulos</div>
+        <div class="stat-label">Episodes</div>
         <div class="stat-num">4 / 8</div>
       </div>
     </div>
@@ -748,12 +755,12 @@
     <!-- PROGRESS -->
     <div class="progress-row">
       <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
-      <div class="progress-label" id="progress-label">0% completado</div>
+      <div class="progress-label" id="progress-label">0% complete</div>
     </div>
 
     <!-- SEARCH -->
     <div class="search-bar">
-      <input class="search-input" type="text" id="search-input" placeholder="Buscar personaje, vehículo, ambiente..." oninput="renderActive()">
+      <input class="search-input" type="text" id="search-input" placeholder="Search character, vehicle, environment..." oninput="renderActive()">
     </div>
 
     <!-- CHARACTERS TAB -->
@@ -776,7 +783,7 @@
       <div class="panels-layout">
         <div class="panels-list-col">
           <div class="panels-list-header">
-            <span class="panels-list-title" id="panels-ep-title">Seleccioná un episodio</span>
+            <span class="panels-list-title" id="panels-ep-title">Select an episode</span>
             <span class="panels-list-count" id="panels-count"></span>
           </div>
           <div class="panels-grid-inner" id="panels-grid"></div>
@@ -784,7 +791,7 @@
         <div class="panels-detail-col" id="panels-detail">
           <div class="panels-detail-empty">
             <svg width="32" height="24" viewBox="0 0 32 24" fill="none" style="opacity:.15;color:var(--text-muted)"><rect x="1" y="1" width="30" height="22" rx="1" stroke="currentColor" stroke-width="1.5"/><line x1="1" y1="9" x2="31" y2="9" stroke="currentColor" stroke-width="1"/><polyline points="4,18 9,13 14,16 20,10 28,15" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
-            <span>Seleccioná un panel</span>
+            <span>Select a panel</span>
           </div>
         </div>
       </div>
@@ -802,7 +809,7 @@
     </div>
     <div class="modal-body">
       <div style="font-size:13px;color:var(--text-muted);font-family:var(--fontb);">
-        Configurá las integraciones de almacenamiento. Los cambios se guardan en localStorage.
+        Configure storage integrations. Changes are saved in localStorage.
       </div>
 
       <div class="modal-field">
@@ -1037,7 +1044,7 @@ function checkPwd() {
     document.getElementById('app').style.display = 'block';
     init();
   } else {
-    document.getElementById('pwd-err').textContent = 'Contraseña incorrecta.';
+    document.getElementById('pwd-err').textContent = 'Incorrect password.';
     document.getElementById('pwd-input').value = '';
     setTimeout(()=> document.getElementById('pwd-err').textContent='', 2000);
   }
@@ -1191,7 +1198,7 @@ function updateStats() {
   if(elTotal) elTotal.textContent = total;
   const pct = total > 0 ? Math.round((imaged/total)*100) : 0;
   document.getElementById('progress-fill').style.width = pct+'%';
-  document.getElementById('progress-label').textContent = pct+'% completado';
+  document.getElementById('progress-label').textContent = pct+'% complete';
 }
 
 // ════════════════════════════════════════
@@ -1385,7 +1392,7 @@ function handleDrop(e, id) {
       imageData[id].images.push({ url: ev.target.result, cloudinaryUrl: '' });
       saveLocal();
       refreshCarousel(id);
-      showToast('Subiendo a Cloudinary...');
+      showToast('Uploading to Cloudinary...');
       uploadCloudinaryFile(id, file, idx);
     };
     reader.readAsDataURL(file);
@@ -1405,7 +1412,7 @@ function handleFile(event, id) {
       imageData[id].images.push({ url: e.target.result, cloudinaryUrl: '' });
       saveLocal();
       refreshCarousel(id);
-      showToast('Subiendo a Cloudinary...');
+      showToast('Uploading to Cloudinary...');
       uploadCloudinaryFile(id, file, idx);
     };
     reader.readAsDataURL(file);
@@ -1438,7 +1445,7 @@ function saveNotes(id) {
 // CLOUDINARY UPLOAD
 // ════════════════════════════════════════
 async function uploadCloudinaryFile(id, file, idx) {
-  setStatus(id, 'Subiendo...', '');
+  setStatus(id, 'Uploading...', '');
   try {
     const fd = new FormData();
     fd.append('file', file);
@@ -1458,7 +1465,7 @@ async function uploadCloudinaryFile(id, file, idx) {
     setStatus(id, '✓ Cloudinary', 'ok');
     refreshCarousel(id);
     saveJSONBin();
-    showToast('✓ Subido: ' + id);
+    showToast('✓ Uploaded: ' + id);
   } catch(err) {
     setStatus(id, '✗ Error: '+err.message, 'err');
     showToast('Error: '+err.message);
@@ -1467,14 +1474,14 @@ async function uploadCloudinaryFile(id, file, idx) {
 
 async function uploadCloudinary(id) {
   if(!pipeline.cloudName || !pipeline.preset) {
-    showToast('Configurá Cloudinary en Pipeline primero.');
+    showToast('Configure Cloudinary in Pipeline first.');
     return;
   }
   if(!imageData[id]?.url) {
     showToast('No hay imagen para subir.');
     return;
   }
-  setStatus(id, 'Subiendo...', '');
+  setStatus(id, 'Uploading...', '');
   try {
     const blob = await (await fetch(imageData[id].url)).blob();
     const fd = new FormData();
@@ -1491,7 +1498,7 @@ async function uploadCloudinary(id) {
     saveLocal();
     setStatus(id, '✓ Cloudinary: '+data.secure_url.slice(0,40)+'...', 'ok');
     saveJSONBin();
-    showToast(`✓ Subido a Cloudinary: ${id}`);
+    showToast(`✓ Uploaded to Cloudinary: ${id}`);
   } catch(err) {
     setStatus(id, '✗ Error: '+err.message, 'err');
     showToast('Error Cloudinary: '+err.message);
@@ -1557,7 +1564,7 @@ function savePipeline() {
   pipeline.binKey = document.getElementById('jb-key').value.trim();
   localStorage.setItem('convoy_pipeline', JSON.stringify(pipeline));
   updatePipeStatus();
-  showToast('Pipeline guardado.');
+  showToast('Pipeline saved.');
   setTimeout(()=>{ closePipeline(); renderActive(); }, 800);
 }
 function updatePipeStatus() {
@@ -1656,15 +1663,15 @@ function renderPanels() {
   const titleEl = document.getElementById('panels-ep-title');
   const countEl = document.getElementById('panels-count');
   if(!panels.length) {
-    grid.innerHTML = '<div style="padding:32px 16px;color:var(--text-muted);font-family:var(--fontb);font-size:11px;letter-spacing:2px;text-transform:uppercase;">Seleccioná un episodio con panels disponibles</div>';
-    titleEl.textContent = 'Sin datos'; countEl.textContent = '';
-    document.getElementById('panels-detail').innerHTML = '<div class="panels-detail-empty"><svg width="32" height="24" viewBox="0 0 32 24" fill="none" style="opacity:.15;color:var(--text-muted)"><rect x="1" y="1" width="30" height="22" rx="1" stroke="currentColor" stroke-width="1.5"/></svg><span>Seleccioná un panel</span></div>';
+    grid.innerHTML = '<div style="padding:32px 16px;color:var(--text-muted);font-family:var(--fontb);font-size:11px;letter-spacing:2px;text-transform:uppercase;">Select an episode with available panels</div>';
+    titleEl.textContent = 'No data'; countEl.textContent = '';
+    document.getElementById('panels-detail').innerHTML = '<div class="panels-detail-empty"><svg width="32" height="24" viewBox="0 0 32 24" fill="none" style="opacity:.15;color:var(--text-muted)"><rect x="1" y="1" width="30" height="22" rx="1" stroke="currentColor" stroke-width="1.5"/></svg><span>Select a panel</span></div>';
     return;
   }
   const s = EP_SYNOPSES[currentChapter];
   titleEl.textContent = s ? (EP_LABELS[currentChapter]||'') + ' · ' + s.title : (EP_LABELS[currentChapter]||'');
   const imaged = panels.filter(p => panelImageData[p.id]).length;
-  countEl.textContent = panels.length + ' panels · ' + imaged + ' con layout';
+  countEl.textContent = panels.length + ' panels · ' + imaged + ' with layout';
   grid.innerHTML = panels.map(p => {
     const img = panelImageData[p.id];
     const sel = selectedPanel === p.id;
@@ -1702,7 +1709,8 @@ function selectPanel(id) {
       ${img?`<img src="${img}" alt="Layout ${p.label}">`:`<div class="pd-img-ph"><svg width="36" height="26" viewBox="0 0 36 26" fill="none"><rect x="1" y="1" width="34" height="24" rx="2" stroke="currentColor" stroke-width="1.2"/><polyline points="1,18 10,10 17,15 25,7 35,14" stroke="currentColor" stroke-width="1.2" fill="none"/><circle cx="11" cy="8" r="2.5" fill="currentColor" opacity="0.4"/></svg></div>`}
     </div>
     <input class="pd-file-input" type="file" id="pd-file-${id}" accept="image/*" onchange="uploadPanelLayout('${id}', this)">
-    <button class="pd-upload-btn" onclick="document.getElementById('pd-file-${id}').click()">+ Subir layout</button>
+    <button class="pd-upload-btn" onclick="document.getElementById('pd-file-${id}').click()">+ Upload layout</button>
+    ${img ? `<button class="pd-delete-btn" onclick="deletePanelLayout('${id}')">✕ Delete layout</button>` : ''}
     <div class="pd-status" id="pd-status-${id}"></div>
     <div class="pd-divider"></div>
     <div class="pd-field"><div class="pd-label">Mundo</div><div class="pd-val" style="color:${p.world==='rw'?'#ffb400':'#00b4ff'}">${p.world==='rw'?'Real World':'Adventure World'}</div></div>
@@ -1721,10 +1729,10 @@ function selectPanel(id) {
 async function uploadPanelLayout(panelId, input) {
   const file = input.files[0]; if(!file) return;
   const statusEl = document.getElementById('pd-status-'+panelId);
-  if(statusEl) { statusEl.textContent = 'Subiendo...'; statusEl.className = 'pd-status'; }
+  if(statusEl) { statusEl.textContent = 'Uploading...'; statusEl.className = 'pd-status'; }
   if(!pipeline.cloudName || !pipeline.preset) {
     const reader = new FileReader();
-    reader.onload = e => { panelImageData[panelId]=e.target.result; savePanelImages(); selectPanel(panelId); renderPanels(); showToast('Layout guardado localmente.'); };
+    reader.onload = e => { panelImageData[panelId]=e.target.result; savePanelImages(); selectPanel(panelId); renderPanels(); showToast('Layout saved locally.'); };
     reader.readAsDataURL(file); return;
   }
   try {
@@ -1735,11 +1743,21 @@ async function uploadPanelLayout(panelId, input) {
     const data = await res.json();
     if(data.secure_url) {
       panelImageData[panelId] = data.secure_url; savePanelImages();
-      if(statusEl) { statusEl.textContent = '✓ Subido'; statusEl.className = 'pd-status ok'; }
+      if(statusEl) { statusEl.textContent = '✓ Uploaded'; statusEl.className = 'pd-status ok'; }
       selectPanel(panelId); renderPanels(); syncPanelImagesToJSONBin();
-      showToast('Layout subido a Cloudinary.');
+      showToast('Layout uploaded to Cloudinary.');
     } else { throw new Error('No URL'); }
-  } catch(e) { if(statusEl) { statusEl.textContent = 'Error al subir.'; statusEl.className = 'pd-status err'; } }
+  } catch(e) { if(statusEl) { statusEl.textContent = 'Upload failed.'; statusEl.className = 'pd-status err'; } }
+}
+
+async function deletePanelLayout(panelId) {
+  if(!confirm('Delete this layout image?')) return;
+  delete panelImageData[panelId];
+  savePanelImages();
+  selectPanel(panelId);
+  renderPanels();
+  syncPanelImagesToJSONBin();
+  showToast('Layout deleted.');
 }
 
 async function syncPanelImagesToJSONBin() {
@@ -1930,7 +1948,7 @@ document.addEventListener('keydown', e => {
 // RESET ALL
 // ════════════════════════════════════════
 function resetAll() {
-  if(!confirm('¿Borrar todas las imágenes y notas guardadas localmente? Esta acción no se puede deshacer.')) return;
+  if(!confirm('Delete all locally saved images and notes? This action cannot be undone.')) return;
   localStorage.removeItem('convoy_images');
   localStorage.removeItem('convoy_notes');
   imageData = {};
@@ -1938,7 +1956,7 @@ function resetAll() {
   carouselPos && Object.keys(carouselPos).forEach(k => delete carouselPos[k]);
   renderActive();
   updateStats();
-  showToast('Todo limpiado. Podés empezar de cero.');
+  showToast('All cleared. Starting fresh.');
 }
 
 // Close modal on outside click

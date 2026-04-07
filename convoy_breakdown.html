@@ -670,7 +670,57 @@
     border-left: 2px solid rgba(160,100,255,.4); padding: 7px 10px;
   }
   .pd-desc-txt { font-size: 11px; color: var(--text-muted); line-height: 1.5; font-family: var(--fontb); }
-  .pd-file-input { display: none; }</style>
+  .pd-file-input { display: none; }
+
+  /* ─── WARDROBE ─── */
+  .wardrobe-section { border-top: 1px solid var(--border); }
+  .wardrobe-header {
+    padding: 10px 18px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .wardrobe-label {
+    font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--text-muted); font-family: var(--fontb);
+  }
+  .wardrobe-count {
+    font-size: 9px; font-weight: 700; letter-spacing: 1px;
+    color: var(--pink); background: var(--pink-dim);
+    border: 1px solid var(--border-pink); padding: 1px 7px; text-transform: uppercase;
+    font-family: var(--font);
+  }
+  .wv-row {
+    border-top: 1px solid var(--border);
+    display: flex; align-items: flex-start; gap: 10px; padding: 9px 18px;
+  }
+  .wv-thumb {
+    width: 48px; height: 48px; flex-shrink: 0;
+    background: var(--bg-card2); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; position: relative; overflow: hidden; transition: border-color .15s;
+  }
+  .wv-thumb:hover { border-color: var(--border-pink); }
+  .wv-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .wv-thumb-ph { opacity: .15; color: var(--text-muted); }
+  .wv-thumb-add {
+    font-size: 18px; color: var(--border-pink); line-height: 1; font-weight: 300;
+    transition: color .15s;
+  }
+  .wv-thumb:hover .wv-thumb-add { color: var(--pink); }
+  .wv-file { display: none; }
+  .wv-info { flex: 1; min-width: 0; }
+  .wv-name {
+    font-size: 13px; font-weight: 800; color: var(--text);
+    text-transform: uppercase; letter-spacing: .5px; font-family: var(--font);
+  }
+  .wv-desc {
+    font-size: 11px; color: var(--text-muted); font-family: var(--fontb);
+    margin-top: 2px; line-height: 1.3;
+  }
+  .wv-eps { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 5px; }
+  .wv-ep {
+    font-size: 8px; font-weight: 700; letter-spacing: 1px; padding: 1px 5px;
+    text-transform: uppercase; background: var(--pink-dim);
+    color: var(--pink); border: 1px solid var(--border-pink); font-family: var(--font);
+  }</style>
 </head>
 <body>
 
@@ -905,12 +955,24 @@ const CHARACTERS = [
     id:'sean', name:'Sean', role:'Lead — The Spy Kid',
     vehicle:'Drives Rover 6x6',
     badge:'character',
-    detail:'Protagonist. Plays as both himself and villain Von Steele (eyepatch). Recurring across all episodes.',
+    detail:'Protagonist. Recurring across all episodes.',
     episodes: ['ep101','ep102','ep103','ep104'],
+    wardrobe: [
+      { id:'sean-base', name:'Base', desc:'Casual everyday outfit', episodes:['ep101','ep102','ep103','ep104'] },
+    ],
+    notes: ''
+  },
+  {
+    id:'ted', name:'Ted', role:'Fire & Rescue Lead',
     vehicle:'Drives Blaze Blaster III & Triumph Scrambler',
     badge:'character',
     detail:'Commands fire rescue ops. Wears full firefighter gear including helmet.',
     episodes: ['ep101','ep102','ep103','ep104'],
+    wardrobe: [
+      { id:'ted-base',        name:'Base',            desc:'Casual everyday outfit',                          episodes:['ep101','ep102','ep104'] },
+      { id:'ted-firefighter', name:'Firefighter',     desc:'Full gear — helmet, coat, breathing apparatus',   episodes:['ep103'] },
+      { id:'ted-race',        name:'Race Spectator',  desc:'Helmet on, visor up, race outfit',                episodes:['ep104'] },
+    ],
     notes: ''
   },
   {
@@ -919,6 +981,10 @@ const CHARACTERS = [
     badge:'character',
     detail:'Aerial recon, water bucket drops and cargo extractions. Uses headset.',
     episodes: ['ep101','ep102','ep103','ep104'],
+    wardrobe: [
+      { id:'charmaine-base',  name:'Base',         desc:'Casual outfit with headset',         episodes:['ep101','ep103','ep104'] },
+      { id:'charmaine-pilot', name:'Pilot Gear',   desc:'Flight suit, cargo extraction gear', episodes:['ep102'] },
+    ],
     notes: ''
   },
   {
@@ -927,6 +993,10 @@ const CHARACTERS = [
     badge:'character',
     detail:'Fast and resourceful. Handles crowd control, medical support and high-speed chases.',
     episodes: ['ep101','ep102','ep103','ep104'],
+    wardrobe: [
+      { id:'aimee-base',  name:'Base',         desc:'Casual everyday outfit',              episodes:['ep101','ep102','ep103'] },
+      { id:'aimee-race',  name:'Race Driver',  desc:'Seatbelt on, focused race look',      episodes:['ep104'] },
+    ],
     notes: ''
   },
   {
@@ -935,14 +1005,21 @@ const CHARACTERS = [
     badge:'character',
     detail:'Engineering mindset. Demolition and heavy construction rigs. Wears orange hard hat.',
     episodes: ['ep101','ep102','ep103','ep104'],
+    wardrobe: [
+      { id:'crosby-base', name:'Base',         desc:'Casual outfit with orange hard hat',   episodes:['ep101','ep102','ep103'] },
+      { id:'crosby-race', name:'Race Driver',  desc:'Race outfit, Nismo driver look',       episodes:['ep104'] },
+    ],
     notes: ''
   },
   {
     id:'von-steele', name:'Von Steele', role:'Villain — Super-Spy Criminal',
     vehicle:'Drives black Dodge Durango',
     badge:'villain',
-    detail:'Sean playing villain with eyepatch. Recurring antagonist across all episodes.',
+    detail:'Recurring antagonist across all episodes.',
     episodes: ['ep101','ep102','ep103'],
+    wardrobe: [
+      { id:'von-steele-base', name:'Base', desc:'Eyepatch, dark villain look, spy aesthetic', episodes:['ep101','ep102','ep103'] },
+    ],
     notes: ''
   }
 ];
@@ -1084,6 +1161,7 @@ function loadLocal() {
     const pipe = localStorage.getItem('convoy_pipeline');
     if(pipe) pipeline = JSON.parse(pipe);
     loadPanelImages();
+    loadWardrobeImages();
   } catch(e) {}
 }
 
@@ -1254,9 +1332,10 @@ function buildItemCard(item) {
       <div class="card-appearances">${epTags}</div>
       <div class="card-detail">${item.detail}</div>
       ${item.sku ? `<div class="card-sku">SKU: ${item.sku}</div>` : ''}
-      <textarea class="notes-area" id="notes-${item.id}" placeholder="Notas de producción..."
+      <textarea class="notes-area" id="notes-${item.id}" placeholder="Production notes..."
         onblur="saveNotes('${item.id}')">${savedNotes}</textarea>
     </div>
+    ${item.wardrobe ? buildWardrobeSection(item) : ''}
   </div>`;
 }
 
@@ -1815,6 +1894,10 @@ async function loadJSONBin() {
       Object.entries(record.panelImages).forEach(([k,v]) => { if(v) panelImageData[k]=v; });
       savePanelImages();
     }
+    if(record.wardrobeImages) {
+      Object.entries(record.wardrobeImages).forEach(([k,v]) => { if(v) wardrobeImageData[k]=v; });
+      saveWardrobeImages();
+    }
     saveLocal();
     renderActive();
     updateStats();
@@ -1965,6 +2048,105 @@ function resetAll() {
 document.getElementById('pipeline-modal').addEventListener('click', function(e) {
   if(e.target === this) closePipeline();
 });
+
+// ════════════════════════════════════════
+// WARDROBE
+// ════════════════════════════════════════
+let wardrobeImageData = {};
+
+function loadWardrobeImages() {
+  try {
+    const raw = localStorage.getItem('convoy_wardrobe_images');
+    if(raw) wardrobeImageData = JSON.parse(raw);
+  } catch(e) {}
+}
+
+function saveWardrobeImages() {
+  const light = {};
+  Object.entries(wardrobeImageData).forEach(([k,v]) => { if(v) light[k] = v; });
+  localStorage.setItem('convoy_wardrobe_images', JSON.stringify(light));
+}
+
+function buildWardrobeSection(item) {
+  const count = item.wardrobe.length;
+  const rows = item.wardrobe.map(v => {
+    const img = wardrobeImageData[v.id] || '';
+    const epBadges = v.episodes.map(ep => `<span class="wv-ep">${EP_LABELS[ep]}</span>`).join('');
+    return `
+    <div class="wv-row">
+      <div class="wv-thumb" onclick="document.getElementById('wv-file-${v.id}').click()">
+        ${img
+          ? `<img src="${img}" alt="${v.name}">`
+          : `<span class="wv-thumb-add">+</span>`
+        }
+      </div>
+      <input class="wv-file" type="file" id="wv-file-${v.id}" accept="image/*" onchange="uploadWardrobeImage('${v.id}', '${item.id}', this)">
+      <div class="wv-info">
+        <div class="wv-name">${v.name}</div>
+        <div class="wv-desc">${v.desc}</div>
+        <div class="wv-eps">${epBadges}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  return `
+  <div class="wardrobe-section">
+    <div class="wardrobe-header">
+      <span class="wardrobe-label">Wardrobe</span>
+      <span class="wardrobe-count">${count} ${count === 1 ? 'variation' : 'variations'}</span>
+    </div>
+    ${rows}
+  </div>`;
+}
+
+async function uploadWardrobeImage(variationId, charId, input) {
+  const file = input.files[0]; if(!file) return;
+
+  if(!pipeline.cloudName || !pipeline.preset) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      wardrobeImageData[variationId] = e.target.result;
+      saveWardrobeImages();
+      renderCharacters();
+      showToast('Wardrobe image saved locally.');
+    };
+    reader.readAsDataURL(file);
+    return;
+  }
+
+  try {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('upload_preset', pipeline.preset);
+    fd.append('folder', 'convoy_breakdown/wardrobe');
+    fd.append('public_id', variationId);
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${pipeline.cloudName}/image/upload`, { method:'POST', body:fd });
+    const data = await res.json();
+    if(data.secure_url) {
+      wardrobeImageData[variationId] = data.secure_url;
+      saveWardrobeImages();
+      renderCharacters();
+      syncWardrobeToJSONBin();
+      showToast('Wardrobe uploaded to Cloudinary.');
+    } else { throw new Error('No URL'); }
+  } catch(e) { showToast('Upload failed.'); }
+}
+
+async function syncWardrobeToJSONBin() {
+  if(!pipeline.binId || !pipeline.binKey) return;
+  try {
+    const res = await fetch('https://api.jsonbin.io/v3/b/'+pipeline.binId+'/latest', {
+      headers:{'X-Master-Key':pipeline.binKey,'X-Bin-Meta':'false'}
+    });
+    const existing = await res.json(); const record = existing.record || existing;
+    record.wardrobeImages = wardrobeImageData;
+    await fetch('https://api.jsonbin.io/v3/b/'+pipeline.binId, {
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Master-Key':pipeline.binKey},
+      body: JSON.stringify(record)
+    });
+  } catch(e) { console.warn('Wardrobe JSONBin sync failed:', e); }
+}
 </script>
 </body>
 </html>

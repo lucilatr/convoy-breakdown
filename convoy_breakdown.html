@@ -564,7 +564,7 @@
 
   /* ─── PANELS TAB ─── */
   .panels-layout {
-    display: grid; grid-template-columns: 1fr 236px;
+    display: grid; grid-template-columns: 1fr 220px;
     min-height: 520px; border: 1px solid var(--border);
   }
   .panels-list-col { border-right: 1px solid var(--border); }
@@ -580,7 +580,8 @@
     font-size: 10px; letter-spacing: 2px; color: var(--text-muted); font-family: var(--fontb);
   }
   .panels-grid-inner {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0,1fr));
     gap: 8px; padding: 14px;
   }
   .p-card {
@@ -590,7 +591,7 @@
   .p-card:hover { border-color: var(--border-pink); }
   .p-card.p-selected { border-color: var(--pink); }
   .p-thumb {
-    width: 100%; aspect-ratio: 16/10; background: var(--bg-card2);
+    width: 100%; aspect-ratio: 16/11; background: var(--bg-card2);
     display: flex; align-items: center; justify-content: center;
     position: relative; overflow: hidden;
   }
@@ -602,17 +603,17 @@
   }
   .p-world {
     position: absolute; top: 5px; right: 6px; font-size: 8px; font-weight: 700;
-    letter-spacing: 1px; text-transform: uppercase; padding: 1px 5px; font-family: var(--font);
+    letter-spacing: 1px; text-transform: uppercase; padding: 1px 4px; font-family: var(--font);
   }
   .p-world-rw { background: rgba(255,180,0,.15); color: #ffb400; }
   .p-world-aw { background: rgba(0,180,255,.12); color: #00b4ff; }
-  .p-info { padding: 7px 8px 9px; }
+  .p-info { padding: 8px 9px 9px; }
   .p-desc {
     font-size: 10px; color: var(--text-dim); line-height: 1.35; font-family: var(--fontb);
     margin-bottom: 5px; display: -webkit-box; -webkit-line-clamp: 2;
     -webkit-box-orient: vertical; overflow: hidden;
   }
-  .p-tags { display: flex; flex-wrap: wrap; gap: 3px; }
+  .p-tags { display: flex; flex-wrap: wrap; gap: 2px; }
   .ptag {
     font-size: 8px; font-weight: 700; letter-spacing: .5px;
     padding: 1px 5px; text-transform: uppercase; font-family: var(--font);
@@ -633,7 +634,7 @@
   }
   .pd-num { font-size: 13px; font-weight: 900; color: var(--pink); letter-spacing: 1px; font-family: var(--font); }
   .pd-img {
-    width: 100%; aspect-ratio: 16/10; background: var(--bg-card2); border: 1px solid var(--border);
+    width: 100%; aspect-ratio: 16/11; background: var(--bg-card2); border: 1px solid var(--border);
     display: flex; align-items: center; justify-content: center;
     position: relative; overflow: hidden; cursor: pointer;
   }
@@ -1632,38 +1633,19 @@ let selectedPanel = null;
 let panelImageData = {};
 
 function loadPanelImages() {
-  try {
-    const raw = localStorage.getItem('convoy_panel_images');
-    if(raw) panelImageData = JSON.parse(raw);
-  } catch(e) {}
+  try { const r = localStorage.getItem('convoy_panel_images'); if(r) panelImageData = JSON.parse(r); } catch(e) {}
 }
-
 function savePanelImages() {
-  const light = {};
-  Object.entries(panelImageData).forEach(([k,v]) => { if(v) light[k] = v; });
-  localStorage.setItem('convoy_panel_images', JSON.stringify(light));
+  const l = {}; Object.entries(panelImageData).forEach(([k,v]) => { if(v) l[k]=v; });
+  localStorage.setItem('convoy_panel_images', JSON.stringify(l));
 }
-
 function getPanelsForChapter() {
   if(currentChapter === 'all' || !PANELS_BY_EP[currentChapter]) return [];
   return PANELS_BY_EP[currentChapter];
 }
-
-function getCharName(id) {
-  const c = CHARACTERS.find(x => x.id === id);
-  return c ? c.name : id;
-}
-
-function getEnvShortName(id) {
-  const e = ENVIRONMENTS.find(x => x.id === id);
-  if(!e) return '';
-  return e.name.split('(')[0].trim().split(' ').slice(0,2).join(' ');
-}
-
-function getEnvName(id) {
-  const e = ENVIRONMENTS.find(x => x.id === id);
-  return e ? e.name : '';
-}
+function getCharName(id) { const c = CHARACTERS.find(x=>x.id===id); return c ? c.name : id; }
+function getEnvShortName(id) { const e = ENVIRONMENTS.find(x=>x.id===id); if(!e) return ''; return e.name.split('(')[0].trim().split(' ').slice(0,2).join(' '); }
+function getEnvName(id) { const e = ENVIRONMENTS.find(x=>x.id===id); return e ? e.name : ''; }
 
 // ════════════════════════════════════════
 // PANELS RENDER
@@ -1673,21 +1655,16 @@ function renderPanels() {
   const grid = document.getElementById('panels-grid');
   const titleEl = document.getElementById('panels-ep-title');
   const countEl = document.getElementById('panels-count');
-
   if(!panels.length) {
     grid.innerHTML = '<div style="padding:32px 16px;color:var(--text-muted);font-family:var(--fontb);font-size:11px;letter-spacing:2px;text-transform:uppercase;">Seleccioná un episodio con panels disponibles</div>';
-    titleEl.textContent = 'Sin datos';
-    countEl.textContent = '';
+    titleEl.textContent = 'Sin datos'; countEl.textContent = '';
     document.getElementById('panels-detail').innerHTML = '<div class="panels-detail-empty"><svg width="32" height="24" viewBox="0 0 32 24" fill="none" style="opacity:.15;color:var(--text-muted)"><rect x="1" y="1" width="30" height="22" rx="1" stroke="currentColor" stroke-width="1.5"/></svg><span>Seleccioná un panel</span></div>';
     return;
   }
-
   const s = EP_SYNOPSES[currentChapter];
-  const epLabel = EP_LABELS[currentChapter] || '';
-  titleEl.textContent = s ? epLabel + ' · ' + s.title : epLabel;
+  titleEl.textContent = s ? (EP_LABELS[currentChapter]||'') + ' · ' + s.title : (EP_LABELS[currentChapter]||'');
   const imaged = panels.filter(p => panelImageData[p.id]).length;
   countEl.textContent = panels.length + ' panels · ' + imaged + ' con layout';
-
   grid.innerHTML = panels.map(p => {
     const img = panelImageData[p.id];
     const sel = selectedPanel === p.id;
@@ -1713,32 +1690,28 @@ function renderPanels() {
 function selectPanel(id) {
   selectedPanel = id;
   const panels = getPanelsForChapter();
-  const p = panels.find(x => x.id === id);
+  const p = panels.find(x=>x.id===id);
   if(!p) return;
-  document.querySelectorAll('.p-card').forEach(c => c.classList.remove('p-selected'));
+  document.querySelectorAll('.p-card').forEach(c=>c.classList.remove('p-selected'));
   const card = document.getElementById('pcard-'+id);
   if(card) card.classList.add('p-selected');
   const img = panelImageData[id];
-  const detail = document.getElementById('panels-detail');
-  detail.innerHTML = `
+  document.getElementById('panels-detail').innerHTML = `
     <div class="pd-num">Panel ${p.label}</div>
     <div class="pd-img" onclick="document.getElementById('pd-file-${id}').click()">
-      ${img ? `<img src="${img}" alt="Layout ${p.label}">` : `<div class="pd-img-ph"><svg width="36" height="26" viewBox="0 0 36 26" fill="none"><rect x="1" y="1" width="34" height="24" rx="2" stroke="currentColor" stroke-width="1.2"/><polyline points="1,18 10,10 17,15 25,7 35,14" stroke="currentColor" stroke-width="1.2" fill="none"/><circle cx="11" cy="8" r="2.5" fill="currentColor" opacity="0.4"/></svg></div>`}
+      ${img?`<img src="${img}" alt="Layout ${p.label}">`:`<div class="pd-img-ph"><svg width="36" height="26" viewBox="0 0 36 26" fill="none"><rect x="1" y="1" width="34" height="24" rx="2" stroke="currentColor" stroke-width="1.2"/><polyline points="1,18 10,10 17,15 25,7 35,14" stroke="currentColor" stroke-width="1.2" fill="none"/><circle cx="11" cy="8" r="2.5" fill="currentColor" opacity="0.4"/></svg></div>`}
     </div>
     <input class="pd-file-input" type="file" id="pd-file-${id}" accept="image/*" onchange="uploadPanelLayout('${id}', this)">
     <button class="pd-upload-btn" onclick="document.getElementById('pd-file-${id}').click()">+ Subir layout</button>
     <div class="pd-status" id="pd-status-${id}"></div>
     <div class="pd-divider"></div>
-    <div class="pd-field">
-      <div class="pd-label">Mundo</div>
-      <div class="pd-val" style="color:${p.world==='rw'?'#ffb400':'#00b4ff'}">${p.world==='rw'?'Real World':'Adventure World'}</div>
-    </div>
-    ${p.env ? `<div class="pd-field"><div class="pd-label">Environment</div><div class="pd-val">${getEnvName(p.env)}</div></div>` : ''}
+    <div class="pd-field"><div class="pd-label">Mundo</div><div class="pd-val" style="color:${p.world==='rw'?'#ffb400':'#00b4ff'}">${p.world==='rw'?'Real World':'Adventure World'}</div></div>
+    ${p.env?`<div class="pd-field"><div class="pd-label">Environment</div><div class="pd-val">${getEnvName(p.env)}</div></div>`:''}
     <div class="pd-field"><div class="pd-label">Shot</div><div class="pd-val">${p.shot}</div></div>
     <div class="pd-field"><div class="pd-label">Time of day</div><div class="pd-val">${p.time}</div></div>
-    ${p.chars.length ? `<div class="pd-field"><div class="pd-label">Characters</div><div class="pd-tags">${p.chars.map(c=>`<span class="ptag ptag-char">${getCharName(c)}</span>`).join('')}</div></div>` : ''}
-    ${p.vo ? `<div class="pd-divider"></div><div class="pd-field"><div class="pd-label">Voice over</div><div class="pd-vo">${p.vo}</div></div>` : ''}
-    ${p.desc ? `<div class="pd-field"><div class="pd-label">Description</div><div class="pd-desc-txt">${p.desc}</div></div>` : ''}
+    ${p.chars.length?`<div class="pd-field"><div class="pd-label">Characters</div><div class="pd-tags">${p.chars.map(c=>`<span class="ptag ptag-char">${getCharName(c)}</span>`).join('')}</div></div>`:''}
+    ${p.vo?`<div class="pd-divider"></div><div class="pd-field"><div class="pd-label">Voice over</div><div class="pd-vo">${p.vo}</div></div>`:''}
+    ${p.desc?`<div class="pd-field"><div class="pd-label">Description</div><div class="pd-desc-txt">${p.desc}</div></div>`:''}
   `;
 }
 
@@ -1746,58 +1719,36 @@ function selectPanel(id) {
 // PANEL LAYOUT UPLOAD
 // ════════════════════════════════════════
 async function uploadPanelLayout(panelId, input) {
-  const file = input.files[0];
-  if(!file) return;
+  const file = input.files[0]; if(!file) return;
   const statusEl = document.getElementById('pd-status-'+panelId);
   if(statusEl) { statusEl.textContent = 'Subiendo...'; statusEl.className = 'pd-status'; }
   if(!pipeline.cloudName || !pipeline.preset) {
     const reader = new FileReader();
-    reader.onload = e => {
-      panelImageData[panelId] = e.target.result;
-      savePanelImages();
-      selectPanel(panelId);
-      renderPanels();
-      showToast('Layout guardado localmente.');
-    };
-    reader.readAsDataURL(file);
-    return;
+    reader.onload = e => { panelImageData[panelId]=e.target.result; savePanelImages(); selectPanel(panelId); renderPanels(); showToast('Layout guardado localmente.'); };
+    reader.readAsDataURL(file); return;
   }
   try {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', pipeline.preset);
-    formData.append('folder', 'convoy_breakdown');
-    formData.append('public_id', panelId);
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${pipeline.cloudName}/image/upload`, { method:'POST', body: formData });
+    const fd = new FormData();
+    fd.append('file', file); fd.append('upload_preset', pipeline.preset);
+    fd.append('folder', 'convoy_breakdown'); fd.append('public_id', panelId);
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${pipeline.cloudName}/image/upload`, {method:'POST',body:fd});
     const data = await res.json();
     if(data.secure_url) {
-      panelImageData[panelId] = data.secure_url;
-      savePanelImages();
+      panelImageData[panelId] = data.secure_url; savePanelImages();
       if(statusEl) { statusEl.textContent = '✓ Subido'; statusEl.className = 'pd-status ok'; }
-      selectPanel(panelId);
-      renderPanels();
-      syncPanelImagesToJSONBin();
+      selectPanel(panelId); renderPanels(); syncPanelImagesToJSONBin();
       showToast('Layout subido a Cloudinary.');
     } else { throw new Error('No URL'); }
-  } catch(e) {
-    if(statusEl) { statusEl.textContent = 'Error al subir.'; statusEl.className = 'pd-status err'; }
-  }
+  } catch(e) { if(statusEl) { statusEl.textContent = 'Error al subir.'; statusEl.className = 'pd-status err'; } }
 }
 
 async function syncPanelImagesToJSONBin() {
   if(!pipeline.binId || !pipeline.binKey) return;
   try {
-    const res = await fetch('https://api.jsonbin.io/v3/b/'+pipeline.binId+'/latest', {
-      headers:{'X-Master-Key':pipeline.binKey,'X-Bin-Meta':'false'}
-    });
-    const existing = await res.json();
-    const record = existing.record || existing;
+    const res = await fetch('https://api.jsonbin.io/v3/b/'+pipeline.binId+'/latest',{headers:{'X-Master-Key':pipeline.binKey,'X-Bin-Meta':'false'}});
+    const existing = await res.json(); const record = existing.record || existing;
     record.panelImages = panelImageData;
-    await fetch('https://api.jsonbin.io/v3/b/'+pipeline.binId, {
-      method:'PUT',
-      headers:{'Content-Type':'application/json','X-Master-Key':pipeline.binKey},
-      body: JSON.stringify(record)
-    });
+    await fetch('https://api.jsonbin.io/v3/b/'+pipeline.binId,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':pipeline.binKey},body:JSON.stringify(record)});
   } catch(e) { console.warn('Panel JSONBin sync failed:', e); }
 }
 
@@ -1841,7 +1792,7 @@ async function loadJSONBin() {
       });
     }
     if(record.panelImages) {
-      Object.entries(record.panelImages).forEach(([k,v]) => { if(v) panelImageData[k] = v; });
+      Object.entries(record.panelImages).forEach(([k,v]) => { if(v) panelImageData[k]=v; });
       savePanelImages();
     }
     saveLocal();

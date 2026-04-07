@@ -561,7 +561,148 @@
 
   /* HIDDEN */
   .hidden { display:none !important; }
-</style>
+
+  /* ─── PANELS TAB ─── */
+  .panels-layout {
+    display: grid;
+    grid-template-columns: 1fr 236px;
+    min-height: 520px;
+    border: 1px solid var(--border);
+  }
+  .panels-list-col {
+    border-right: 1px solid var(--border);
+  }
+  .panels-list-header {
+    padding: 13px 16px 11px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .panels-list-title {
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--text-muted); font-family: var(--fontb);
+  }
+  .panels-list-count {
+    font-size: 10px; letter-spacing: 2px;
+    color: var(--text-muted); font-family: var(--fontb);
+  }
+  .panels-grid-inner {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+    gap: 8px;
+    padding: 14px;
+  }
+  .p-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: border-color .15s;
+  }
+  .p-card:hover { border-color: var(--border-pink); }
+  .p-card.p-selected { border-color: var(--pink); }
+  .p-thumb {
+    width: 100%; aspect-ratio: 16/10;
+    background: var(--bg-card2);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .p-thumb img {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  }
+  .p-thumb-ph { opacity: .12; color: var(--text-muted); }
+  .p-num {
+    position: absolute; top: 5px; left: 7px;
+    font-size: 10px; font-weight: 900;
+    color: var(--pink); letter-spacing: .5px;
+    font-family: var(--font);
+  }
+  .p-world {
+    position: absolute; top: 5px; right: 6px;
+    font-size: 8px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; padding: 1px 5px;
+    font-family: var(--font);
+  }
+  .p-world-rw { background: rgba(255,180,0,.15); color: #ffb400; }
+  .p-world-aw { background: rgba(0,180,255,.12); color: #00b4ff; }
+  .p-info { padding: 7px 8px 9px; }
+  .p-desc {
+    font-size: 10px; color: var(--text-dim); line-height: 1.35;
+    font-family: var(--fontb); margin-bottom: 5px;
+    display: -webkit-box; -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .p-tags { display: flex; flex-wrap: wrap; gap: 3px; }
+  .ptag {
+    font-size: 8px; font-weight: 700; letter-spacing: .5px;
+    padding: 1px 5px; text-transform: uppercase; font-family: var(--font);
+  }
+  .ptag-char { background: var(--pink-dim); color: var(--pink); border: 1px solid var(--border-pink); }
+  .ptag-env  { background: rgba(0,220,120,.08); color: #00dc78; border: 1px solid rgba(0,220,120,.2); }
+  .ptag-vo   { background: rgba(160,100,255,.1); color: #b47fff; border: 1px solid rgba(160,100,255,.2); }
+  .ptag-more { background: var(--bg-card2); color: var(--text-muted); border: 1px solid var(--border); }
+
+  /* DETAIL COLUMN */
+  .panels-detail-col {
+    background: var(--bg-card);
+    padding: 16px;
+    display: flex; flex-direction: column; gap: 12px;
+    overflow-y: auto; max-height: 80vh;
+  }
+  .panels-detail-empty {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; height: 100%; gap: 10px;
+    color: var(--text-muted); font-size: 10px;
+    letter-spacing: 2px; text-transform: uppercase;
+    font-family: var(--fontb); min-height: 300px;
+  }
+  .pd-num {
+    font-size: 13px; font-weight: 900; color: var(--pink);
+    letter-spacing: 1px; font-family: var(--font);
+  }
+  .pd-img {
+    width: 100%; aspect-ratio: 16/10;
+    background: var(--bg-card2); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden; cursor: pointer;
+  }
+  .pd-img img { width: 100%; height: 100%; object-fit: contain; }
+  .pd-img-ph { opacity: .12; color: var(--text-muted); }
+  .pd-upload-btn {
+    width: 100%; background: transparent;
+    border: 1px dashed var(--border-pink);
+    color: var(--pink); font-family: var(--font);
+    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; padding: 7px; cursor: pointer;
+    transition: all .15s; opacity: .6;
+  }
+  .pd-upload-btn:hover { opacity: 1; border-style: solid; }
+  .pd-status {
+    font-size: 10px; text-align: center; font-family: var(--fontb);
+    min-height: 16px; color: var(--text-muted);
+  }
+  .pd-status.ok { color: #00dc78; }
+  .pd-status.err { color: var(--pink); }
+  .pd-divider { height: 1px; background: var(--border); }
+  .pd-field { display: flex; flex-direction: column; gap: 3px; }
+  .pd-label {
+    font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--text-muted); font-family: var(--fontb);
+  }
+  .pd-val {
+    font-size: 12px; color: var(--text); font-family: var(--fontb); line-height: 1.4;
+  }
+  .pd-tags { display: flex; flex-wrap: wrap; gap: 3px; }
+  .pd-vo {
+    font-size: 11px; color: var(--text-dim); line-height: 1.55;
+    font-family: var(--fontb); font-style: italic;
+    background: var(--bg-card2);
+    border-left: 2px solid rgba(160,100,255,.4);
+    padding: 7px 10px;
+  }
+  .pd-desc-txt {
+    font-size: 11px; color: var(--text-muted); line-height: 1.5;
+    font-family: var(--fontb);
+  }
+  .pd-file-input { display: none; }</style>
 </head>
 <body>
 
@@ -598,7 +739,6 @@
     <button class="chapter-btn" onclick="filterChapter('ep101', this)">Ep 101 — Bridge of Super Spies</button>
     <button class="chapter-btn" onclick="filterChapter('ep102', this)">Ep 102 — The Jungle Chase</button>
     <button class="chapter-btn" onclick="filterChapter('ep103', this)">Ep 103 — Fireworks Firefighting</button>
-    <button class="chapter-btn" onclick="filterChapter('ep104', this)">Ep 104 — Dog Race Rescue!</button>
   </div>
 
   <div class="synopsis-box" id="synopsis-box">
@@ -624,6 +764,9 @@
     <button class="tab-btn" onclick="switchTab('environments', this)">
       Environments <span class="tab-count" id="tc-envs">0</span>
     </button>
+    <button class="tab-btn" onclick="switchTab('panels', this)">
+      Panels <span class="tab-count" id="tc-panels">—</span>
+    </button>
   </div>
 
   <!-- SECTION CONTENT -->
@@ -638,7 +781,7 @@
 
       <div class="stat-card">
         <div class="stat-label">Capítulos</div>
-        <div class="stat-num">4 / 8</div>
+        <div class="stat-num">3 / 8</div>
       </div>
     </div>
 
@@ -666,6 +809,25 @@
     <!-- ENVIRONMENTS TAB -->
     <div id="tab-environments" class="tab-panel hidden">
       <div id="envs-grid" class="cards-grid"></div>
+    </div>
+
+    <!-- PANELS TAB -->
+    <div id="tab-panels" class="tab-panel hidden">
+      <div class="panels-layout">
+        <div class="panels-list-col">
+          <div class="panels-list-header">
+            <span class="panels-list-title" id="panels-ep-title">Seleccioná un episodio</span>
+            <span class="panels-list-count" id="panels-count"></span>
+          </div>
+          <div class="panels-grid-inner" id="panels-grid"></div>
+        </div>
+        <div class="panels-detail-col" id="panels-detail">
+          <div class="panels-detail-empty">
+            <svg width="32" height="24" viewBox="0 0 32 24" fill="none" style="opacity:.15;color:var(--text-muted)"><rect x="1" y="1" width="30" height="22" rx="1" stroke="currentColor" stroke-width="1.5"/><line x1="1" y1="9" x2="31" y2="9" stroke="currentColor" stroke-width="1"/><polyline points="4,18 9,13 14,16 20,10 28,15" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
+            <span>Seleccioná un panel</span>
+          </div>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -729,8 +891,8 @@
 // ════════════════════════════════════════
 // DATA
 // ════════════════════════════════════════
-const EPISODES = ['ep101','ep102','ep103','ep104'];
-const EP_LABELS = { ep101:'Ep 101', ep102:'Ep 102', ep103:'Ep 103', ep104:'Ep 104' };
+const EPISODES = ['ep101','ep102','ep103'];
+const EP_LABELS = { ep101:'Ep 101', ep102:'Ep 102', ep103:'Ep 103' };
 
 const EP_SYNOPSES = {
   ep101: {
@@ -756,14 +918,6 @@ const EP_SYNOPSES = {
     script: 'https://drive.google.com/file/d/1nvvJd4C2lv9zKdNOAu_7042REAHTVoYE/view?usp=drive_link',
     en: "A massive fire breaks out at the fireworks factory, threatening the entire city. Ted leads the rescue team to battle the blaze while Sean pursues Von Steele — the criminal responsible. The mission culminates in a daring maneuver: using the Mountain Convoy Pursuit truck to topple the water tower and douse the fire once and for all.",
     es: 'Un incendio masivo en la fábrica de fuegos artificiales pone en peligro toda la ciudad. Ted lidera al equipo de rescate para combatir las llamas mientras Sean persigue a Von Steele, el responsable del siniestro. La misión culmina con una maniobra audaz: derribar la torre de agua para apagar el fuego de una vez por todas.'
-  },
-  ep104: {
-    label: 'Episode 104',
-    title: 'Dog Race Rescue!',
-    panels: 43,
-    script: 'https://drive.google.com/file/d/1ngC373Xxvl8DdeRTfHvkDmK_2hO8rCoz/view?usp=drive_link',
-    en: "The Matchbox Grand Prix turns from a race into a rescue when a runaway mobile dog washing van full of wet pups pulls into the lead. Aimee must use a dog bone as bait to guide the driverless van to the finish line, while the rest of the squad converts the Smalley's Garage car crusher into a soft landing zone using pillows. A dog-gone rescue race unlike anything the squad has tackled before.",
-    es: 'El Gran Premio Matchbox se convierte en una misión de rescate cuando una furgoneta de baño canino sin conductor llena de perros mojados toma la delantera. Aimee debe usar un hueso como señuelo para guiar la furgoneta hasta la meta, mientras el resto del equipo convierte la aplastadora del garage Smalley en una zona de aterrizaje con almohadas. Una carrera de rescate perruna como nunca antes había enfrentado el equipo.'
   }
 };
 
@@ -775,11 +929,15 @@ const CHARACTERS = [
     vehicle:'Drives Rover 6x6',
     badge:'character',
     detail:'Protagonist. Plays as both himself and villain Von Steele (eyepatch). Recurring across all episodes.',
-    episodes: ['ep101','ep102','ep103','ep104'],
+    episodes: ['ep101','ep102','ep103'],
+    notes: ''
+  },
+  {
+    id:'ted', name:'Ted', role:'Fire & Rescue Lead',
     vehicle:'Drives Blaze Blaster III & Triumph Scrambler',
     badge:'character',
     detail:'Commands fire rescue ops. Wears full firefighter gear including helmet.',
-    episodes: ['ep101','ep102','ep103','ep104'],
+    episodes: ['ep101','ep102','ep103'],
     notes: ''
   },
   {
@@ -787,7 +945,7 @@ const CHARACTERS = [
     vehicle:'Pilots Rescue Helicopter & Super Hercules',
     badge:'character',
     detail:'Aerial recon, water bucket drops and cargo extractions. Uses headset.',
-    episodes: ['ep101','ep102','ep103','ep104'],
+    episodes: ['ep101','ep102','ep103'],
     notes: ''
   },
   {
@@ -795,7 +953,7 @@ const CHARACTERS = [
     vehicle:'Drives Ambulance, Toyota Tacoma & Chevy Stock Car',
     badge:'character',
     detail:'Fast and resourceful. Handles crowd control, medical support and high-speed chases.',
-    episodes: ['ep101','ep102','ep103','ep104'],
+    episodes: ['ep101','ep102','ep103'],
     notes: ''
   },
   {
@@ -803,7 +961,7 @@ const CHARACTERS = [
     vehicle:'Operates Excavator & Turf Hauler',
     badge:'character',
     detail:'Engineering mindset. Demolition and heavy construction rigs. Wears orange hard hat.',
-    episodes: ['ep101','ep102','ep103','ep104'],
+    episodes: ['ep101','ep102','ep103'],
     notes: ''
   },
   {
@@ -819,7 +977,7 @@ const CHARACTERS = [
 const VEHICLES = [
   // Ep 101
   { id:'rover-6x6', name:'Rover 6x6', sku:'JKH28', badge:'vehicle', detail:"Sean's primary pursuit vehicle. Appears in all 3 episodes.", episodes:['ep101','ep102','ep103'], notes:'' },
-  { id:'rescue-heli', name:'Rescue Helicopter', sku:'JKH39', badge:'vehicle', detail:'Charmaine. Air support, cargo drops, water bucket. Appears in all eps.', episodes:['ep101','ep102','ep103','ep104'], notes:'' },
+  { id:'rescue-heli', name:'Rescue Helicopter', sku:'JKH39', badge:'vehicle', detail:'Charmaine. Air support, cargo drops, water bucket. Appears in all 3 eps.', episodes:['ep101','ep102','ep103'], notes:'' },
   { id:'dodge-durango', name:'Dodge Durango', sku:'HFP46', badge:'vehicle', detail:"Von Steele's black villain vehicle. Recurring across all eps.", episodes:['ep101','ep102','ep103'], notes:'' },
   { id:'plowverizer', name:'Plowverizer', sku:'JHN22', badge:'vehicle', detail:'Heavy plow truck. Ep 101 bridge chase. Von Steele escape vehicle.', episodes:['ep101'], notes:'' },
   { id:'f650-rollback', name:'F-650 Rollback', sku:'JKH49', badge:'vehicle', detail:'Tow truck. Ep 101 bridge construction sequence.', episodes:['ep101'], notes:'' },
@@ -827,10 +985,10 @@ const VEHICLES = [
   { id:'excavator', name:'Excavator', sku:'JKH38', badge:'vehicle', detail:'Crosby. Ep 101 bridge demolition and pursuit. Key to trap.', episodes:['ep101'], notes:'' },
   { id:'turf-hauler', name:'Turf Hauler', sku:'HFB90', badge:'vehicle', detail:'Construction hauler. Ep 101 bridge rubble.', episodes:['ep101'], notes:'' },
   { id:'mustang-fastback', name:'Mustang Fastback', sku:'JKH34', badge:'vehicle', detail:"Aimee's signature vehicle. Ep 101.", episodes:['ep101'], notes:'' },
-  { id:'triumph-scrambler', name:'Triumph Scrambler', sku:'JKH31', badge:'vehicle', detail:"Ted's motorcycle. Eps 101, 102 & 104. Used for jungle rescue and city race.", episodes:['ep101','ep102','ep104'], notes:'' },
+  { id:'triumph-scrambler', name:'Triumph Scrambler', sku:'JKH31', badge:'vehicle', detail:"Ted's motorcycle. Eps 101 & 102. Used for jungle rescue.", episodes:['ep101','ep102'], notes:'' },
   // Ep 102
   { id:'toyota-tacoma', name:'Toyota Tacoma', sku:'JMB54', badge:'vehicle', detail:"Aimee's jungle truck. Carries the secret crate. Ep 102.", episodes:['ep102'], notes:'' },
-  { id:'chevy-stock', name:'Chevy Stock Car', sku:'JKH33', badge:'vehicle', detail:"Aimee's fast car. Ep 102 jungle sprint, Ep 104 city race rescue.", episodes:['ep102','ep104'], notes:'' },
+  { id:'chevy-stock', name:'Chevy Stock Car', sku:'JKH33', badge:'vehicle', detail:"Aimee's fast car swap. Ep 102 jungle sprint.", episodes:['ep102'], notes:'' },
   { id:'polaris-rzr', name:'Polaris RZR', sku:'BL251', badge:'vehicle', detail:"Von Steele's lumberjack henchmen. Chainsaw attachments (paperclip). Ep 102.", episodes:['ep102'], notes:'' },
   { id:'super-hercules', name:'Super Hercules', sku:'JKH51', badge:'vehicle', detail:"Charmaine's cargo plane. Ep 102 extraction mission.", episodes:['ep102'], notes:'' },
   { id:'mountain-escape', name:'Mountain Escape Getaway', sku:'JMG57', badge:'vehicle', detail:'Playset. Multi-level ramp chase. Ep 102 finale.', episodes:['ep102'], notes:'' },
@@ -839,19 +997,13 @@ const VEHICLES = [
   { id:'blaze-buster', name:'Blaze Buster', sku:'HVP56', badge:'vehicle', detail:"Crosby's fire engine. Ep 103.", episodes:['ep103'], notes:'' },
   { id:'dodge-ambulance', name:'2019 Dodge Ambulance', sku:'JKH45', badge:'vehicle', detail:"Aimee's medical/crowd control. Ep 103.", episodes:['ep103'], notes:'' },
   { id:'mountain-convoy', name:'Mountain Convoy Pursuit', sku:'JJB32', badge:'vehicle', detail:"Sean's massive truck / Secret Hideout. Ep 103 water tower sequence.", episodes:['ep103'], notes:'' },
-  // Ep 104
-  { id:'nissan-nismo', name:'2020 Nissan Nismo', sku:'JKH44', badge:'vehicle', detail:"Crosby's race car. Ep 104 Matchbox Grand Prix.", episodes:['ep104'], notes:'' },
-  { id:'vw-bus', name:'VW Bus Moving Parts', sku:'JHV23', badge:'vehicle', detail:'Runaway mobile dog washing van. Three wet sheepdogs inside. No driver. Ep 104 central MacGuffin.', episodes:['ep104'], notes:'' },
-  { id:'porsche-911', name:'Porsche 911', sku:'BL252', badge:'vehicle', detail:"Charmaine's race car. Ep 104 Grand Prix.", episodes:['ep104'], notes:'' },
-  { id:'ford-gt40', name:'Ford GT40 Moving Parts', sku:'JKH53', badge:'vehicle', detail:"Sean's race car. Ep 104 Grand Prix.", episodes:['ep104'], notes:'' },
-  { id:'smalleys-crusher', name:"Smalley's Garage Crusher Playset", sku:'JMG56', badge:'vehicle', detail:'Car crusher converted into padded car catcher using pillows. Ep 104 finish line trap.', episodes:['ep104'], notes:'' },
 ];
 
 const ENVIRONMENTS = [
   {
     id:'smalleys-garage', name:"Smalley's Garage", badge:'env',
     detail:'INT. Hub location. Professional mechanic garage converted into ultimate Matchbox play space. Large central diorama table. Appears in ALL episodes as Real World framing device.',
-    episodes:['ep101','ep102','ep103','ep104'], notes:''
+    episodes:['ep101','ep102','ep103'], notes:''
   },
   {
     id:'matchbox-bridge', name:'Matchbox Bridge', badge:'env',
@@ -882,11 +1034,6 @@ const ENVIRONMENTS = [
     id:'fireworks-factory', name:'Fireworks Factory', badge:'env',
     detail:'EXT. Industrial building on fire. Steep San Francisco-style hill approach. Water tower nearby. Ep 103 primary action location.',
     episodes:['ep103'], notes:''
-  },
-  {
-    id:'city-race-course', name:'City Race Course', badge:'env',
-    detail:'EXT. Street-level road circuit through Matchbox City. Curved sections, downtown chicanes, hay bale barriers, spectators behind safety barriers. Finish line at Smalley\'s Garage. Ep 104 primary location.',
-    episodes:['ep104'], notes:''
   },
 ];
 
@@ -952,6 +1099,7 @@ function loadLocal() {
     if(nts) notesData = JSON.parse(nts);
     const pipe = localStorage.getItem('convoy_pipeline');
     if(pipe) pipeline = JSON.parse(pipe);
+    loadPanelImages();
   } catch(e) {}
 }
 
@@ -972,6 +1120,7 @@ function saveLocal() {
 // ════════════════════════════════════════
 function filterChapter(ch, btn) {
   currentChapter = ch;
+  selectedPanel = null;
   document.querySelectorAll('.chapter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   updateTabCounts();
@@ -1042,6 +1191,8 @@ function updateTabCounts() {
   document.getElementById('tc-chars').textContent = getFiltered(CHARACTERS).length;
   document.getElementById('tc-vehicles').textContent = getFiltered(VEHICLES).length;
   document.getElementById('tc-envs').textContent = getFiltered(ENVIRONMENTS).length;
+  const p = getPanelsForChapter();
+  document.getElementById('tc-panels').textContent = p.length || '—';
 }
 
 function renderActive() {
@@ -1049,6 +1200,7 @@ function renderActive() {
   if(currentTab === 'characters') renderCharacters();
   if(currentTab === 'vehicles') renderVehicles();
   if(currentTab === 'environments') renderEnvironments();
+  if(currentTab === 'panels') renderPanels();
   updateStats();
 }
 
@@ -1447,8 +1599,267 @@ function updatePipeStatus() {
 }
 
 // ════════════════════════════════════════
-// JSONBIN LOAD
+// PANELS DATA
 // ════════════════════════════════════════
+const PANELS_BY_EP = {
+  ep103: [
+    { id:'ep103-p01',  label:'01',    world:'aw', env:'matchbox-city',    chars:['ted'],                                     shot:'MWS · 3/4 rear',         time:'Afternoon', vo:'',                                                                                     desc:"Ted's fire engine races downhill toward the burning fireworks factory as the fire pulses and fireworks explode." },
+    { id:'ep103-p02',  label:'02',    world:'aw', env:'matchbox-city',    chars:['ted'],                                     shot:'MS · 3/4 front',         time:'Afternoon', vo:'Ted (V.O.): A fire at the fireworks factory! This is bad.',                            desc:'Ted reacts in shock inside the truck while firelight shimmers across the windshield.' },
+    { id:'ep103-p03',  label:'03',    world:'aw', env:'',                 chars:[],                                          shot:'Graphic',                time:'—',         vo:'Ted (V.O.): Fireworks Factory Explosive Rescue!',                                      desc:'Title card.' },
+    { id:'ep103-p04',  label:'04',    world:'rw', env:'smalleys-garage',  chars:['ted'],                                     shot:'CU',                     time:'Day',       vo:'Ted (V.O.): (fire noises) boom - krrrgh - pew - pew - boosh',                          desc:'Ted parts and shakes two ribbon wands in the foreground.' },
+    { id:'ep103-p05',  label:'05',    world:'rw', env:'smalleys-garage',  chars:['ted','sean','aimee','crosby','charmaine'],  shot:'WS · high angle',        time:'Day',       vo:"Ted (V.O.): We're gonna need everyone to fight this blaze!",                           desc:'The kids lean toward Ted and the open car case moves toward camera in front of the burning factory diorama.' },
+    { id:'ep103-p06',  label:'06A–F', world:'rw', env:'smalleys-garage',  chars:['ted','crosby','sean','aimee','charmaine'],  shot:'MWS · split-screen',     time:'Day',       vo:'',                                                                                     desc:'Split-screen hero reveals — each character with their vehicle popping forward.' },
+    { id:'ep103-p07',  label:'07',    world:'rw', env:'smalleys-garage',  chars:['ted','crosby'],                            shot:'MS · table-level',       time:'Day',       vo:"Crosby (V.O.): wee-woo! / Ted (V.O.): Stay alert team. Fires are dangerous!",          desc:'Ted and Crosby move their fire engines in sync across the play area street.' },
+    { id:'ep103-p08',  label:'08',    world:'aw', env:'fireworks-factory', chars:['ted','crosby'],                            shot:'MWS · 45°',              time:'Afternoon', vo:"Ted (V.O.): Charmaine, what do you see?",                                              desc:'The factory, flames and smoke appear from black as two fire engines charge in.' },
+    { id:'ep103-p09',  label:'09',    world:'aw', env:'fireworks-factory', chars:['charmaine'],                               shot:'WS · aerial 45°',        time:'Afternoon', vo:"Charmaine (V.O.): Ted, there are fires on the left and right side!",                   desc:'The helicopter moves into frame to reveal the fire scene below, rotors spinning.' },
+    { id:'ep103-p10',  label:'10A–B', world:'aw', env:'fireworks-factory', chars:['ted','crosby'],                            shot:'CU · split-screen',      time:'Afternoon', vo:"Ted (V.O.): Let's split up!",                                                           desc:'Ted and Crosby bounce in their seats as the split image opens to reveal the building.' },
+    { id:'ep103-p11',  label:'11',    world:'aw', env:'matchbox-city',    chars:['sean','aimee'],                            shot:'MS',                     time:'Afternoon', vo:"Sean (V.O.): No one left in the building. / Aimee (V.O.): Let's keep bystanders safe.", desc:'The ambulance and Rover 6x6 drive from opposite sides and stop face to face.' },
+    { id:'ep103-p12',  label:'12A–B', world:'aw', env:'fireworks-factory', chars:['charmaine'],                               shot:'WS · aerial',            time:'Afternoon', vo:"Ted (V.O.): Great work team! Keep it up.",                                              desc:'Ted and Crosby spray both sides of the building, flames start to shrink.' },
+    { id:'ep103-p13',  label:'13',    world:'aw', env:'fireworks-factory', chars:['ted','crosby'],                            shot:'MS',                     time:'Afternoon', vo:"Sean (V.O.): That's nefarious super-criminal Von Steele!",                             desc:"Sean's Rover and Von Steele's Durango slide in at angles, stop side by side." },
+    { id:'ep103-p14',  label:'14',    world:'aw', env:'lower-roadway',    chars:['sean','von-steele'],                       shot:'WS',                     time:'Evening',   vo:"Sean (V.O.): This fire was no accident. Let's get him!",                               desc:'Sky shifts from afternoon to dark stormy night as the Rover chases the Durango.' },
+    { id:'ep103-p15',  label:'15',    world:'aw', env:'fireworks-factory', chars:['ted','crosby'],                            shot:'MS',                     time:'Night',     vo:"Ted (V.O.): Where are you going?",                                                     desc:'Ted throws his arms up while the loose firehose flails and sprays water.' },
+    { id:'ep103-p16',  label:'16',    world:'rw', env:'smalleys-garage',  chars:['aimee'],                                   shot:'WS · 45°',               time:'Day',       vo:"Ted (V.O.): Sean, this is a fire rescue!",                                             desc:'Aimee enters the scene to assist.' },
+    { id:'ep103-p17',  label:'17',    world:'rw', env:'smalleys-garage',  chars:['sean'],                                    shot:'WS',                     time:'Day',       vo:"Sean (V.O.): I'm not Sean, I'm Von Steele.",                                           desc:'Sean lowers his eyepatch into character, raises the Durango, camera pushes in.' },
+    { id:'ep103-p18',  label:'18',    world:'rw', env:'smalleys-garage',  chars:['ted','sean','aimee','crosby','charmaine'],  shot:'MWS',                    time:'Day',       vo:"Ted (V.O.): The flames are spreading. We need to reposition.",                         desc:'All the kids move their vehicles in the fire play area.' },
+    { id:'ep103-p19',  label:'19',    world:'rw', env:'smalleys-garage',  chars:['charmaine'],                               shot:'WS aerial',              time:'Day',       vo:"Sean (V.O.): And I'm gonna catch the guy responsible!",                                desc:"Camera pulls out from the fire play area over Sean's shoulder." },
+    { id:'ep103-p20',  label:'20',    world:'aw', env:'fireworks-factory', chars:['charmaine'],                               shot:'CU · aerial',            time:'Night',     vo:"Sean (V.O.): You can't escape me, Von Steele!",                                        desc:'The Durango races through a puddle, splashing water up, the Rover follows.' },
+    { id:'ep103-p21',  label:'21',    world:'aw', env:'lower-roadway',    chars:['sean'],                                    shot:'WS',                     time:'Night',     vo:"Sean (V.O.): Whoa! Where did he go?",                                                  desc:'The Durango heads straight for a closed garage door, Sean follows tight behind.' },
+    { id:'ep103-p22',  label:'22',    world:'aw', env:'lower-roadway',    chars:['sean','von-steele'],                       shot:'MS',                     time:'Night',     vo:"Von Steele (V.O.): It's almost too easy.",                                             desc:'The garage is revealed to be a car elevator already lowering the Durango.' },
+    { id:'ep103-p23',  label:'23',    world:'aw', env:'fireworks-factory', chars:['ted','crosby'],                            shot:'MS',                     time:'Night',     vo:"Ted (V.O.): We need more firefighters!",                                               desc:'Ted and Crosby lean hard into their hoses as the water stream climbs up.' },
+    { id:'ep103-p24',  label:'24',    world:'aw', env:'fireworks-factory', chars:['ted','crosby','aimee'],                    shot:'WS high angle',          time:'Night',     vo:"Aimee (V.O.): The people are safe, Ted. I'm here to help!",                            desc:'Two trucks continue while a third fire engine drives in and joins the attack.' },
+    { id:'ep103-p25',  label:'25',    world:'aw', env:'fireworks-factory', chars:['charmaine'],                               shot:'WS high angle',          time:'Night',     vo:"Charmaine (V.O.): Here's a present from the Matchbox Water Tower!",                    desc:'Huge bucket drop from the helicopter falls toward the factory.' },
+    { id:'ep103-p26',  label:'26A–B', world:'aw', env:'lower-roadway',    chars:['sean','von-steele'],                       shot:'WS + insert',            time:'Night',     vo:"Sean (V.O.): Where is he! / Von Steele (V.O.): Right here!",                          desc:"Sean drives past the massive truck while the secret hideout pops open in the inset." },
+    { id:'ep103-p27',  label:'27',    world:'aw', env:'lower-roadway',    chars:['sean','von-steele'],                       shot:'MS',                     time:'Night',     vo:"Sean (V.O.): You've done your last crime, Von Steele!",                                desc:'Sean and Von Steele face off inside the hideout, bumper-to-bumper.' },
+    { id:'ep103-p28',  label:'28',    world:'rw', env:'smalleys-garage',  chars:['sean','von-steele'],                       shot:'WS',                     time:'Day',       vo:"Sean (V.O.): Give me back those stolen fireworks! / Von Steele (V.O.): Never!",        desc:'Sean plays under the table with the hideout set, mimicking the fight.' },
+    { id:'ep103-p29',  label:'29',    world:'rw', env:'smalleys-garage',  chars:['ted','sean','aimee'],                      shot:'WS',                     time:'Day',       vo:"Ted (V.O.): We sure could use this. / Aimee (V.O.): We need you. Move it!",            desc:'Ted joins Sean under the table, urging him to return and help.' },
+    { id:'ep103-p30',  label:'30',    world:'aw', env:'fireworks-factory', chars:['sean'],                                    shot:'CU',                     time:'Night',     vo:"Sean (V.O.): We're gonna put this truck to good use!",                                 desc:'Sean drives the large convoy vehicle toward the fire scene.' },
+    { id:'ep103-p31',  label:'31',    world:'aw', env:'fireworks-factory', chars:['sean'],                                    shot:'WS',                     time:'Night',     vo:'',                                                                                     desc:'Sean abandons the chase, leaving Von Steele behind.' },
+    { id:'ep103-p32',  label:'32',    world:'aw', env:'fireworks-factory', chars:['sean'],                                    shot:'MWS',                    time:'Night',     vo:'',                                                                                     desc:'Sean speeds toward the burning factory in the large convoy vehicle.' },
+    { id:'ep103-p33',  label:'33',    world:'aw', env:'fireworks-factory', chars:['ted','sean','aimee','crosby'],              shot:'MS',                     time:'Night',     vo:'',                                                                                     desc:'The fire intensifies, flames growing larger and spreading across the structure.' },
+    { id:'ep103-p34',  label:'34',    world:'aw', env:'fireworks-factory', chars:['sean','ted','aimee','crosby'],              shot:'MS · group',             time:'Night',     vo:'',                                                                                     desc:'Sean arrives and assesses the fire situation with the team.' },
+    { id:'ep103-p35',  label:'35',    world:'aw', env:'fireworks-factory', chars:['ted','sean'],                              shot:'MS · 2-shot',            time:'Night',     vo:'',                                                                                     desc:'Ted directs Sean toward a solution involving the nearby water tower.' },
+    { id:'ep103-p36',  label:'36',    world:'aw', env:'fireworks-factory', chars:['sean'],                                    shot:'MWS · low angle',        time:'Night',     vo:'',                                                                                     desc:'Sean positions the Rover at the base of the water tower, preparing for impact.' },
+    { id:'ep103-p37',  label:'37',    world:'aw', env:'fireworks-factory', chars:['sean'],                                    shot:'Dynamic impact',         time:'Night',     vo:'',                                                                                     desc:'Sean drives the Rover into the base of the water tower with force.' },
+    { id:'ep103-p38',  label:'38',    world:'aw', env:'fireworks-factory', chars:[],                                          shot:'WS · spectacle',         time:'Night',     vo:'',                                                                                     desc:'The water tower collapses, releasing a massive wave of water toward the factory.' },
+    { id:'ep103-p39',  label:'39',    world:'aw', env:'fireworks-factory', chars:['ted','sean','aimee','crosby'],              shot:'WS · hero angle',        time:'Night',     vo:"Charmaine (V.O.): Nice shot, Sean!",                                                   desc:'The surge of water crashes over the factory, extinguishing the fire.' },
+    { id:'ep103-p40',  label:'40',    world:'aw', env:'matchbox-city',    chars:['charmaine'],                               shot:'MS · aerial',            time:'Night',     vo:"Aimee / Crosby (V.O.): Wow!",                                                          desc:'Aftermath: water recedes as helicopter passes overhead and smoke dissipates.' },
+    { id:'ep103-p41',  label:'41',    world:'aw', env:'fireworks-factory', chars:['ted','sean','aimee','crosby','charmaine'],  shot:'WS · group',             time:'Night',     vo:'',                                                                                     desc:'The team celebrates together in front of the extinguished factory.' },
+    { id:'ep103-p42',  label:'42A–B', world:'aw', env:'matchbox-city',    chars:['ted','sean','aimee','crosby','charmaine'],  shot:'MS / WS back view',      time:'Night',     vo:'',                                                                                     desc:'Silhouette of the five kids on top of a fire truck watching the fireworks show. INSET: awed faces lit up by colorful fireworks.' },
+    { id:'ep103-p43',  label:'43',    world:'aw', env:'fireworks-factory', chars:['ted','charmaine','aimee','crosby','sean'],  shot:'—',                      time:'Night',     vo:'',                                                                                     desc:"Ted's smiling face surrounded by water puddles shaped like flower petals. Each puddle reflects a team member or the safe factory." },
+    { id:'ep103-p44',  label:'44',    world:'rw', env:'smalleys-garage',  chars:['ted','sean','aimee','crosby','charmaine'],  shot:'WS · table-level',       time:'Day',       vo:'',                                                                                     desc:'Wide shot at table level. Kids are mid-air, each holding a rescue vehicle and ribbon wands.' },
+    { id:'ep103-p45',  label:'45',    world:'rw', env:'smalleys-garage',  chars:['charmaine','aimee','sean','ted','crosby'],  shot:'MWS · 20° high angle',   time:'Day',       vo:'',                                                                                     desc:'The kids stand side-by-side behind the play area, smiling and holding their vehicles. From right to left: Charmaine, Aimee, Sean, Ted, Crosby.' },
+  ]
+};
+
+// ════════════════════════════════════════
+// PANELS STATE
+// ════════════════════════════════════════
+let selectedPanel = null;
+let panelImageData = {};
+
+function loadPanelImages() {
+  try {
+    const raw = localStorage.getItem('convoy_panel_images');
+    if(raw) panelImageData = JSON.parse(raw);
+  } catch(e) {}
+}
+
+function savePanelImages() {
+  const light = {};
+  Object.entries(panelImageData).forEach(([k,v]) => { if(v) light[k] = v; });
+  localStorage.setItem('convoy_panel_images', JSON.stringify(light));
+}
+
+function getPanelsForChapter() {
+  if(currentChapter === 'all' || !PANELS_BY_EP[currentChapter]) return [];
+  return PANELS_BY_EP[currentChapter];
+}
+
+function getCharName(id) {
+  const c = CHARACTERS.find(x => x.id === id);
+  return c ? c.name : id;
+}
+
+function getEnvShortName(id) {
+  const e = ENVIRONMENTS.find(x => x.id === id);
+  if(!e) return '';
+  return e.name.split('(')[0].trim().split(' ').slice(0,2).join(' ');
+}
+
+function getEnvName(id) {
+  const e = ENVIRONMENTS.find(x => x.id === id);
+  return e ? e.name : '';
+}
+
+// ════════════════════════════════════════
+// PANELS RENDER
+// ════════════════════════════════════════
+function renderPanels() {
+  const panels = getPanelsForChapter();
+  const grid = document.getElementById('panels-grid');
+  const titleEl = document.getElementById('panels-ep-title');
+  const countEl = document.getElementById('panels-count');
+
+  if(!panels.length) {
+    grid.innerHTML = '<div style="padding:32px 16px;color:var(--text-muted);font-family:var(--fontb);font-size:11px;letter-spacing:2px;text-transform:uppercase;">Seleccioná un episodio con panels disponibles</div>';
+    titleEl.textContent = 'Sin datos';
+    countEl.textContent = '';
+    document.getElementById('panels-detail').innerHTML = '<div class="panels-detail-empty"><svg width="32" height="24" viewBox="0 0 32 24" fill="none" style="opacity:.15;color:var(--text-muted)"><rect x="1" y="1" width="30" height="22" rx="1" stroke="currentColor" stroke-width="1.5"/></svg><span>Seleccioná un panel</span></div>';
+    return;
+  }
+
+  const s = EP_SYNOPSES[currentChapter];
+  const epLabel = EP_LABELS[currentChapter] || '';
+  titleEl.textContent = s ? epLabel + ' · ' + s.title : epLabel;
+  const imaged = panels.filter(p => panelImageData[p.id]).length;
+  countEl.textContent = panels.length + ' panels · ' + imaged + ' con layout';
+
+  grid.innerHTML = panels.map(p => {
+    const img = panelImageData[p.id];
+    const sel = selectedPanel === p.id;
+    return `<div class="p-card${sel?' p-selected':''}" id="pcard-${p.id}" onclick="selectPanel('${p.id}')">
+      <div class="p-thumb">
+        ${img ? `<img src="${img}" alt="P${p.label}">` : `<div class="p-thumb-ph"><svg width="22" height="16" viewBox="0 0 22 16" fill="none"><rect x="1" y="1" width="20" height="14" rx="1" stroke="currentColor" stroke-width="1.2"/><polyline points="1,11 5,7 9,10 14,5 21,9" stroke="currentColor" stroke-width="1" fill="none"/><circle cx="5.5" cy="4.5" r="1.5" fill="currentColor" opacity="0.5"/></svg></div>`}
+        <span class="p-num">${p.label}</span>
+        <span class="p-world ${p.world==='rw'?'p-world-rw':'p-world-aw'}">${p.world==='rw'?'RW':'AW'}</span>
+      </div>
+      <div class="p-info">
+        <div class="p-desc">${p.desc}</div>
+        <div class="p-tags">
+          ${p.chars.slice(0,2).map(c=>`<span class="ptag ptag-char">${getCharName(c)}</span>`).join('')}
+          ${p.chars.length>2?`<span class="ptag ptag-more">+${p.chars.length-2}</span>`:''}
+          ${p.env?`<span class="ptag ptag-env">${getEnvShortName(p.env)}</span>`:''}
+          ${p.vo?`<span class="ptag ptag-vo">VO</span>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function selectPanel(id) {
+  selectedPanel = id;
+  const panels = getPanelsForChapter();
+  const p = panels.find(x => x.id === id);
+  if(!p) return;
+
+  document.querySelectorAll('.p-card').forEach(c => c.classList.remove('p-selected'));
+  const card = document.getElementById('pcard-'+id);
+  if(card) card.classList.add('p-selected');
+
+  const img = panelImageData[id];
+  const detail = document.getElementById('panels-detail');
+
+  detail.innerHTML = `
+    <div class="pd-num">Panel ${p.label}</div>
+
+    <div class="pd-img" onclick="document.getElementById('pd-file-${id}').click()">
+      ${img ? `<img src="${img}" alt="Layout ${p.label}">` : `<div class="pd-img-ph"><svg width="36" height="26" viewBox="0 0 36 26" fill="none"><rect x="1" y="1" width="34" height="24" rx="2" stroke="currentColor" stroke-width="1.2"/><polyline points="1,18 10,10 17,15 25,7 35,14" stroke="currentColor" stroke-width="1.2" fill="none"/><circle cx="11" cy="8" r="2.5" fill="currentColor" opacity="0.4"/></svg></div>`}
+    </div>
+    <input class="pd-file-input" type="file" id="pd-file-${id}" accept="image/*" onchange="uploadPanelLayout('${id}', this)">
+    <button class="pd-upload-btn" onclick="document.getElementById('pd-file-${id}').click()">+ Subir layout</button>
+    <div class="pd-status" id="pd-status-${id}"></div>
+
+    <div class="pd-divider"></div>
+
+    <div class="pd-field">
+      <div class="pd-label">Mundo</div>
+      <div class="pd-val" style="color:${p.world==='rw'?'#ffb400':'#00b4ff'}">${p.world==='rw'?'Real World':'Adventure World'}</div>
+    </div>
+
+    ${p.env ? `<div class="pd-field">
+      <div class="pd-label">Environment</div>
+      <div class="pd-val">${getEnvName(p.env)}</div>
+    </div>` : ''}
+
+    <div class="pd-field">
+      <div class="pd-label">Shot</div>
+      <div class="pd-val">${p.shot}</div>
+    </div>
+
+    <div class="pd-field">
+      <div class="pd-label">Time of day</div>
+      <div class="pd-val">${p.time}</div>
+    </div>
+
+    ${p.chars.length ? `<div class="pd-field">
+      <div class="pd-label">Characters</div>
+      <div class="pd-tags">${p.chars.map(c=>`<span class="ptag ptag-char">${getCharName(c)}</span>`).join('')}</div>
+    </div>` : ''}
+
+    ${p.vo ? `<div class="pd-divider"></div><div class="pd-field">
+      <div class="pd-label">Voice over</div>
+      <div class="pd-vo">${p.vo}</div>
+    </div>` : ''}
+
+    ${p.desc ? `<div class="pd-field">
+      <div class="pd-label">Description</div>
+      <div class="pd-desc-txt">${p.desc}</div>
+    </div>` : ''}
+  `;
+}
+
+// ════════════════════════════════════════
+// PANEL LAYOUT UPLOAD
+// ════════════════════════════════════════
+async function uploadPanelLayout(panelId, input) {
+  const file = input.files[0];
+  if(!file) return;
+  const statusEl = document.getElementById('pd-status-'+panelId);
+  if(statusEl) { statusEl.textContent = 'Subiendo...'; statusEl.className = 'pd-status'; }
+
+  if(!pipeline.cloudName || !pipeline.preset) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      panelImageData[panelId] = e.target.result;
+      savePanelImages();
+      selectPanel(panelId);
+      renderPanels();
+      showToast('Layout guardado localmente.');
+    };
+    reader.readAsDataURL(file);
+    return;
+  }
+
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', pipeline.preset);
+    formData.append('folder', 'convoy_breakdown');
+    formData.append('public_id', panelId);
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${pipeline.cloudName}/image/upload`, { method:'POST', body: formData });
+    const data = await res.json();
+    if(data.secure_url) {
+      panelImageData[panelId] = data.secure_url;
+      savePanelImages();
+      if(statusEl) { statusEl.textContent = '✓ Subido'; statusEl.className = 'pd-status ok'; }
+      selectPanel(panelId);
+      renderPanels();
+      syncPanelImagesToJSONBin();
+      showToast('Layout subido a Cloudinary.');
+    } else { throw new Error('No URL'); }
+  } catch(e) {
+    if(statusEl) { statusEl.textContent = 'Error al subir.'; statusEl.className = 'pd-status err'; }
+  }
+}
+
+async function syncPanelImagesToJSONBin() {
+  if(!pipeline.binId || !pipeline.binKey) return;
+  try {
+    const res = await fetch('https://api.jsonbin.io/v3/b/'+pipeline.binId+'/latest', {
+      headers:{'X-Master-Key':pipeline.binKey,'X-Bin-Meta':'false'}
+    });
+    const existing = await res.json();
+    const record = existing.record || existing;
+    record.panelImages = panelImageData;
+    await fetch('https://api.jsonbin.io/v3/b/'+pipeline.binId, {
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Master-Key':pipeline.binKey},
+      body: JSON.stringify(record)
+    });
+  } catch(e) { console.warn('Panel JSONBin sync failed:', e); }
+}
+
+
 async function loadJSONBin() {
   if(!pipeline.binId || !pipeline.binKey) return;
   try {
@@ -1486,6 +1897,13 @@ async function loadJSONBin() {
           });
         }
       });
+    }
+    // Merge panel layout images
+    if(record.panelImages) {
+      Object.entries(record.panelImages).forEach(([k,v]) => {
+        if(v) panelImageData[k] = v;
+      });
+      savePanelImages();
     }
     saveLocal();
     renderActive();

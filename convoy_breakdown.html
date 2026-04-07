@@ -566,6 +566,7 @@
   .panels-layout {
     display: grid; grid-template-columns: 1fr 220px;
     min-height: 520px; border: 1px solid var(--border);
+    align-items: start;
   }
   .panels-list-col { border-right: 1px solid var(--border); }
   .panels-list-header {
@@ -624,7 +625,9 @@
   .panels-detail-col {
     background: var(--bg-card); padding: 16px;
     display: flex; flex-direction: column; gap: 12px;
-    overflow-y: auto; max-height: 80vh;
+    overflow-y: auto;
+    position: sticky; top: 56px;
+    max-height: calc(100vh - 56px);
   }
   .panels-detail-empty {
     display: flex; flex-direction: column; align-items: center; justify-content: center;

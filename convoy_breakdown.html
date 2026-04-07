@@ -720,7 +720,82 @@
     font-size: 8px; font-weight: 700; letter-spacing: 1px; padding: 1px 5px;
     text-transform: uppercase; background: var(--pink-dim);
     color: var(--pink); border: 1px solid var(--border-pink); font-family: var(--font);
-  }</style>
+  }
+
+  /* ─── SCRIPT BOT ─── */
+  .bot-fab {
+    position: fixed; bottom: 28px; right: 28px; z-index: 8000;
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--pink); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity .2s; box-shadow: none;
+  }
+  .bot-fab:hover { opacity: .85; }
+  .bot-fab svg { width: 24px; height: 24px; color: #fff; }
+  .bot-panel {
+    position: fixed; bottom: 92px; right: 28px; z-index: 8000;
+    width: 360px; background: var(--bg-card);
+    border: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    max-height: 520px; overflow: hidden;
+  }
+  .bot-panel.hidden { display: none; }
+  .bot-header {
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .bot-title {
+    font-size: 13px; font-weight: 900; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--text); font-family: var(--font);
+  }
+  .bot-title span { color: var(--pink); }
+  .bot-close {
+    background: transparent; border: none; color: var(--text-muted);
+    font-size: 20px; cursor: pointer; line-height: 1; padding: 2px 4px;
+  }
+  .bot-close:hover { color: var(--pink); }
+  .bot-messages {
+    flex: 1; overflow-y: auto; padding: 14px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .bot-msg {
+    max-width: 85%; font-size: 12px; line-height: 1.55;
+    font-family: var(--fontb); padding: 9px 12px;
+  }
+  .bot-msg.user {
+    align-self: flex-end; background: var(--pink-dim);
+    border: 1px solid var(--border-pink); color: var(--text);
+  }
+  .bot-msg.assistant {
+    align-self: flex-start; background: var(--bg-card2);
+    border: 1px solid var(--border); color: var(--text-dim);
+  }
+  .bot-msg.thinking {
+    align-self: flex-start; background: var(--bg-card2);
+    border: 1px solid var(--border); color: var(--text-muted);
+    font-style: italic;
+  }
+  .bot-input-row {
+    padding: 10px 14px; border-top: 1px solid var(--border);
+    display: flex; gap: 8px; flex-shrink: 0;
+  }
+  .bot-input {
+    flex: 1; background: var(--bg-card2); border: 1px solid var(--border);
+    color: var(--text); font-family: var(--fontb); font-size: 12px;
+    padding: 8px 12px; outline: none; resize: none; height: 36px;
+    transition: border-color .2s;
+  }
+  .bot-input:focus { border-color: var(--pink); }
+  .bot-send {
+    background: var(--pink); border: none; color: #fff;
+    font-family: var(--font); font-size: 12px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    padding: 0 14px; cursor: pointer; transition: opacity .2s;
+    flex-shrink: 0;
+  }
+  .bot-send:hover { opacity: .85; }
+  .bot-send:disabled { opacity: .4; cursor: default; }</style>
 </head>
 <body>
 
@@ -849,6 +924,26 @@
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- ══════════════ SCRIPT BOT ══════════════ -->
+<button class="bot-fab" id="bot-fab" onclick="toggleBot()" title="Ask the script bot">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+</button>
+
+<div class="bot-panel hidden" id="bot-panel">
+  <div class="bot-header">
+    <div class="bot-title">Script <span>Bot</span></div>
+    <button class="bot-close" onclick="toggleBot()">×</button>
+  </div>
+  <div class="bot-messages" id="bot-messages">
+    <div class="bot-msg assistant">Ask me anything about the scripts — characters, scenes, vehicles, dialogue, panels.</div>
+  </div>
+  <div class="bot-input-row">
+    <textarea class="bot-input" id="bot-input" placeholder="Ask about the scripts..." rows="1"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendBotMessage();}"></textarea>
+    <button class="bot-send" id="bot-send" onclick="sendBotMessage()">Send</button>
   </div>
 </div>
 
@@ -2044,7 +2139,103 @@ function resetAll() {
   showToast('All cleared. Starting fresh.');
 }
 
-// Close modal on outside click
+// ════════════════════════════════════════
+// SCRIPT BOT
+// ════════════════════════════════════════
+const BOT_CONTEXT = `You are a production assistant for "Matchbox Adventure Squad" Season 1, an animated series. You have complete knowledge of all 4 scripts. Answer questions about characters, scenes, vehicles, dialogue, panels, environments, and wardrobe. Be concise and precise. Reference specific panel numbers and episodes when relevant.
+
+LANGUAGE: The user may write in Spanish or English. Always respond in whichever language they use, unless they explicitly ask you to respond in a specific language (e.g. "answer in English" or "respondé en español") — in that case, use that language regardless of what language the question is in.
+
+SHOW OVERVIEW:
+- Kids play with Matchbox toys in Smalley's Garage (Real World) and imagine Adventure World sequences
+- Characters: Sean (spy/protagonist, also plays villain Von Steele with eyepatch), Ted (fire & rescue), Charmaine (air support, headset), Aimee (speed/logistics), Crosby (construction, orange hard hat), Von Steele (villain, Sean with eyepatch)
+- Each episode: 45-46 panels, alternates Real World (Smalley's Garage) and Adventure World
+
+EP 101 — "Bridge of Super Spies!" (45 panels)
+Sean chases Von Steele across a bridge under construction. Team uses Excavator, Plowverizer, Skidster, F-650 Rollback, Turf Hauler to create a trap — fake drywall road section over a gap. Von Steele's Plowverizer falls through, caught by Crosby's Excavator. Von Steele escapes. Vehicles: Rover 6x6 (Sean), Dodge Durango (Von Steele), Rescue Helicopter (Charmaine), Plowverizer, F-650 Rollback, Skidster, Excavator (Crosby), Turf Hauler, Mustang Fastback (Aimee), Triumph Scrambler (Ted). Key panels: P01-02 highway chase, P03 title card, P04-08 Real World setup, P09-14 bridge chase begins, P15-21 construction interference, P22-29 Excavator chase, P30-36 gap creation, P37-41 trap springs, P42-43 Von Steele escapes, P44-45 finale.
+
+EP 102 — "The Jungle Chase!" (46 panels)
+Aimee races secret crate through jungle to Super Hercules plane before Von Steele steals it. Von Steele's lumberjack henchmen use Polaris RZRs with paperclip chainsaws to fell trees and block the airfield. Ted arrives on Triumph Scrambler, places bananas in RZR exhaust pipes. Charmaine finds new landing spot via Mountain Escape Getaway playset ramp. Aimee catches crate mid-air when tree knocks it off Durango. Vehicles: Toyota Tacoma (Aimee, first), Chevy Stock Car (Aimee, swap), Dodge Durango (Von Steele), Polaris RZR x2 (henchmen with chainsaws), Super Hercules (Charmaine), Triumph Scrambler (Ted), Mountain Escape Getaway playset. Key panels: P01-02 Aimee with crate in jungle, P03 title, P04-07 Real World setup, P08-10 jungle race, P11-12 Von Steele blocks road, P13-15 Real World replan, P16-23 Stock Car chase + blocked airfield, P24-26 Real World, P27-32 Ted + bananas, P33-36 cliff edge, P37-43 Mountain Escape playset, P44-45 Hercules takeoff, P46 finale.
+
+EP 103 — "Fireworks Firefighting!" (45 panels)
+Massive fire at fireworks factory. Ted leads firefight with Blaze Blaster III and Blaze Buster. Sean chases Von Steele (who started the fire) through streets, loses him to a car elevator/lower roadway. Sean rejoins with Mountain Convoy Pursuit (Secret Hideout truck) and takes out the water tower to douse the fire. Von Steele had stolen fireworks — they go off safely at the end. Vehicles: Rover 6x6 (Sean), Blaze Blaster III (Ted), Blaze Buster (Crosby), 2019 Dodge Ambulance (Aimee), Rescue Helicopter (Charmaine), Dodge Durango (Von Steele), Mountain Convoy Pursuit playset (Sean). Key panels: P01-02 fire engine racing to factory, P03 title, P04-07 Real World setup, P08-12 Adventure World firefight, P13-22 Sean chases Von Steele, lower roadway, P23-29 more firefighting + Real World, P30-36 Sean with Secret Hideout, P37-40 water tower taken out, P41-43 celebration + fireworks, P44-45 finale.
+
+EP 104 — "Dog Race Rescue!" (43 panels)
+Matchbox Grand Prix race interrupted by runaway VW Bus mobile dog-washing van with 3 wet sheepdogs and no driver. Aimee (Chevy Stock Car) uses dog bone on pole as bait to lead the van. VW Bus bumps Aimee — she spins out to last place. Crosby and Ted fill Smalley's Garage Crusher with pillows (cotton balls in play) — turned into car catcher. Aimee drifts 180° at finish line, sends bone flying, VW Bus chases bone off ramp into padded crusher. Dogs rescued. Vehicles: Chevy Stock Car (Aimee), VW Bus Moving Parts (runaway dog van), 2020 Nissan Nismo (Crosby), Porsche 911 (Charmaine), Ford GT40 Moving Parts (Sean), Triumph Scrambler (Ted), Rescue Helicopter (Charmaine), Smalley's Garage Crusher playset. Key panels: P01-02 race opening, P03 title, P04-07 Real World race setup, P08-12 Grand Prix race, P13-15 VW Bus appears airborne, P16-22 dog driving, Aimee spins out, P23-28 Real World + dog bait plan, P29-32 bone bait works, P33-37 boxed in, P38-40 Ted encourages, final sprint, P40-42 drift + bone throw + VW into crusher, P43 rescue celebration.
+
+WARDROBE BY CHARACTER:
+- Sean: Base (casual, all eps), Von Steele (eyepatch + dark villain look, ep101-103)
+- Ted: Base (casual, ep101/102/104), Firefighter (full gear + helmet, ep103), Race Spectator (helmet on visor up, ep104)
+- Charmaine: Base (casual + headset, ep101/103/104), Pilot Gear (flight suit, ep102)
+- Aimee: Base (casual, ep101/102/103), Race Driver (seatbelt on, ep104)
+- Crosby: Base (casual + orange hard hat, ep101/102/103), Race Driver (ep104)
+- Von Steele: Base (eyepatch, dark spy look, ep101-103) — separate character from Sean
+
+ENVIRONMENTS:
+- Smalley's Garage (Real World hub, all eps), Matchbox Bridge (under construction, ep101), Matchbox City (ep101/103), Adventure World Jungle (ep102), Jungle Airfield (ep102), Lower Roadway/Underground (ep103), Fireworks Factory (ep103), City Race Course (ep104)`;
+
+let botHistory = [];
+let botOpen = false;
+
+function toggleBot() {
+  botOpen = !botOpen;
+  document.getElementById('bot-panel').classList.toggle('hidden', !botOpen);
+  if(botOpen) {
+    setTimeout(() => document.getElementById('bot-input').focus(), 100);
+  }
+}
+
+function addBotMessage(role, text) {
+  const msgs = document.getElementById('bot-messages');
+  const div = document.createElement('div');
+  div.className = 'bot-msg ' + role;
+  div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+async function sendBotMessage() {
+  const input = document.getElementById('bot-input');
+  const sendBtn = document.getElementById('bot-send');
+  const text = input.value.trim();
+  if(!text) return;
+
+  input.value = '';
+  sendBtn.disabled = true;
+  addBotMessage('user', text);
+  const thinking = addBotMessage('thinking', 'Thinking...');
+
+  botHistory.push({ role: 'user', content: text });
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: BOT_CONTEXT,
+        messages: botHistory
+      })
+    });
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || 'Sorry, I couldn\'t get an answer.';
+    botHistory.push({ role: 'assistant', content: reply });
+    thinking.className = 'bot-msg assistant';
+    thinking.textContent = reply;
+  } catch(e) {
+    thinking.className = 'bot-msg assistant';
+    thinking.textContent = 'Connection error. Try again.';
+    botHistory.pop();
+  }
+
+  sendBtn.disabled = false;
+  document.getElementById('bot-messages').scrollTop = 99999;
+  input.focus();
+}
+
+
 document.getElementById('pipeline-modal').addEventListener('click', function(e) {
   if(e.target === this) closePipeline();
 });

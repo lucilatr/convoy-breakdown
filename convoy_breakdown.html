@@ -827,7 +827,7 @@
 
   <!-- CHAPTER FILTER -->
   <div class="chapter-bar">
-    <span class="chapter-label">Capítulo</span>
+    <span class="chapter-label">Episode</span>
     <button class="chapter-btn active" onclick="filterChapter('all', this)">All</button>
     <button class="chapter-btn" onclick="filterChapter('ep101', this)">Ep 101 — Bridge of Super Spies</button>
     <button class="chapter-btn" onclick="filterChapter('ep102', this)">Ep 102 — The Jungle Chase</button>
@@ -2259,8 +2259,17 @@ function saveWardrobeImages() {
 }
 
 function buildWardrobeSection(item) {
-  const count = item.wardrobe.length;
-  const rows = item.wardrobe.map(v => {
+  // In 'all' view show everything, otherwise filter to current episode
+  const filtered = currentChapter === 'all'
+    ? item.wardrobe
+    : item.wardrobe.filter(v => v.episodes.includes(currentChapter));
+
+  if(!filtered.length) return '';
+
+  const count = filtered.length;
+  const totalCount = item.wardrobe.length;
+
+  const rows = filtered.map(v => {
     const img = wardrobeImageData[v.id] || '';
     const epBadges = v.episodes.map(ep => `<span class="wv-ep">${EP_LABELS[ep]}</span>`).join('');
     return `
@@ -2280,11 +2289,15 @@ function buildWardrobeSection(item) {
     </div>`;
   }).join('');
 
+  const label = currentChapter === 'all'
+    ? `${totalCount} ${totalCount === 1 ? 'variation' : 'variations'}`
+    : `${count} of ${totalCount} ${totalCount === 1 ? 'variation' : 'variations'}`;
+
   return `
   <div class="wardrobe-section">
     <div class="wardrobe-header">
       <span class="wardrobe-label">Wardrobe</span>
-      <span class="wardrobe-count">${count} ${count === 1 ? 'variation' : 'variations'}</span>
+      <span class="wardrobe-count">${label}</span>
     </div>
     ${rows}
   </div>`;

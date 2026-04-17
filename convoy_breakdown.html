@@ -1981,21 +1981,27 @@ function setStatus(id, msg, type) {
 async function saveJSONBin() {
   if(!pipeline.binId || !pipeline.binKey) return;
   try {
-    // Only store cloudinary URLs (never base64) and notes — keeps payload tiny
+    // Read existing record first to preserve other data (panels, wardrobe, tracker, boardmatic)
+    const existing = await fetch('https://api.jsonbin.io/v3/b/' + pipeline.binId + '/latest', {
+      headers:{ 'X-Master-Key': pipeline.binKey, 'X-Bin-Meta': 'false' }
+    });
+    const data = await existing.json();
+    const record = data.record || data || {};
+
+    // Update only images and notes — preserve everything else
     const images = {};
     Object.entries(imageData).forEach(([k,v]) => {
       if(v.images?.length) images[k] = v.images.map(i => i.cloudinaryUrl).filter(Boolean);
     });
-    const payload = {
-      project:'CONVOY',
-      timestamp: new Date().toISOString(),
-      images,
-      notes: notesData
-    };
+    record.project = 'CONVOY';
+    record.timestamp = new Date().toISOString();
+    record.images = images;
+    record.notes = notesData;
+
     await fetch('https://api.jsonbin.io/v3/b/' + pipeline.binId, {
       method:'PUT',
       headers:{ 'Content-Type':'application/json', 'X-Master-Key': pipeline.binKey },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(record)
     });
   } catch(e) { console.warn('JSONBin sync failed', e); }
 }
@@ -2310,47 +2316,41 @@ async function loadJSONBin() {
     const data = await res.json();
     const record = data.record || data;
     if(!record) return;
-    // Merge notes — remote wins
+    // JSONBin is source of truth — full replace, not merge
     if(record.notes) {
-      Object.entries(record.notes).forEach(([k,v]) => {
-        if(v) notesData[k] = v;
-      });
+      notesData = record.notes;
     }
-    // Merge cloudinary URLs
     if(record.images) {
-      Object.entries(record.images).forEach(([k,v]) => {
+      // Rebuild imageData from remote — remote wins completely
+      const remoteImages = record.images;
+      Object.keys(imageData).forEach(k => {
+        if(!remoteImages[k]) delete imageData[k];
+      });
+      Object.entries(remoteImages).forEach(([k,v]) => {
         const urls = Array.isArray(v) ? v : (typeof v === 'string' ? [v] : []);
-        if(urls.length) {
-          if(!imageData[k]) imageData[k] = { images: [] };
-          if(!imageData[k].images) imageData[k].images = [];
-          urls.forEach(url => {
-            if(url && !imageData[k].images.find(i => i.cloudinaryUrl === url)) {
-              imageData[k].images.push({ cloudinaryUrl: url, url });
-            }
-          });
-        }
+        imageData[k] = { images: urls.map(url => ({ cloudinaryUrl: url, url })) };
       });
     }
-    if(record.panelImages) {
-      Object.entries(record.panelImages).forEach(([k,v]) => { if(v) panelImageData[k]=v; });
+    if(record.panelImages !== undefined) {
+      panelImageData = record.panelImages || {};
       savePanelImages();
     }
-    if(record.wardrobeImages) {
-      Object.entries(record.wardrobeImages).forEach(([k,v]) => { if(v) wardrobeImageData[k]=v; });
+    if(record.wardrobeImages !== undefined) {
+      wardrobeImageData = record.wardrobeImages || {};
       saveWardrobeImages();
     }
-    if(record.boardmaticUrls) {
-      Object.entries(record.boardmaticUrls).forEach(([k,v]) => { if(v) boardmaticUrls[k]=v; });
+    if(record.boardmaticUrls !== undefined) {
+      boardmaticUrls = record.boardmaticUrls || {};
       saveBoardmaticUrlsLocal();
     }
-    if(record.trackerData) {
-      Object.entries(record.trackerData).forEach(([k,v]) => { if(v) trackerData[k]=v; });
+    if(record.trackerData !== undefined) {
+      trackerData = record.trackerData || {};
       saveTrackerDataLocal();
     }
     saveLocal();
     renderActive();
     updateStats();
-    console.log('JSONBin loaded OK');
+    console.log('JSONBin loaded OK — full sync');
   } catch(e) {
     console.warn('JSONBin load failed:', e);
   }

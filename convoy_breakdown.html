@@ -2519,16 +2519,16 @@ function saveTrackerDataLocal() {
   localStorage.setItem('convoy_tracker_data', JSON.stringify(trackerData));
 }
 
-function trkKey(ep, assetId, stage) { return ep + '|' + assetId + '|' + stage; }
+function trkKey(scope, assetId, stage) { return scope + '|' + assetId + '|' + stage; }
 
-function getTrkVal(ep, assetId, stage, field) {
-  const k = trkKey(ep, assetId, stage);
+function getTrkVal(scope, assetId, stage, field) {
+  const k = trkKey(scope, assetId, stage);
   if(!trackerData[k]) return field === 'status' ? 'none' : '';
   return trackerData[k][field] || (field === 'status' ? 'none' : '');
 }
 
-function setTrkVal(ep, assetId, stage, field, val) {
-  const k = trkKey(ep, assetId, stage);
+function setTrkVal(scope, assetId, stage, field, val) {
+  const k = trkKey(scope, assetId, stage);
   if(!trackerData[k]) trackerData[k] = {};
   trackerData[k][field] = val;
   if(field === 'status' || field === 'notes') {
@@ -2538,6 +2538,9 @@ function setTrkVal(ep, assetId, stage, field, val) {
   saveTrackerDataLocal();
   syncTrackerToJSONBin();
 }
+
+function isMultiEp(item) { return item.episodes && item.episodes.length >= 2; }
+function isPlayset(v) { return v.name.includes('Playset') || v.name.includes('Crusher') || v.name.includes('Getaway') || v.name.includes('Mountain Escape'); }
 
 function toggleTracker() {
   const overlay = document.getElementById('tracker-overlay');
@@ -2569,16 +2572,16 @@ function saveTrackerName() {
 
 function initTrackerEpSelect() {
   const sel = document.getElementById('tracker-ep-select');
-  sel.innerHTML = '<option value="">— Select —</option>' +
+  sel.innerHTML = '<option value="general">General</option>' +
     EPISODES.map(ep => {
       const s = EP_SYNOPSES[ep];
-      return '<option value="'+ep+'"'+(currentChapter===ep?' selected':'')+'>'+
+      return '<option value="'+ep+'">'+
         (s ? EP_LABELS[ep]+' — '+s.title : EP_LABELS[ep])+'</option>';
     }).join('');
-  if(currentChapter && currentChapter !== 'all') sel.value = currentChapter;
+  sel.value = trackerEp || 'general';
 }
 
-let trackerEp = '';
+let trackerEp = 'general';
 function switchTrackerEp(ep) { trackerEp = ep; renderTracker(); }
 
 function renderTracker() {
@@ -2592,23 +2595,26 @@ function renderTracker() {
   ).join('');
 
   const sel = document.getElementById('tracker-ep-select');
-  const ep = sel.value;
-  trackerEp = ep;
-  if(!ep) { body.innerHTML = '<div class="tracker-empty">Select an episode</div>'; return; }
+  trackerEp = sel.value;
 
-  const chars = CHARACTERS.filter(c => c.episodes.includes(ep));
-  const vehs = VEHICLES.filter(v => v.episodes.includes(ep));
-  const envs = ENVIRONMENTS.filter(e => e.episodes.includes(ep));
-  const panels = (PANELS_BY_EP[ep] || []);
+  if(trackerEp === 'general') {
+    renderTrackerGeneral(body);
+  } else {
+    renderTrackerEpisode(body, trackerEp);
+  }
+}
 
-  // Separate playsets from vehicles/envs
-  const playsets = vehs.filter(v => v.name.includes('Playset') || v.name.includes('Crusher') || v.name.includes('Getaway') || v.name.includes('Mountain Escape'));
-  const regularVehs = vehs.filter(v => !playsets.includes(v));
+function renderTrackerGeneral(body) {
+  const multiChars = CHARACTERS.filter(c => isMultiEp(c));
+  const allVehs = VEHICLES.filter(v => !isPlayset(v));
+  const multiVehs = allVehs.filter(v => isMultiEp(v));
+  const multiEnvs = ENVIRONMENTS.filter(e => isMultiEp(e));
+  const multiPlaysets = VEHICLES.filter(v => isPlayset(v) && isMultiEp(v));
 
   let html = '';
 
-  // ─── ASSETS TABLE ───
-  html += '<div class="trk-section-title">Assets</div><div class="trk-wrap"><table class="trk-table"><thead><tr>';
+  // ─── Characters Base ───
+  html += '<div class="trk-section-title">Characters — Base wardrobe</div><div class="trk-wrap"><table class="trk-table"><thead><tr>';
   html += '<th class="left" style="width:90px">Type</th>';
   html += '<th class="left" style="min-width:120px">Asset</th>';
   html += '<th class="trk-status-col">Concept</th>';
@@ -2619,152 +2625,288 @@ function renderTracker() {
   html += '<th class="trk-due-col">Due date</th>';
   html += '</tr></thead><tbody>';
 
-  // Characters
-  chars.forEach(c => {
+  multiChars.forEach(c => {
     html += '<tr>';
     html += '<td class="trk-type">Character</td>';
     html += '<td class="trk-asset">'+c.name+'</td>';
-    html += statusCell(ep, c.id, 'concept');
-    html += statusCell(ep, c.id, 'views');
-    html += statusCell(ep, c.id, 'expressions');
-    html += statusCell(ep, c.id, 'actions');
-    html += notesCell(ep, c.id);
-    html += dueCell(ep, c.id);
+    html += statusCell('general', c.id, 'concept');
+    html += statusCell('general', c.id, 'views');
+    html += statusCell('general', c.id, 'expressions');
+    html += statusCell('general', c.id, 'actions');
+    html += notesCell('general', c.id);
+    html += dueCell('general', c.id);
     html += '</tr>';
   });
+  html += '</tbody></table></div>';
 
-  // Separator
-  html += '<tr class="trk-sep"><td colspan="8"></td></tr>';
+  // ─── Vehicles ───
+  if(multiVehs.length) {
+    html += '<div class="trk-section-title">Vehicles</div><div class="trk-wrap"><table class="trk-table"><thead><tr>';
+    html += '<th class="left" style="width:90px">Type</th>';
+    html += '<th class="left" style="min-width:120px">Asset</th>';
+    html += '<th class="trk-status-col">Concept</th>';
+    html += '<th class="trk-status-col">Views</th>';
+    html += '<th class="trk-status-col">Actions</th>';
+    html += '<th class="left trk-notes-col">Notes</th>';
+    html += '<th class="trk-due-col">Due date</th>';
+    html += '</tr></thead><tbody>';
 
-  // Vehicles
-  regularVehs.forEach(v => {
-    const hasActions = VEHICLES_WITH_ACTIONS.includes(v.id);
-    html += '<tr>';
-    html += '<td class="trk-type">Vehicle</td>';
-    html += '<td class="trk-asset">'+v.name+'</td>';
-    html += statusCell(ep, v.id, 'concept');
-    html += statusCell(ep, v.id, 'views');
-    html += naCell();
-    html += (hasActions ? statusCell(ep, v.id, 'actions') : naCell());
-    html += notesCell(ep, v.id);
-    html += dueCell(ep, v.id);
-    html += '</tr>';
-  });
+    multiVehs.forEach(v => {
+      const hasActions = VEHICLES_WITH_ACTIONS.includes(v.id);
+      html += '<tr>';
+      html += '<td class="trk-type">Vehicle</td>';
+      html += '<td class="trk-asset">'+v.name+'</td>';
+      html += statusCell('general', v.id, 'concept');
+      html += statusCell('general', v.id, 'views');
+      html += (hasActions ? statusCell('general', v.id, 'actions') : naCell());
+      html += notesCell('general', v.id);
+      html += dueCell('general', v.id);
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+  }
 
-  // Separator
-  html += '<tr class="trk-sep"><td colspan="8"></td></tr>';
+  // ─── Environments ───
+  if(multiEnvs.length) {
+    html += '<div class="trk-section-title">Environments</div><div class="trk-wrap"><table class="trk-table"><thead><tr>';
+    html += '<th class="left" style="width:90px">Type</th>';
+    html += '<th class="left" style="min-width:120px">Asset</th>';
+    html += '<th class="trk-status-col">Concept</th>';
+    html += '<th class="left trk-notes-col">Notes</th>';
+    html += '<th class="trk-due-col">Due date</th>';
+    html += '</tr></thead><tbody>';
 
-  // Environments
-  envs.forEach(e => {
-    html += '<tr>';
-    html += '<td class="trk-type">Environment</td>';
-    html += '<td class="trk-asset">'+e.name+'</td>';
-    html += statusCell(ep, e.id, 'concept');
-    html += naCell();
-    html += naCell();
-    html += naCell();
-    html += notesCell(ep, e.id);
-    html += dueCell(ep, e.id);
-    html += '</tr>';
-  });
+    multiEnvs.forEach(e => {
+      html += '<tr>';
+      html += '<td class="trk-type">Environment</td>';
+      html += '<td class="trk-asset">'+e.name+'</td>';
+      html += statusCell('general', e.id, 'concept');
+      html += notesCell('general', e.id);
+      html += dueCell('general', e.id);
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+  }
 
-  // Playsets
-  if(playsets.length) {
-    html += '<tr class="trk-sep"><td colspan="8"></td></tr>';
-    playsets.forEach(p => {
+  // ─── Playsets ───
+  if(multiPlaysets.length) {
+    html += '<div class="trk-section-title">Playsets</div><div class="trk-wrap"><table class="trk-table"><thead><tr>';
+    html += '<th class="left" style="width:90px">Type</th>';
+    html += '<th class="left" style="min-width:120px">Asset</th>';
+    html += '<th class="trk-status-col">Concept</th>';
+    html += '<th class="left trk-notes-col">Notes</th>';
+    html += '<th class="trk-due-col">Due date</th>';
+    html += '</tr></thead><tbody>';
+
+    multiPlaysets.forEach(p => {
       html += '<tr>';
       html += '<td class="trk-type">Playset</td>';
       html += '<td class="trk-asset">'+p.name+'</td>';
-      html += statusCell(ep, p.id, 'concept');
-      html += naCell();
-      html += naCell();
-      html += naCell();
-      html += notesCell(ep, p.id);
-      html += dueCell(ep, p.id);
+      html += statusCell('general', p.id, 'concept');
+      html += notesCell('general', p.id);
+      html += dueCell('general', p.id);
       html += '</tr>';
     });
+    html += '</tbody></table></div>';
   }
-
-  html += '</tbody></table></div>';
-
-  // ─── PANELS TABLE ───
-  html += '<div class="trk-section-title" style="margin-top:24px">Panels</div><div class="trk-wrap"><table class="trk-table"><thead><tr>';
-  html += '<th class="left" style="width:90px">Type</th>';
-  html += '<th style="width:60px">Panel</th>';
-  html += '<th class="trk-status-col">Layout</th>';
-  html += '<th class="trk-status-col">Line art</th>';
-  html += '<th class="trk-status-col">Color</th>';
-  html += '<th class="trk-status-col">Animation</th>';
-  html += '<th class="left trk-notes-col">Notes</th>';
-  html += '<th class="trk-due-col">Due date</th>';
-  html += '</tr></thead><tbody>';
-
-  panels.forEach(p => {
-    html += '<tr>';
-    html += '<td class="trk-type">Panel</td>';
-    html += '<td class="trk-asset center">'+p.label+'</td>';
-    html += statusCell(ep, p.id, 'layout');
-    html += statusCell(ep, p.id, 'lineart');
-    html += statusCell(ep, p.id, 'color');
-    html += statusCell(ep, p.id, 'animation');
-    html += notesCell(ep, p.id);
-    html += dueCell(ep, p.id);
-    html += '</tr>';
-  });
-
-  html += '</tbody></table></div>';
 
   body.innerHTML = html;
 }
 
-function statusCell(ep, assetId, stage) {
-  const val = getTrkVal(ep, assetId, stage, 'status');
+function renderTrackerEpisode(body, ep) {
+  let html = '';
+
+  // ─── Character Wardrobes (episode-specific only) ───
+  const epChars = CHARACTERS.filter(c => c.episodes.includes(ep));
+  const epWardrobes = [];
+  epChars.forEach(c => {
+    if(!c.wardrobe) return;
+    c.wardrobe.forEach(w => {
+      if(w.episodes.includes(ep) && w.name !== 'Base') {
+        epWardrobes.push({ charName: c.name, charId: c.id, wardrobeId: w.id, wardrobeName: w.name, wardrobeDesc: w.desc });
+      }
+    });
+  });
+
+  if(epWardrobes.length) {
+    html += '<div class="trk-section-title">Character wardrobes — '+EP_LABELS[ep]+'</div><div class="trk-wrap"><table class="trk-table"><thead><tr>';
+    html += '<th class="left" style="width:90px">Type</th>';
+    html += '<th class="left" style="min-width:180px">Asset</th>';
+    html += '<th class="trk-status-col">Concept</th>';
+    html += '<th class="trk-status-col">Views</th>';
+    html += '<th class="trk-status-col">Expressions</th>';
+    html += '<th class="trk-status-col">Actions</th>';
+    html += '<th class="left trk-notes-col">Notes</th>';
+    html += '<th class="trk-due-col">Due date</th>';
+    html += '</tr></thead><tbody>';
+
+    epWardrobes.forEach(w => {
+      html += '<tr>';
+      html += '<td class="trk-type">Wardrobe</td>';
+      html += '<td class="trk-asset">'+w.charName+' — '+w.wardrobeName+'</td>';
+      html += statusCell(ep, w.wardrobeId, 'concept');
+      html += statusCell(ep, w.wardrobeId, 'views');
+      html += statusCell(ep, w.wardrobeId, 'expressions');
+      html += statusCell(ep, w.wardrobeId, 'actions');
+      html += notesCell(ep, w.wardrobeId);
+      html += dueCell(ep, w.wardrobeId);
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+  }
+
+  // ─── Vehicles (all in episode, using general key) ───
+  const allVehs = VEHICLES.filter(v => v.episodes.includes(ep) && !isPlayset(v));
+  if(allVehs.length) {
+    html += '<div class="trk-section-title">Vehicles — '+EP_LABELS[ep]+'</div><div class="trk-wrap"><table class="trk-table"><thead><tr>';
+    html += '<th class="left" style="width:90px">Type</th>';
+    html += '<th class="left" style="min-width:120px">Asset</th>';
+    html += '<th class="trk-status-col">Concept</th>';
+    html += '<th class="trk-status-col">Views</th>';
+    html += '<th class="trk-status-col">Actions</th>';
+    html += '<th class="left trk-notes-col">Notes</th>';
+    html += '<th class="trk-due-col">Due date</th>';
+    html += '</tr></thead><tbody>';
+
+    allVehs.forEach(v => {
+      const hasActions = VEHICLES_WITH_ACTIONS.includes(v.id);
+      html += '<tr>';
+      html += '<td class="trk-type">Vehicle</td>';
+      html += '<td class="trk-asset">'+v.name+'</td>';
+      html += statusCell('general', v.id, 'concept');
+      html += statusCell('general', v.id, 'views');
+      html += (hasActions ? statusCell('general', v.id, 'actions') : naCell());
+      html += notesCell('general', v.id);
+      html += dueCell('general', v.id);
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+  }
+
+  // ─── Environments (episode-exclusive only) ───
+  const exclusiveEnvs = ENVIRONMENTS.filter(e => e.episodes.includes(ep) && !isMultiEp(e));
+  if(exclusiveEnvs.length) {
+    html += '<div class="trk-section-title">Environments — '+EP_LABELS[ep]+'</div><div class="trk-wrap"><table class="trk-table"><thead><tr>';
+    html += '<th class="left" style="width:90px">Type</th>';
+    html += '<th class="left" style="min-width:120px">Asset</th>';
+    html += '<th class="trk-status-col">Concept</th>';
+    html += '<th class="left trk-notes-col">Notes</th>';
+    html += '<th class="trk-due-col">Due date</th>';
+    html += '</tr></thead><tbody>';
+
+    exclusiveEnvs.forEach(e => {
+      html += '<tr>';
+      html += '<td class="trk-type">Environment</td>';
+      html += '<td class="trk-asset">'+e.name+'</td>';
+      html += statusCell(ep, e.id, 'concept');
+      html += notesCell(ep, e.id);
+      html += dueCell(ep, e.id);
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+  }
+
+  // ─── Playsets (episode-exclusive) ───
+  const exclusivePlaysets = VEHICLES.filter(v => isPlayset(v) && v.episodes.includes(ep) && !isMultiEp(v));
+  if(exclusivePlaysets.length) {
+    html += '<div class="trk-section-title">Playsets — '+EP_LABELS[ep]+'</div><div class="trk-wrap"><table class="trk-table"><thead><tr>';
+    html += '<th class="left" style="width:90px">Type</th>';
+    html += '<th class="left" style="min-width:120px">Asset</th>';
+    html += '<th class="trk-status-col">Concept</th>';
+    html += '<th class="left trk-notes-col">Notes</th>';
+    html += '<th class="trk-due-col">Due date</th>';
+    html += '</tr></thead><tbody>';
+
+    exclusivePlaysets.forEach(p => {
+      html += '<tr>';
+      html += '<td class="trk-type">Playset</td>';
+      html += '<td class="trk-asset">'+p.name+'</td>';
+      html += statusCell(ep, p.id, 'concept');
+      html += notesCell(ep, p.id);
+      html += dueCell(ep, p.id);
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+  }
+
+  // ─── Panels ───
+  const panels = (PANELS_BY_EP[ep] || []);
+  if(panels.length) {
+    html += '<div class="trk-section-title">Panels — '+EP_LABELS[ep]+'</div><div class="trk-wrap"><table class="trk-table"><thead><tr>';
+    html += '<th class="left" style="width:90px">Type</th>';
+    html += '<th style="width:60px">Panel</th>';
+    html += '<th class="trk-status-col">Layout</th>';
+    html += '<th class="trk-status-col">Line art</th>';
+    html += '<th class="trk-status-col">Color</th>';
+    html += '<th class="trk-status-col">Animation</th>';
+    html += '<th class="left trk-notes-col">Notes</th>';
+    html += '<th class="trk-due-col">Due date</th>';
+    html += '</tr></thead><tbody>';
+
+    panels.forEach(p => {
+      html += '<tr>';
+      html += '<td class="trk-type">Panel</td>';
+      html += '<td class="trk-asset center">'+p.label+'</td>';
+      html += statusCell(ep, p.id, 'layout');
+      html += statusCell(ep, p.id, 'lineart');
+      html += statusCell(ep, p.id, 'color');
+      html += statusCell(ep, p.id, 'animation');
+      html += notesCell(ep, p.id);
+      html += dueCell(ep, p.id);
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+  }
+
+  if(!html) html = '<div class="tracker-empty">No data for this episode yet</div>';
+  body.innerHTML = html;
+}
+
+function statusCell(scope, assetId, stage) {
+  const val = getTrkVal(scope, assetId, stage, 'status');
   const clsMap = { 'wip':'s-wip','wait':'s-wait','app-play':'s-app-play','app-mattel':'s-app-mattel','review':'s-review','reviewed':'s-reviewed','ready':'s-ready','na':'s-na','none':'s-none' };
   const cls = clsMap[val] || 's-none';
   let opts = '<option value="none"'+(val==='none'||!val?' selected':'')+'>— Select —</option>';
   TRK_STATUSES.forEach(s => {
     opts += '<option value="'+s.id+'"'+(val===s.id?' selected':'')+'>'+s.label+'</option>';
   });
-  return '<td class="center"><select class="trk-select '+cls+'" onchange="changeStatus(\''+ep+'\',\''+assetId+'\',\''+stage+'\',this)">' + opts + '</select></td>';
+  return '<td class="center"><select class="trk-select '+cls+'" onchange="changeStatus(\''+scope+'\',\''+assetId+'\',\''+stage+'\',this)">' + opts + '</select></td>';
 }
 
 function naCell() {
   return '<td class="center"><select class="trk-select s-na" disabled><option>N/A</option></select></td>';
 }
 
-function changeStatus(ep, assetId, stage, el) {
+function changeStatus(scope, assetId, stage, el) {
   const val = el.value;
-  setTrkVal(ep, assetId, stage, 'status', val);
+  setTrkVal(scope, assetId, stage, 'status', val);
   const clsMap = { 'wip':'s-wip','wait':'s-wait','app-play':'s-app-play','app-mattel':'s-app-mattel','review':'s-review','reviewed':'s-reviewed','ready':'s-ready','na':'s-na','none':'s-none' };
   el.className = 'trk-select ' + (clsMap[val] || 's-none');
 }
 
-function notesCell(ep, assetId) {
-  const note = getTrkVal(ep, assetId, 'meta', 'notes');
-  const user = getTrkVal(ep, assetId, 'meta', 'updatedBy');
-  const display = user && note ? user + ': ' + note : note;
+function notesCell(scope, assetId) {
+  const note = getTrkVal(scope, assetId, 'meta', 'notes');
   return '<td><input class="trk-notes-input" value="'+escHtml(note)+'" placeholder="Add note…" '
-    + 'data-ep="'+ep+'" data-asset="'+assetId+'" '
     + 'onfocus="this.dataset.orig=this.value" '
-    + 'onblur="saveNote(\''+ep+'\',\''+assetId+'\',this.value,this)"></td>';
+    + 'onblur="saveNote(\''+scope+'\',\''+assetId+'\',this.value)"></td>';
 }
 
-function dueCell(ep, assetId) {
-  const due = getTrkVal(ep, assetId, 'meta', 'due');
-  return '<td class="center"><input type="date" class="trk-due-input" value="'+(due||'')+'" onchange="saveDue(\''+ep+'\',\''+assetId+'\',this.value)"></td>';
+function dueCell(scope, assetId) {
+  const due = getTrkVal(scope, assetId, 'meta', 'due');
+  return '<td class="center"><input type="date" class="trk-due-input" value="'+(due||'')+'" onchange="saveDue(\''+scope+'\',\''+assetId+'\',this.value)"></td>';
 }
 
 function escHtml(s) {
   return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-function saveNote(ep, assetId, val) {
-  setTrkVal(ep, assetId, 'meta', 'notes', val.trim());
-  setTrkVal(ep, assetId, 'meta', 'updatedBy', trackerUser);
+function saveNote(scope, assetId, val) {
+  setTrkVal(scope, assetId, 'meta', 'notes', val.trim());
+  setTrkVal(scope, assetId, 'meta', 'updatedBy', trackerUser);
 }
 
-function saveDue(ep, assetId, val) {
-  setTrkVal(ep, assetId, 'meta', 'due', val);
+function saveDue(scope, assetId, val) {
+  setTrkVal(scope, assetId, 'meta', 'due', val);
 }
 
 async function syncTrackerToJSONBin() {
@@ -2810,50 +2952,67 @@ setInterval(() => {
 // ─── CSV Export ───
 function exportTrackerCSV() {
   const ep = trackerEp;
-  if(!ep) { showToast('Select an episode first.'); return; }
-
-  const chars = CHARACTERS.filter(c => c.episodes.includes(ep));
-  const vehs = VEHICLES.filter(v => v.episodes.includes(ep));
-  const envs = ENVIRONMENTS.filter(e => e.episodes.includes(ep));
-  const panels = (PANELS_BY_EP[ep] || []);
-  const playsets = vehs.filter(v => v.name.includes('Playset') || v.name.includes('Crusher') || v.name.includes('Getaway') || v.name.includes('Mountain Escape'));
-  const regularVehs = vehs.filter(v => !playsets.includes(v));
+  if(!ep) { showToast('Select a view first.'); return; }
 
   const statusLabel = (id) => { const s = TRK_STATUSES.find(x=>x.id===id); return s ? s.label : (id==='none' ? '' : id); };
-  const g = (assetId, stage) => statusLabel(getTrkVal(ep, assetId, stage, 'status'));
-  const gn = (assetId) => getTrkVal(ep, assetId, 'meta', 'notes');
-  const gu = (assetId) => getTrkVal(ep, assetId, 'meta', 'updatedBy');
-  const gd = (assetId) => getTrkVal(ep, assetId, 'meta', 'due');
+  const gs = (scope, assetId, stage) => statusLabel(getTrkVal(scope, assetId, stage, 'status'));
+  const gn = (scope, assetId) => getTrkVal(scope, assetId, 'meta', 'notes');
+  const gu = (scope, assetId) => getTrkVal(scope, assetId, 'meta', 'updatedBy');
+  const gd = (scope, assetId) => getTrkVal(scope, assetId, 'meta', 'due');
 
   let rows = [];
   const esc = (s) => '"' + (s||'').replace(/"/g,'""') + '"';
-  const epLabel = EP_SYNOPSES[ep] ? EP_LABELS[ep] + ' — ' + EP_SYNOPSES[ep].title : EP_LABELS[ep];
+  const viewLabel = ep === 'general' ? 'General' : (EP_SYNOPSES[ep] ? EP_LABELS[ep] + ' — ' + EP_SYNOPSES[ep].title : EP_LABELS[ep]);
 
-  // Assets header
-  rows.push(['TYPE','ASSET','CONCEPT','VIEWS','EXPRESSIONS','ACTIONS','NOTES','UPDATED BY','DUE DATE'].map(esc).join(','));
-
-  chars.forEach(c => {
-    rows.push([esc('Character'),esc(c.name),esc(g(c.id,'concept')),esc(g(c.id,'views')),esc(g(c.id,'expressions')),esc(g(c.id,'actions')),esc(gn(c.id)),esc(gu(c.id)),esc(gd(c.id))].join(','));
-  });
-  regularVehs.forEach(v => {
-    const hasAct = VEHICLES_WITH_ACTIONS.includes(v.id);
-    rows.push([esc('Vehicle'),esc(v.name),esc(g(v.id,'concept')),esc(g(v.id,'views')),esc('N/A'),esc(hasAct?g(v.id,'actions'):'N/A'),esc(gn(v.id)),esc(gu(v.id)),esc(gd(v.id))].join(','));
-  });
-  envs.forEach(e => {
-    rows.push([esc('Environment'),esc(e.name),esc(g(e.id,'concept')),esc('N/A'),esc('N/A'),esc('N/A'),esc(gn(e.id)),esc(gu(e.id)),esc(gd(e.id))].join(','));
-  });
-  playsets.forEach(p => {
-    rows.push([esc('Playset'),esc(p.name),esc(g(p.id,'concept')),esc('N/A'),esc('N/A'),esc('N/A'),esc(gn(p.id)),esc(gu(p.id)),esc(gd(p.id))].join(','));
-  });
-
-  // Blank separator
-  rows.push('');
-
-  // Panels header
-  rows.push(['TYPE','PANEL','LAYOUT','LINE ART','COLOR','ANIMATION','NOTES','UPDATED BY','DUE DATE'].map(esc).join(','));
-  panels.forEach(p => {
-    rows.push([esc('Panel'),esc(p.label),esc(g(p.id,'layout')),esc(g(p.id,'lineart')),esc(g(p.id,'color')),esc(g(p.id,'animation')),esc(gn(p.id)),esc(gu(p.id)),esc(gd(p.id))].join(','));
-  });
+  if(ep === 'general') {
+    rows.push(['TYPE','ASSET','CONCEPT','VIEWS','EXPRESSIONS','ACTIONS','NOTES','UPDATED BY','DUE DATE'].map(esc).join(','));
+    CHARACTERS.filter(c=>isMultiEp(c)).forEach(c => {
+      rows.push([esc('Character'),esc(c.name),esc(gs('general',c.id,'concept')),esc(gs('general',c.id,'views')),esc(gs('general',c.id,'expressions')),esc(gs('general',c.id,'actions')),esc(gn('general',c.id)),esc(gu('general',c.id)),esc(gd('general',c.id))].join(','));
+    });
+    VEHICLES.filter(v=>!isPlayset(v)&&isMultiEp(v)).forEach(v => {
+      const hasAct = VEHICLES_WITH_ACTIONS.includes(v.id);
+      rows.push([esc('Vehicle'),esc(v.name),esc(gs('general',v.id,'concept')),esc(gs('general',v.id,'views')),esc('N/A'),esc(hasAct?gs('general',v.id,'actions'):'N/A'),esc(gn('general',v.id)),esc(gu('general',v.id)),esc(gd('general',v.id))].join(','));
+    });
+    ENVIRONMENTS.filter(e=>isMultiEp(e)).forEach(e => {
+      rows.push([esc('Environment'),esc(e.name),esc(gs('general',e.id,'concept')),esc('N/A'),esc('N/A'),esc('N/A'),esc(gn('general',e.id)),esc(gu('general',e.id)),esc(gd('general',e.id))].join(','));
+    });
+    VEHICLES.filter(v=>isPlayset(v)&&isMultiEp(v)).forEach(p => {
+      rows.push([esc('Playset'),esc(p.name),esc(gs('general',p.id,'concept')),esc('N/A'),esc('N/A'),esc('N/A'),esc(gn('general',p.id)),esc(gu('general',p.id)),esc(gd('general',p.id))].join(','));
+    });
+  } else {
+    // Wardrobes
+    const epChars = CHARACTERS.filter(c => c.episodes.includes(ep));
+    const wRows = [];
+    epChars.forEach(c => { if(!c.wardrobe) return; c.wardrobe.forEach(w => { if(w.episodes.includes(ep)&&w.name!=='Base') wRows.push({charName:c.name,wId:w.id,wName:w.name}); }); });
+    if(wRows.length) {
+      rows.push(['TYPE','ASSET','CONCEPT','VIEWS','EXPRESSIONS','ACTIONS','NOTES','UPDATED BY','DUE DATE'].map(esc).join(','));
+      wRows.forEach(w => { rows.push([esc('Wardrobe'),esc(w.charName+' — '+w.wName),esc(gs(ep,w.wId,'concept')),esc(gs(ep,w.wId,'views')),esc(gs(ep,w.wId,'expressions')),esc(gs(ep,w.wId,'actions')),esc(gn(ep,w.wId)),esc(gu(ep,w.wId)),esc(gd(ep,w.wId))].join(',')); });
+      rows.push('');
+    }
+    // Vehicles
+    const allVehs = VEHICLES.filter(v=>v.episodes.includes(ep)&&!isPlayset(v));
+    if(allVehs.length) {
+      rows.push(['TYPE','ASSET','CONCEPT','VIEWS','ACTIONS','NOTES','UPDATED BY','DUE DATE'].map(esc).join(','));
+      allVehs.forEach(v => {
+        const hasAct = VEHICLES_WITH_ACTIONS.includes(v.id);
+        rows.push([esc('Vehicle'),esc(v.name),esc(gs('general',v.id,'concept')),esc(gs('general',v.id,'views')),esc(hasAct?gs('general',v.id,'actions'):'N/A'),esc(gn('general',v.id)),esc(gu('general',v.id)),esc(gd('general',v.id))].join(','));
+      });
+      rows.push('');
+    }
+    // Envs exclusive
+    const exEnvs = ENVIRONMENTS.filter(e=>e.episodes.includes(ep)&&!isMultiEp(e));
+    if(exEnvs.length) {
+      rows.push(['TYPE','ASSET','CONCEPT','NOTES','UPDATED BY','DUE DATE'].map(esc).join(','));
+      exEnvs.forEach(e => { rows.push([esc('Environment'),esc(e.name),esc(gs(ep,e.id,'concept')),esc(gn(ep,e.id)),esc(gu(ep,e.id)),esc(gd(ep,e.id))].join(',')); });
+      rows.push('');
+    }
+    // Panels
+    const panels = (PANELS_BY_EP[ep]||[]);
+    if(panels.length) {
+      rows.push(['TYPE','PANEL','LAYOUT','LINE ART','COLOR','ANIMATION','NOTES','UPDATED BY','DUE DATE'].map(esc).join(','));
+      panels.forEach(p => { rows.push([esc('Panel'),esc(p.label),esc(gs(ep,p.id,'layout')),esc(gs(ep,p.id,'lineart')),esc(gs(ep,p.id,'color')),esc(gs(ep,p.id,'animation')),esc(gn(ep,p.id)),esc(gu(ep,p.id)),esc(gd(ep,p.id))].join(',')); });
+    }
+  }
 
   const blob = new Blob(['\uFEFF' + rows.join('\n')], {type:'text/csv;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
@@ -2866,89 +3025,93 @@ function exportTrackerCSV() {
 // ─── PDF Export ───
 function exportTrackerPDF() {
   const ep = trackerEp;
-  if(!ep) { showToast('Select an episode first.'); return; }
-
-  const chars = CHARACTERS.filter(c => c.episodes.includes(ep));
-  const vehs = VEHICLES.filter(v => v.episodes.includes(ep));
-  const envs = ENVIRONMENTS.filter(e => e.episodes.includes(ep));
-  const panels = (PANELS_BY_EP[ep] || []);
-  const playsets = vehs.filter(v => v.name.includes('Playset') || v.name.includes('Crusher') || v.name.includes('Getaway') || v.name.includes('Mountain Escape'));
-  const regularVehs = vehs.filter(v => !playsets.includes(v));
+  if(!ep) { showToast('Select a view first.'); return; }
 
   const statusLabel = (id) => { const s = TRK_STATUSES.find(x=>x.id===id); return s ? s.label : (id==='none' ? '—' : id); };
   const statusColor = (id) => {
     const map = { 'wip':'#ddb020','wait':'#f05050','app-play':'#50b4ff','app-mattel':'#00dc78','review':'#b47fff','reviewed':'#e09020','ready':'#888','na':'#555','none':'#444' };
     return map[id] || '#444';
   };
-  const g = (assetId, stage) => getTrkVal(ep, assetId, stage, 'status');
-  const gl = (assetId, stage) => statusLabel(g(assetId, stage));
-  const gc = (assetId, stage) => statusColor(g(assetId, stage));
-  const gn = (assetId) => getTrkVal(ep, assetId, 'meta', 'notes');
-  const gu = (assetId) => getTrkVal(ep, assetId, 'meta', 'updatedBy');
-  const gd = (assetId) => getTrkVal(ep, assetId, 'meta', 'due');
+  const gs = (scope, assetId, stage) => getTrkVal(scope, assetId, stage, 'status');
+  const gsl = (scope, assetId, stage) => statusLabel(gs(scope, assetId, stage));
+  const gsc = (scope, assetId, stage) => statusColor(gs(scope, assetId, stage));
+  const gn = (scope, assetId) => getTrkVal(scope, assetId, 'meta', 'notes');
+  const gu = (scope, assetId) => getTrkVal(scope, assetId, 'meta', 'updatedBy');
+  const gd = (scope, assetId) => getTrkVal(scope, assetId, 'meta', 'due');
 
-  const epLabel = EP_SYNOPSES[ep] ? EP_LABELS[ep] + ' — ' + EP_SYNOPSES[ep].title : EP_LABELS[ep];
+  const viewLabel = ep === 'general' ? 'General' : (EP_SYNOPSES[ep] ? EP_LABELS[ep] + ' — ' + EP_SYNOPSES[ep].title : EP_LABELS[ep]);
   const today = new Date().toLocaleDateString('en-US', {year:'numeric',month:'short',day:'numeric'});
 
-  const sCell = (assetId, stage) => {
-    const val = g(assetId, stage);
-    const c = gc(assetId, stage);
-    return '<td style="text-align:center;padding:4px 6px;"><span style="background:'+c+'22;color:'+c+';border:1px solid '+c+'44;padding:2px 8px;border-radius:3px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">'+gl(assetId,stage)+'</span></td>';
+  const sCell = (scope, assetId, stage) => {
+    const c = gsc(scope, assetId, stage);
+    return '<td style="text-align:center;padding:4px 6px;"><span style="background:'+c+'22;color:'+c+';border:1px solid '+c+'44;padding:2px 8px;border-radius:3px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">'+gsl(scope,assetId,stage)+'</span></td>';
   };
   const naC = '<td style="text-align:center;padding:4px 6px;color:#555;font-size:9px;">N/A</td>';
-  const noteC = (id) => '<td style="padding:4px 6px;font-size:9px;color:#666;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+(gu(id)&&gn(id)?gu(id)+': ':'')+escHtml(gn(id))+'</td>';
-  const dueC = (id) => '<td style="text-align:center;padding:4px 6px;font-size:9px;color:#888;">'+(gd(id)||'')+'</td>';
+  const noteC = (scope, id) => '<td style="padding:4px 6px;font-size:9px;color:#666;">'+(gu(scope,id)&&gn(scope,id)?gu(scope,id)+': ':'')+escHtml(gn(scope,id))+'</td>';
+  const dueC = (scope, id) => '<td style="text-align:center;padding:4px 6px;font-size:9px;color:#888;">'+(gd(scope,id)||'')+'</td>';
 
-  let html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Tracker — '+escHtml(epLabel)+'</title>';
+  let html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Tracker — '+escHtml(viewLabel)+'</title>';
   html += '<style>body{font-family:Helvetica,Arial,sans-serif;font-size:11px;color:#222;margin:24px;} ';
   html += 'h1{font-size:16px;margin:0 0 4px;} h2{font-size:12px;color:#FF0066;margin:20px 0 6px;text-transform:uppercase;letter-spacing:2px;border-bottom:1px solid #fce;padding-bottom:3px;} ';
   html += '.meta{font-size:9px;color:#999;margin-bottom:16px;} ';
   html += 'table{border-collapse:collapse;width:100%;margin-bottom:8px;} ';
-  html += 'th{text-align:center;font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:#999;padding:5px 6px;border-bottom:1px solid #ddd;font-weight:700;} ';
-  html += 'th.left{text-align:left;} ';
-  html += 'td{padding:4px 6px;border-bottom:1px solid #f0f0f0;font-size:10px;} ';
-  html += '.type{font-weight:700;text-transform:uppercase;font-size:9px;color:#999;letter-spacing:0.5px;} ';
-  html += '.asset{font-weight:600;} ';
-  html += '@media print{body{margin:12px;} h1{font-size:14px;}} ';
-  html += '</style></head><body>';
+  html += 'th{text-align:center;font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:#999;padding:5px 6px;border-bottom:1px solid #ddd;font-weight:700;} th.left{text-align:left;} ';
+  html += 'td{padding:4px 6px;border-bottom:1px solid #f0f0f0;font-size:10px;} .type{font-weight:700;text-transform:uppercase;font-size:9px;color:#999;} .asset{font-weight:600;} ';
+  html += '@media print{body{margin:12px;}} </style></head><body>';
   html += '<h1>CONVOY — Production Tracker</h1>';
-  html += '<div class="meta">'+escHtml(epLabel)+' · Exported '+today+' by '+escHtml(trackerUser)+'</div>';
+  html += '<div class="meta">'+escHtml(viewLabel)+' · Exported '+today+' by '+escHtml(trackerUser)+'</div>';
 
-  // Assets table
-  html += '<h2>Assets</h2><table><thead><tr>';
-  html += '<th class="left">Type</th><th class="left">Asset</th><th>Concept</th><th>Views</th><th>Expressions</th><th>Actions</th><th class="left">Notes</th><th>Due</th>';
-  html += '</tr></thead><tbody>';
-
-  chars.forEach(c => {
-    html += '<tr><td class="type">Character</td><td class="asset">'+c.name+'</td>'+sCell(c.id,'concept')+sCell(c.id,'views')+sCell(c.id,'expressions')+sCell(c.id,'actions')+noteC(c.id)+dueC(c.id)+'</tr>';
-  });
-  regularVehs.forEach(v => {
-    const hasAct = VEHICLES_WITH_ACTIONS.includes(v.id);
-    html += '<tr><td class="type">Vehicle</td><td class="asset">'+v.name+'</td>'+sCell(v.id,'concept')+sCell(v.id,'views')+naC+(hasAct?sCell(v.id,'actions'):naC)+noteC(v.id)+dueC(v.id)+'</tr>';
-  });
-  envs.forEach(e => {
-    html += '<tr><td class="type">Environment</td><td class="asset">'+e.name+'</td>'+sCell(e.id,'concept')+naC+naC+naC+noteC(e.id)+dueC(e.id)+'</tr>';
-  });
-  playsets.forEach(p => {
-    html += '<tr><td class="type">Playset</td><td class="asset">'+p.name+'</td>'+sCell(p.id,'concept')+naC+naC+naC+noteC(p.id)+dueC(p.id)+'</tr>';
-  });
-  html += '</tbody></table>';
-
-  // Panels table
-  html += '<h2>Panels</h2><table><thead><tr>';
-  html += '<th class="left">Type</th><th>Panel</th><th>Layout</th><th>Line Art</th><th>Color</th><th>Animation</th><th class="left">Notes</th><th>Due</th>';
-  html += '</tr></thead><tbody>';
-  panels.forEach(p => {
-    html += '<tr><td class="type">Panel</td><td class="asset" style="text-align:center">'+p.label+'</td>'+sCell(p.id,'layout')+sCell(p.id,'lineart')+sCell(p.id,'color')+sCell(p.id,'animation')+noteC(p.id)+dueC(p.id)+'</tr>';
-  });
-  html += '</tbody></table></body></html>';
+  if(ep === 'general') {
+    html += '<h2>Characters — Base</h2><table><thead><tr><th class="left">Type</th><th class="left">Asset</th><th>Concept</th><th>Views</th><th>Expressions</th><th>Actions</th><th class="left">Notes</th><th>Due</th></tr></thead><tbody>';
+    CHARACTERS.filter(c=>isMultiEp(c)).forEach(c => {
+      html += '<tr><td class="type">Character</td><td class="asset">'+c.name+'</td>'+sCell('general',c.id,'concept')+sCell('general',c.id,'views')+sCell('general',c.id,'expressions')+sCell('general',c.id,'actions')+noteC('general',c.id)+dueC('general',c.id)+'</tr>';
+    });
+    html += '</tbody></table>';
+    const mv = VEHICLES.filter(v=>!isPlayset(v)&&isMultiEp(v));
+    if(mv.length) {
+      html += '<h2>Vehicles</h2><table><thead><tr><th class="left">Type</th><th class="left">Asset</th><th>Concept</th><th>Views</th><th>Actions</th><th class="left">Notes</th><th>Due</th></tr></thead><tbody>';
+      mv.forEach(v => { const ha=VEHICLES_WITH_ACTIONS.includes(v.id); html += '<tr><td class="type">Vehicle</td><td class="asset">'+v.name+'</td>'+sCell('general',v.id,'concept')+sCell('general',v.id,'views')+(ha?sCell('general',v.id,'actions'):naC)+noteC('general',v.id)+dueC('general',v.id)+'</tr>'; });
+      html += '</tbody></table>';
+    }
+    const me = ENVIRONMENTS.filter(e=>isMultiEp(e));
+    if(me.length) {
+      html += '<h2>Environments</h2><table><thead><tr><th class="left">Type</th><th class="left">Asset</th><th>Concept</th><th class="left">Notes</th><th>Due</th></tr></thead><tbody>';
+      me.forEach(e => { html += '<tr><td class="type">Environment</td><td class="asset">'+e.name+'</td>'+sCell('general',e.id,'concept')+noteC('general',e.id)+dueC('general',e.id)+'</tr>'; });
+      html += '</tbody></table>';
+    }
+  } else {
+    const epChars = CHARACTERS.filter(c=>c.episodes.includes(ep));
+    const wRows = []; epChars.forEach(c=>{if(!c.wardrobe)return;c.wardrobe.forEach(w=>{if(w.episodes.includes(ep)&&w.name!=='Base')wRows.push({cn:c.name,wId:w.id,wn:w.name});});});
+    if(wRows.length) {
+      html += '<h2>Character wardrobes</h2><table><thead><tr><th class="left">Type</th><th class="left">Asset</th><th>Concept</th><th>Views</th><th>Expressions</th><th>Actions</th><th class="left">Notes</th><th>Due</th></tr></thead><tbody>';
+      wRows.forEach(w=>{html+='<tr><td class="type">Wardrobe</td><td class="asset">'+w.cn+' — '+w.wn+'</td>'+sCell(ep,w.wId,'concept')+sCell(ep,w.wId,'views')+sCell(ep,w.wId,'expressions')+sCell(ep,w.wId,'actions')+noteC(ep,w.wId)+dueC(ep,w.wId)+'</tr>';});
+      html += '</tbody></table>';
+    }
+    const av = VEHICLES.filter(v=>v.episodes.includes(ep)&&!isPlayset(v));
+    if(av.length) {
+      html += '<h2>Vehicles</h2><table><thead><tr><th class="left">Type</th><th class="left">Asset</th><th>Concept</th><th>Views</th><th>Actions</th><th class="left">Notes</th><th>Due</th></tr></thead><tbody>';
+      av.forEach(v=>{const ha=VEHICLES_WITH_ACTIONS.includes(v.id);html+='<tr><td class="type">Vehicle</td><td class="asset">'+v.name+'</td>'+sCell('general',v.id,'concept')+sCell('general',v.id,'views')+(ha?sCell('general',v.id,'actions'):naC)+noteC('general',v.id)+dueC('general',v.id)+'</tr>';});
+      html += '</tbody></table>';
+    }
+    const ee = ENVIRONMENTS.filter(e=>e.episodes.includes(ep)&&!isMultiEp(e));
+    if(ee.length) {
+      html += '<h2>Environments</h2><table><thead><tr><th class="left">Type</th><th class="left">Asset</th><th>Concept</th><th class="left">Notes</th><th>Due</th></tr></thead><tbody>';
+      ee.forEach(e=>{html+='<tr><td class="type">Environment</td><td class="asset">'+e.name+'</td>'+sCell(ep,e.id,'concept')+noteC(ep,e.id)+dueC(ep,e.id)+'</tr>';});
+      html += '</tbody></table>';
+    }
+    const panels = (PANELS_BY_EP[ep]||[]);
+    if(panels.length) {
+      html += '<h2>Panels</h2><table><thead><tr><th class="left">Type</th><th>Panel</th><th>Layout</th><th>Line Art</th><th>Color</th><th>Animation</th><th class="left">Notes</th><th>Due</th></tr></thead><tbody>';
+      panels.forEach(p=>{html+='<tr><td class="type">Panel</td><td class="asset" style="text-align:center">'+p.label+'</td>'+sCell(ep,p.id,'layout')+sCell(ep,p.id,'lineart')+sCell(ep,p.id,'color')+sCell(ep,p.id,'animation')+noteC(ep,p.id)+dueC(ep,p.id)+'</tr>';});
+      html += '</tbody></table>';
+    }
+  }
+  html += '</body></html>';
 
   const blob = new Blob([html], {type:'text/html;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
   const w = window.open(url, '_blank');
-  if(w) {
-    w.onload = () => { setTimeout(()=>{ w.print(); }, 500); };
-  }
+  if(w) { w.onload = () => { setTimeout(()=>{ w.print(); }, 500); }; }
   showToast('PDF ready — use Print dialog to save as PDF.');
 }
 

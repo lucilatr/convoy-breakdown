@@ -545,6 +545,169 @@
   .pipe-dot.err { background:var(--pink); }
   .pipe-text { font-size:12px; color:var(--text-dim); font-family:var(--fontb); }
 
+  /* ═══════════ SCHEDULE MODAL (fullscreen gantt) ═══════════ */
+  .sched-overlay {
+    position:fixed; inset:0; z-index:600; background:rgba(0,0,0,0.92);
+    display:none; flex-direction:column;
+  }
+  .sched-overlay.open { display:flex; }
+  .sched-header {
+    padding: 14px 28px; border-bottom: 1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between;
+    background: var(--bg-card); flex-shrink:0;
+  }
+  .sched-title-wrap { display:flex; align-items:baseline; gap:18px; }
+  .sched-title {
+    font-size: 22px; font-weight: 900; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--text);
+  }
+  .sched-title span { color: var(--pink); }
+  .sched-subtitle {
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--text-dim); font-family: var(--fontb);
+  }
+  .sched-controls { display:flex; gap:10px; align-items:center; }
+  .sched-zoom-btn {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text-dim); font-family: var(--fontb);
+    font-size: 11px; letter-spacing:2px; text-transform:uppercase;
+    padding: 6px 12px; cursor:pointer; transition: all .15s;
+  }
+  .sched-zoom-btn:hover { border-color: var(--pink); color: var(--pink); }
+  .sched-zoom-btn.active { background: var(--pink); color: #fff; border-color: var(--pink); }
+  .sched-close {
+    background: transparent; border: 1px solid var(--pink); color: var(--pink);
+    width: 36px; height: 36px; font-size: 20px; cursor:pointer;
+    transition: all .15s; line-height:1;
+  }
+  .sched-close:hover { background: var(--pink); color: #fff; }
+
+  .sched-legend {
+    display:flex; gap:14px; flex-wrap:wrap; align-items:center;
+    padding: 10px 28px; background: var(--bg-card2);
+    border-bottom: 1px solid var(--border); flex-shrink:0;
+  }
+  .sched-legend-item {
+    display:flex; align-items:center; gap:6px;
+    font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+    color: var(--text-dim); font-family: var(--fontb);
+  }
+  .sched-legend-swatch {
+    width: 16px; height: 12px; border: 1px solid rgba(0,0,0,0.3);
+  }
+
+  /* Colores de etapa */
+  .stage-script { background: #FFEB3B; color: #111; }
+  .stage-wait { background: #FFF59D; color: #111; }
+  .stage-licensors { background: #FFEB3B; color: #111; }
+  .stage-fd { background: #A5D6A7; color: #111; }
+  .stage-internal { background: #81D4FA; color: #111; }
+  .stage-rlayout { background: #FFAB91; color: #111; }
+  .stage-lineart { background: #F8BBD0; color: #111; }
+  .stage-color { background: #FF0099; color: #fff; }
+  .stage-color-t { background: #F48FB1; color: #111; }
+  .stage-animation { background: #C158DC; color: #fff; }
+  .stage-vfx { background: #7B1FA2; color: #fff; }
+  .stage-revs { background: #9C27B0; color: #fff; }
+  .stage-lock { background: #66BB6A; color: #111; }
+  .stage-bs { background: #FFB74D; color: #111; }
+
+  .sched-scroll {
+    flex: 1; overflow: auto; position: relative;
+    background: var(--bg);
+  }
+  .sched-grid {
+    display: grid;
+    /* col sizes set via inline style for zoom */
+    position: relative;
+    min-width: 100%;
+  }
+  .sched-col-head {
+    position: sticky; top: 0; z-index: 5;
+    background: var(--bg-card); border-bottom: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    padding: 6px 4px; text-align: center;
+    font-family: var(--fontb);
+  }
+  .sched-col-head.today {
+    background: rgba(0,188,212,0.22);
+    border-bottom: 2px solid #00BCD4;
+  }
+  .sched-col-head.blackout {
+    background: rgba(244,67,54,0.18);
+  }
+  .sched-week-num {
+    font-size: 11px; font-weight: 700; color: var(--text);
+    letter-spacing: 1px;
+  }
+  .sched-week-date {
+    font-size: 9px; color: var(--text-dim);
+    letter-spacing: .5px; line-height: 1.3;
+  }
+  .sched-ep-head {
+    position: sticky; left: 0; z-index: 6;
+    background: #F57C00; color: #fff;
+    font-weight: 900; font-family: var(--font);
+    letter-spacing: 2px; font-size: 15px;
+    display:flex; align-items:center; justify-content:center;
+    border-bottom: 1px solid var(--border);
+    border-right: 2px solid var(--border);
+    box-shadow: 2px 0 6px rgba(0,0,0,0.5);
+  }
+  .sched-ep-head.topleft {
+    background: var(--bg-card); z-index: 10; top:0;
+  }
+  .sched-ep-row {
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    background: var(--bg-card);
+  }
+  .sched-ep-row.alt { background: var(--bg); }
+  .sched-ep-row.blackout-col {
+    background-image: linear-gradient(to right, transparent 0, transparent 100%);
+  }
+  /* Red blackout overlay strips */
+  .sched-blackout-strip {
+    position: absolute; top: 0; bottom: 0;
+    background: rgba(244,67,54,0.35);
+    pointer-events: none; z-index: 3;
+  }
+  .sched-today-strip {
+    position: absolute; top: 0; bottom: 0;
+    background: rgba(0,188,212,0.15);
+    border-left: 2px solid #00BCD4; border-right: 2px solid #00BCD4;
+    pointer-events: none; z-index: 2;
+  }
+
+  /* Task bar inside row */
+  .sched-task {
+    position: absolute; top: 4px; bottom: 4px;
+    display:flex; align-items:center; padding: 0 6px;
+    font-family: var(--fontb); font-weight: 700;
+    font-size: 10px; letter-spacing: .5px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    border: 1px solid rgba(0,0,0,0.25);
+    z-index: 1;
+  }
+  .sched-task.micro { padding: 0 3px; font-size: 9px; justify-content:center; }
+
+  .sched-empty-row {
+    height: 16px; background: var(--bg);
+    border-bottom: 1px dashed var(--border);
+  }
+
+  /* Row height configurable */
+  .sched-row-top, .sched-row-bot {
+    position: relative; height: 38px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sched-row-top { background: rgba(255,255,255,0.015); }
+  .sched-row-bot { background: rgba(255,255,255,0.03); }
+  .sched-row-spacer {
+    height: 10px; background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+
   /* SCROLLBAR */
   ::-webkit-scrollbar { width:4px; height:4px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
@@ -1025,8 +1188,8 @@
     <div class="topbar-logo">CONV<span>O</span>Y</div>
     <div class="topbar-meta">Matchbox Adventure Squad · S01 · v1.0</div>
     <div class="topbar-right">
+      <button class="topbar-export" onclick="openSchedule()">▤ Schedule</button>
       <button class="topbar-export" id="tracker-btn" onclick="toggleTracker()">▦ Tracker</button>
-      <button class="topbar-export" onclick="openPipeline()">⚙ Pipeline</button>
       <button class="topbar-export" onclick="exportZip()">↓ Export ZIP</button>
     </div>
   </div>
@@ -1213,7 +1376,42 @@
   </div>
 </div>
 
-<!-- ══════════════ PIPELINE MODAL ══════════════ -->
+<!-- ══════════════ SCHEDULE MODAL (fullscreen) ══════════════ -->
+<div class="sched-overlay" id="schedule-modal">
+  <div class="sched-header">
+    <div class="sched-title-wrap">
+      <div class="sched-title">SCHED<span>U</span>LE</div>
+      <div class="sched-subtitle">Matchbox Adventure Squad · S01 · Production Timeline 2026</div>
+    </div>
+    <div class="sched-controls">
+      <button class="sched-zoom-btn" onclick="schedZoom('s')" id="sz-s">S</button>
+      <button class="sched-zoom-btn active" onclick="schedZoom('m')" id="sz-m">M</button>
+      <button class="sched-zoom-btn" onclick="schedZoom('l')" id="sz-l">L</button>
+      <button class="sched-zoom-btn" onclick="schedJumpToday()">→ Today</button>
+      <button class="sched-close" onclick="closeSchedule()">×</button>
+    </div>
+  </div>
+
+  <div class="sched-legend">
+    <div class="sched-legend-item"><div class="sched-legend-swatch stage-script"></div>Scripting</div>
+    <div class="sched-legend-item"><div class="sched-legend-swatch stage-fd"></div>FD</div>
+    <div class="sched-legend-item"><div class="sched-legend-swatch stage-rlayout"></div>Rough Layout</div>
+    <div class="sched-legend-item"><div class="sched-legend-swatch stage-lineart"></div>Line Art</div>
+    <div class="sched-legend-item"><div class="sched-legend-swatch stage-color"></div>Color</div>
+    <div class="sched-legend-item"><div class="sched-legend-swatch stage-animation"></div>Animation</div>
+    <div class="sched-legend-item"><div class="sched-legend-swatch stage-vfx"></div>VFX/SFX/Mix</div>
+    <div class="sched-legend-item"><div class="sched-legend-swatch stage-revs"></div>Revs</div>
+    <div class="sched-legend-item"><div class="sched-legend-swatch stage-internal"></div>Internal</div>
+    <div class="sched-legend-item"><div class="sched-legend-swatch" style="background:rgba(244,67,54,0.35);"></div>Blackout</div>
+    <div class="sched-legend-item"><div class="sched-legend-swatch" style="background:rgba(0,188,212,0.4);border-left:2px solid #00BCD4;border-right:2px solid #00BCD4;"></div>Today</div>
+  </div>
+
+  <div class="sched-scroll" id="sched-scroll">
+    <div class="sched-grid" id="sched-grid"></div>
+  </div>
+</div>
+
+
 <div class="modal-overlay" id="pipeline-modal">
   <div class="modal-box">
     <div class="modal-header">
@@ -2048,6 +2246,590 @@ function updatePipeStatus() {
     ? `JSONBin: ${pipeline.binId.slice(0,12)}...`
     : 'JSONBin: no configurado';
 }
+
+// ════════════════════════════════════════
+// SCHEDULE (Gantt) - read-only visualization
+// ════════════════════════════════════════
+const SCHED_WEEKS = [
+  { n:19, from:'9-feb',  to:'13-feb' },
+  { n:20, from:'16-feb', to:'20-feb' },
+  { n:21, from:'23-feb', to:'27-feb' },
+  { n:22, from:'2-mar',  to:'6-mar'  },
+  { n:23, from:'9-mar',  to:'13-mar' },
+  { n:24, from:'16-mar', to:'20-mar' },
+  { n:25, from:'23-mar', to:'27-mar' },
+  { n:26, from:'30-mar', to:'3-abr'  },
+  { n:27, from:'6-abr',  to:'10-abr' },
+  { n:28, from:'13-abr', to:'17-abr' },
+  { n:29, from:'20-abr', to:'24-abr' },
+  { n:30, from:'27-abr', to:'1-may'  },
+  { n:31, from:'4-may',  to:'8-may'  },
+  { n:32, from:'11-may', to:'15-may' },
+  { n:33, from:'18-may', to:'22-may' },
+  { n:34, from:'25-may', to:'29-may' },
+  { n:35, from:'1-jun',  to:'5-jun'  },
+  { n:36, from:'8-jun',  to:'12-jun' },
+  { n:37, from:'15-jun', to:'19-jun' },
+  { n:38, from:'22-jun', to:'26-jun' },
+  { n:39, from:'30-jun', to:'4-jul'  },
+  { n:40, from:'7-jul',  to:'11-jul' },
+  { n:41, from:'14-jul', to:'18-jul' },
+  { n:42, from:'21-jul', to:'25-jul' },
+  { n:43, from:'28-jul', to:'1-ago'  },
+  { n:44, from:'4-ago',  to:'8-ago'  },
+  { n:45, from:'11-ago', to:'15-ago' },
+  { n:46, from:'18-ago', to:'22-ago' },
+  { n:47, from:'25-ago', to:'29-ago' },
+  { n:48, from:'1-sept', to:'5-sept' },
+  { n:49, from:'8-sept', to:'12-sept'},
+  { n:50, from:'15-sept',to:'19-sept'},
+  { n:51, from:'22-sept',to:'26-sept'},
+  { n:52, from:'29-sept',to:'3-oct'  }
+];
+
+const SCHED_BLACKOUTS = [
+  { wk: 22, fromQ: 0, toQ: 2 },  // H (holiday parcial inicio de W22)
+  { wk: 26, fromQ: 1, toQ: 2 },  // I parcial en W26
+  { wk: 30, fromQ: 3, toQ: 4 },
+  { wk: 34, fromQ: 0, toQ: 4 },  // H semana completa rojo
+  { wk: 39, fromQ: 2, toQ: 4 },
+  { wk: 47, fromQ: 3, toQ: 4 }
+];
+
+// Parse "23-mar" / "1-sept" / "3-oct" style dates → Date object (year 2026)
+function schedParseDate(str) {
+  const MONTHS = {
+    'ene':0,'feb':1,'mar':2,'abr':3,'may':4,'jun':5,
+    'jul':6,'ago':7,'sept':8,'sep':8,'oct':9,'nov':10,'dic':11
+  };
+  const parts = str.trim().split('-');
+  const day = parseInt(parts[0], 10);
+  const mon = MONTHS[parts[1].toLowerCase()];
+  return new Date(2026, mon, day);
+}
+
+// Determine today dynamically based on real date vs SCHED_WEEKS ranges.
+// Returns { wk, fromQ, toQ } matching current day within its week, or null if out of range.
+function schedComputeToday() {
+  const today = new Date();
+  // Normalize to midnight
+  today.setHours(0,0,0,0);
+
+  for(let i = 0; i < SCHED_WEEKS.length; i++) {
+    const w = SCHED_WEEKS[i];
+    const start = schedParseDate(w.from);
+    // Week end is Friday (to), but the week really spans until Sunday before next week.
+    // Use next week's start minus 1 day, or Sunday after "to" for last week.
+    let end;
+    if(i < SCHED_WEEKS.length - 1) {
+      end = schedParseDate(SCHED_WEEKS[i+1].from);
+      end.setDate(end.getDate() - 1);
+    } else {
+      end = schedParseDate(w.to);
+      end.setDate(end.getDate() + 2); // include weekend of last week
+    }
+    end.setHours(23,59,59,999);
+
+    if(today >= start && today <= end) {
+      // Calculate which "quarter" of the week we're in
+      // Week has 7 days; split into 4 quarters (~1.75 days each)
+      const daysDiff = Math.floor((today - start) / (1000*60*60*24));
+      const q = Math.min(3, Math.floor(daysDiff * 4 / 7));
+      return { wk: w.n, fromQ: q, toQ: q + 1 };
+    }
+  }
+  return null; // out of schedule range
+}
+
+let SCHED_TODAY = schedComputeToday() || { wk: 39, fromQ: 2, toQ: 3 };
+
+const SCHED_DATA = {
+  101: {
+    top: [
+      { wk:25, fromQ:0, len:4,  label:'SCRIPTING V2', cls:'stage-script' },
+      { wk:26, fromQ:0, len:1,  label:'W', cls:'stage-wait' },
+      { wk:27, fromQ:0, len:4,  label:'SCRIPTING V3', cls:'stage-script' },
+      { wk:28, fromQ:0, len:4,  label:'Licensors + W?', cls:'stage-licensors' },
+      { wk:29, fromQ:0, len:3,  label:'', cls:'stage-wait' },
+      { wk:29, fromQ:3, len:2,  label:'FD', cls:'stage-fd' }
+    ],
+    bot: [
+      { wk:26, fromQ:0, len:4,  label:'ROUGH LAYOUT V1', cls:'stage-rlayout' },
+      { wk:27, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:27, fromQ:1, len:4,  label:'RL V2', cls:'stage-rlayout' },
+      { wk:28, fromQ:1, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:28, fromQ:2, len:4,  label:'RL V3', cls:'stage-rlayout' },
+      { wk:29, fromQ:2, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:29, fromQ:3, len:5,  label:'LINE ART V1', cls:'stage-lineart' },
+      { wk:31, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:31, fromQ:1, len:7,  label:'LINE ART V2', cls:'stage-lineart' },
+      { wk:33, fromQ:0, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:33, fromQ:1, len:4,  label:'LA V3', cls:'stage-lineart' },
+      { wk:34, fromQ:1, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:34, fromQ:2, len:1,  label:'COLOR V1', cls:'stage-color' },
+      { wk:34, fromQ:3, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:35, fromQ:0, len:6,  label:'COLOR V2', cls:'stage-color' },
+      { wk:36, fromQ:2, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:36, fromQ:3, len:3,  label:'COLOR', cls:'stage-color-t' },
+      { wk:37, fromQ:2, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:37, fromQ:3, len:5,  label:'ANIMATION V1', cls:'stage-animation' },
+      { wk:39, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:39, fromQ:1, len:6,  label:'ANIMATION V2', cls:'stage-animation' },
+      { wk:40, fromQ:3, len:3,  label:'W + LICENSORS', cls:'stage-licensors' },
+      { wk:41, fromQ:2, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:41, fromQ:3, len:4,  label:'VFX/SFX/MIX V2', cls:'stage-vfx' },
+      { wk:43, fromQ:0, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:43, fromQ:1, len:7,  label:'VFX/SFX/M LICENSORS', cls:'stage-vfx' },
+      { wk:45, fromQ:0, len:1,  label:'REVS', cls:'stage-revs' },
+      { wk:45, fromQ:1, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:45, fromQ:2, len:2,  label:'FD', cls:'stage-fd' }
+    ]
+  },
+  102: {
+    top: [
+      { wk:25, fromQ:0, len:4,  label:'SCRIPTING V2', cls:'stage-script' },
+      { wk:26, fromQ:0, len:1,  label:'W', cls:'stage-wait' },
+      { wk:27, fromQ:0, len:4,  label:'SCRIPTING V3', cls:'stage-script' },
+      { wk:28, fromQ:0, len:4,  label:'Licensors + W?', cls:'stage-licensors' },
+      { wk:29, fromQ:0, len:3,  label:'', cls:'stage-wait' },
+      { wk:29, fromQ:3, len:2,  label:'FD', cls:'stage-fd' }
+    ],
+    bot: [
+      { wk:26, fromQ:0, len:4,  label:'ROUGH LAYOUT V1', cls:'stage-rlayout' },
+      { wk:27, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:27, fromQ:1, len:4,  label:'RL V2', cls:'stage-rlayout' },
+      { wk:28, fromQ:1, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:28, fromQ:2, len:4,  label:'RL V3', cls:'stage-rlayout' },
+      { wk:29, fromQ:2, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:29, fromQ:3, len:5,  label:'LINE ART V1', cls:'stage-lineart' },
+      { wk:31, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:31, fromQ:1, len:7,  label:'LINE ART V2', cls:'stage-lineart' },
+      { wk:33, fromQ:0, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:33, fromQ:1, len:4,  label:'LA V3', cls:'stage-lineart' },
+      { wk:34, fromQ:1, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:34, fromQ:2, len:1,  label:'COLOR V1', cls:'stage-color' },
+      { wk:34, fromQ:3, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:35, fromQ:0, len:6,  label:'COLOR V2', cls:'stage-color' },
+      { wk:36, fromQ:2, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:36, fromQ:3, len:3,  label:'COLOR', cls:'stage-color-t' },
+      { wk:37, fromQ:2, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:37, fromQ:3, len:5,  label:'ANIMATION V1', cls:'stage-animation' },
+      { wk:39, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:39, fromQ:1, len:5,  label:'ANIMATION', cls:'stage-animation' },
+      { wk:40, fromQ:2, len:4,  label:'W + LICENSORS', cls:'stage-licensors' },
+      { wk:41, fromQ:2, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:41, fromQ:3, len:4,  label:'VFX/SFX/MIX V2', cls:'stage-vfx' },
+      { wk:43, fromQ:0, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:43, fromQ:1, len:7,  label:'VFX/SFX/M LICENSORS', cls:'stage-vfx' },
+      { wk:45, fromQ:0, len:1,  label:'REVS', cls:'stage-revs' },
+      { wk:45, fromQ:1, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:45, fromQ:2, len:2,  label:'FD', cls:'stage-fd' }
+    ]
+  },
+  103: {
+    top: [
+      { wk:25, fromQ:0, len:4,  label:'SCRIPTING V2', cls:'stage-script' },
+      { wk:26, fromQ:0, len:1,  label:'W', cls:'stage-wait' },
+      { wk:27, fromQ:0, len:4,  label:'SCRIPTING V3', cls:'stage-script' },
+      { wk:28, fromQ:0, len:4,  label:'Licensors + W?', cls:'stage-licensors' },
+      { wk:29, fromQ:0, len:3,  label:'', cls:'stage-wait' },
+      { wk:29, fromQ:3, len:2,  label:'FD', cls:'stage-fd' }
+    ],
+    bot: [
+      { wk:26, fromQ:2, len:5,  label:'ROUGH LAYOUT V1', cls:'stage-rlayout' },
+      { wk:28, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:28, fromQ:1, len:4,  label:'RL V2', cls:'stage-rlayout' },
+      { wk:29, fromQ:1, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:29, fromQ:2, len:4,  label:'RL V3', cls:'stage-rlayout' },
+      { wk:30, fromQ:2, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:30, fromQ:3, len:5,  label:'LINE ART V1', cls:'stage-lineart' },
+      { wk:32, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:32, fromQ:1, len:7,  label:'LINE ART V2', cls:'stage-lineart' },
+      { wk:34, fromQ:0, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:34, fromQ:1, len:4,  label:'LA V3', cls:'stage-lineart' },
+      { wk:35, fromQ:1, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:35, fromQ:2, len:1,  label:'COLOR V1', cls:'stage-color' },
+      { wk:35, fromQ:3, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:36, fromQ:0, len:6,  label:'COLOR V2', cls:'stage-color' },
+      { wk:37, fromQ:2, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:37, fromQ:3, len:3,  label:'COLOR', cls:'stage-color-t' },
+      { wk:38, fromQ:2, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:38, fromQ:3, len:5,  label:'ANIMATION V1', cls:'stage-animation' },
+      { wk:40, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:40, fromQ:1, len:7,  label:'ANIMATION V2', cls:'stage-animation' },
+      { wk:42, fromQ:0, len:4,  label:'+ LICENSORS', cls:'stage-licensors' },
+      { wk:43, fromQ:0, len:4,  label:'VFX/SFX/MIX V2', cls:'stage-vfx' },
+      { wk:44, fromQ:0, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:44, fromQ:1, len:7,  label:'VFX/SFX/M LICENSORS', cls:'stage-vfx' },
+      { wk:46, fromQ:0, len:1,  label:'REVS', cls:'stage-revs' },
+      { wk:46, fromQ:1, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:46, fromQ:2, len:2,  label:'FD', cls:'stage-fd' }
+    ]
+  },
+  104: {
+    top: [
+      { wk:25, fromQ:0, len:4,  label:'SCRIPTING V2', cls:'stage-script' },
+      { wk:26, fromQ:0, len:1,  label:'W', cls:'stage-wait' },
+      { wk:27, fromQ:0, len:4,  label:'SCRIPTING V3', cls:'stage-script' },
+      { wk:28, fromQ:0, len:4,  label:'Licensors + W?', cls:'stage-licensors' },
+      { wk:29, fromQ:0, len:2,  label:'FD', cls:'stage-fd' },
+      { wk:29, fromQ:2, len:4,  label:'', cls:'stage-licensors' },
+      { wk:30, fromQ:2, len:2,  label:'FD', cls:'stage-fd' }
+    ],
+    bot: [
+      { wk:26, fromQ:2, len:5,  label:'ROUGH LAYOUT V1', cls:'stage-rlayout' },
+      { wk:28, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:28, fromQ:1, len:4,  label:'RL V2', cls:'stage-rlayout' },
+      { wk:29, fromQ:1, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:29, fromQ:2, len:4,  label:'RL V3', cls:'stage-rlayout' },
+      { wk:30, fromQ:2, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:30, fromQ:3, len:5,  label:'LINE ART V1', cls:'stage-lineart' },
+      { wk:32, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:32, fromQ:1, len:7,  label:'LINE ART V2', cls:'stage-lineart' },
+      { wk:34, fromQ:0, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:34, fromQ:1, len:4,  label:'LA V3', cls:'stage-lineart' },
+      { wk:35, fromQ:1, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:35, fromQ:2, len:1,  label:'COLOR V1', cls:'stage-color' },
+      { wk:35, fromQ:3, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:36, fromQ:0, len:6,  label:'COLOR V2', cls:'stage-color' },
+      { wk:37, fromQ:2, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:37, fromQ:3, len:3,  label:'COLOR', cls:'stage-color-t' },
+      { wk:38, fromQ:2, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:38, fromQ:3, len:5,  label:'ANIMATION V1', cls:'stage-animation' },
+      { wk:40, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:40, fromQ:1, len:5,  label:'ANIMATION', cls:'stage-animation' },
+      { wk:41, fromQ:2, len:4,  label:'+ LICENSORS', cls:'stage-licensors' },
+      { wk:43, fromQ:0, len:4,  label:'VFX/SFX/MIX V2', cls:'stage-vfx' },
+      { wk:44, fromQ:0, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:44, fromQ:1, len:7,  label:'VFX/SFX/M LICENSORS', cls:'stage-vfx' },
+      { wk:46, fromQ:0, len:1,  label:'REVS', cls:'stage-revs' },
+      { wk:46, fromQ:1, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:46, fromQ:2, len:2,  label:'FD', cls:'stage-fd' }
+    ]
+  },
+  105: {
+    top: [
+      { wk:25, fromQ:0, len:4,  label:'SCRIPTING V2', cls:'stage-script' },
+      { wk:26, fromQ:0, len:1,  label:'W', cls:'stage-wait' },
+      { wk:27, fromQ:0, len:4,  label:'SCRIPTING V3', cls:'stage-script' },
+      { wk:28, fromQ:0, len:4,  label:'Licensors + W?', cls:'stage-licensors' },
+      { wk:29, fromQ:0, len:2,  label:'FD', cls:'stage-fd' }
+    ],
+    bot: [
+      { wk:27, fromQ:2, len:5,  label:'ROUGH LAYOUT V1', cls:'stage-rlayout' },
+      { wk:29, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:29, fromQ:1, len:4,  label:'RL V2', cls:'stage-rlayout' },
+      { wk:30, fromQ:1, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:30, fromQ:2, len:4,  label:'RL V3', cls:'stage-rlayout' },
+      { wk:31, fromQ:2, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:31, fromQ:3, len:5,  label:'LINE ART V1', cls:'stage-lineart' },
+      { wk:33, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:33, fromQ:1, len:7,  label:'LINE ART V2', cls:'stage-lineart' },
+      { wk:35, fromQ:0, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:35, fromQ:1, len:4,  label:'LA V3', cls:'stage-lineart' },
+      { wk:36, fromQ:1, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:36, fromQ:2, len:1,  label:'COLOR V1', cls:'stage-color' },
+      { wk:36, fromQ:3, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:37, fromQ:0, len:6,  label:'COLOR V2', cls:'stage-color' },
+      { wk:38, fromQ:2, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:38, fromQ:3, len:3,  label:'COLOR', cls:'stage-color-t' },
+      { wk:39, fromQ:2, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:39, fromQ:3, len:5,  label:'ANIMATION V1', cls:'stage-animation' },
+      { wk:41, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:41, fromQ:1, len:3,  label:'ANIMAT', cls:'stage-animation' },
+      { wk:42, fromQ:0, len:4,  label:'W + LICENSORS', cls:'stage-licensors' },
+      { wk:43, fromQ:0, len:4,  label:'VFX/SFX/MIX V2', cls:'stage-vfx' },
+      { wk:44, fromQ:0, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:44, fromQ:1, len:4,  label:'VFX/SF LICENSORS', cls:'stage-vfx' },
+      { wk:47, fromQ:0, len:1,  label:'REVS', cls:'stage-revs' },
+      { wk:47, fromQ:1, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:47, fromQ:2, len:2,  label:'FD', cls:'stage-fd' }
+    ]
+  },
+  106: {
+    top: [
+      { wk:25, fromQ:0, len:2,  label:'V2 W', cls:'stage-script' },
+      { wk:25, fromQ:2, len:2,  label:'BS V3', cls:'stage-bs' },
+      { wk:26, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:26, fromQ:1, len:4,  label:'SCRIPTING V1', cls:'stage-script' },
+      { wk:27, fromQ:1, len:2,  label:'I + V', cls:'stage-internal' },
+      { wk:27, fromQ:3, len:4,  label:'SCRIPTING V2', cls:'stage-script' },
+      { wk:28, fromQ:3, len:1,  label:'W', cls:'stage-wait' },
+      { wk:29, fromQ:0, len:4,  label:'SCRIPTING V3', cls:'stage-script' },
+      { wk:30, fromQ:0, len:4,  label:'Licensors + W?', cls:'stage-licensors' },
+      { wk:31, fromQ:2, len:2,  label:'FD', cls:'stage-fd' }
+    ],
+    bot: [
+      { wk:28, fromQ:2, len:5,  label:'ROUGH LAYOUT V1', cls:'stage-rlayout' },
+      { wk:30, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:30, fromQ:1, len:4,  label:'RL V2', cls:'stage-rlayout' },
+      { wk:31, fromQ:1, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:31, fromQ:2, len:4,  label:'RL V3', cls:'stage-rlayout' },
+      { wk:32, fromQ:2, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:32, fromQ:3, len:5,  label:'LINE ART V1', cls:'stage-lineart' },
+      { wk:34, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:34, fromQ:1, len:7,  label:'LINE ART V2', cls:'stage-lineart' },
+      { wk:36, fromQ:0, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:36, fromQ:1, len:4,  label:'LA V3', cls:'stage-lineart' },
+      { wk:37, fromQ:1, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:37, fromQ:2, len:1,  label:'COLOR V1', cls:'stage-color' },
+      { wk:37, fromQ:3, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:38, fromQ:0, len:6,  label:'COLOR V2', cls:'stage-color' },
+      { wk:39, fromQ:2, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:39, fromQ:3, len:3,  label:'COLOR', cls:'stage-color-t' },
+      { wk:40, fromQ:2, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:40, fromQ:3, len:5,  label:'ANIMAT V1', cls:'stage-animation' },
+      { wk:42, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:42, fromQ:1, len:4,  label:'ANIMATION', cls:'stage-animation' },
+      { wk:43, fromQ:1, len:4,  label:'W + LICENSORS', cls:'stage-licensors' },
+      { wk:44, fromQ:2, len:4,  label:'VFX/SFX/MIX V2', cls:'stage-vfx' },
+      { wk:45, fromQ:2, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:45, fromQ:3, len:6,  label:'VFX/SFX/M LICENSORS', cls:'stage-vfx' },
+      { wk:48, fromQ:0, len:1,  label:'REVS', cls:'stage-revs' },
+      { wk:48, fromQ:1, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:48, fromQ:2, len:2,  label:'FD', cls:'stage-fd' }
+    ]
+  },
+  107: {
+    top: [
+      { wk:25, fromQ:0, len:2,  label:'V2 W', cls:'stage-script' },
+      { wk:25, fromQ:2, len:2,  label:'BS V3', cls:'stage-bs' },
+      { wk:26, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:26, fromQ:1, len:4,  label:'SCRIPTING V1', cls:'stage-script' },
+      { wk:27, fromQ:1, len:2,  label:'I + V', cls:'stage-internal' },
+      { wk:27, fromQ:3, len:4,  label:'SCRIPTING V2', cls:'stage-script' },
+      { wk:28, fromQ:3, len:1,  label:'W', cls:'stage-wait' },
+      { wk:29, fromQ:0, len:4,  label:'SCRIPTING V3', cls:'stage-script' },
+      { wk:30, fromQ:0, len:4,  label:'Licensors + W?', cls:'stage-licensors' },
+      { wk:31, fromQ:2, len:2,  label:'FD', cls:'stage-fd' }
+    ],
+    bot: [
+      { wk:28, fromQ:2, len:5,  label:'ROUGH LAYOUT V1', cls:'stage-rlayout' },
+      { wk:30, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:30, fromQ:1, len:4,  label:'RL V2', cls:'stage-rlayout' },
+      { wk:31, fromQ:1, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:31, fromQ:2, len:4,  label:'RL V3', cls:'stage-rlayout' },
+      { wk:32, fromQ:2, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:32, fromQ:3, len:5,  label:'LINE ART V1', cls:'stage-lineart' },
+      { wk:34, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:34, fromQ:1, len:7,  label:'LINE ART V2', cls:'stage-lineart' },
+      { wk:36, fromQ:0, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:36, fromQ:1, len:4,  label:'LA V3', cls:'stage-lineart' },
+      { wk:37, fromQ:1, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:37, fromQ:2, len:1,  label:'COLOR V1', cls:'stage-color' },
+      { wk:37, fromQ:3, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:38, fromQ:0, len:6,  label:'COLOR V2', cls:'stage-color' },
+      { wk:39, fromQ:2, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:39, fromQ:3, len:3,  label:'COLOR', cls:'stage-color-t' },
+      { wk:40, fromQ:2, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:40, fromQ:3, len:5,  label:'ANIMAT V1', cls:'stage-animation' },
+      { wk:42, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:42, fromQ:1, len:4,  label:'ANIMATION', cls:'stage-animation' },
+      { wk:43, fromQ:1, len:4,  label:'W + LICENSORS', cls:'stage-licensors' },
+      { wk:44, fromQ:2, len:4,  label:'VFX/SFX/MIX V2', cls:'stage-vfx' },
+      { wk:45, fromQ:2, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:45, fromQ:3, len:6,  label:'VFX/SFX/M LICENSORS', cls:'stage-vfx' },
+      { wk:48, fromQ:0, len:1,  label:'REVS', cls:'stage-revs' },
+      { wk:48, fromQ:1, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:48, fromQ:2, len:2,  label:'FD', cls:'stage-fd' }
+    ]
+  },
+  108: {
+    top: [
+      { wk:19, fromQ:0, len:4,  label:'CONCEPTING V1', cls:'stage-script' },
+      { wk:20, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:20, fromQ:1, len:4,  label:'CNCPT V2', cls:'stage-script' },
+      { wk:21, fromQ:1, len:3,  label:'W', cls:'stage-wait' },
+      { wk:22, fromQ:2, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:22, fromQ:3, len:5,  label:'BEAT SHEETS V1', cls:'stage-script' },
+      { wk:24, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:24, fromQ:1, len:7,  label:'BEAT SHEETS  V2', cls:'stage-script' },
+      { wk:26, fromQ:0, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:26, fromQ:2, len:2,  label:'BS V3', cls:'stage-bs' },
+      { wk:27, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:27, fromQ:1, len:4,  label:'SCRIPTING V1', cls:'stage-script' },
+      { wk:28, fromQ:1, len:2,  label:'I + V', cls:'stage-internal' },
+      { wk:28, fromQ:3, len:4,  label:'SCRIPTING V2', cls:'stage-script' },
+      { wk:29, fromQ:3, len:1,  label:'W', cls:'stage-wait' },
+      { wk:30, fromQ:0, len:4,  label:'SCRIPTING V3', cls:'stage-script' },
+      { wk:31, fromQ:0, len:4,  label:'Licensors + W?', cls:'stage-licensors' },
+      { wk:33, fromQ:3, len:2,  label:'FD', cls:'stage-fd' }
+    ],
+    bot: [
+      { wk:29, fromQ:2, len:5,  label:'ROUGH LAYOUT V1', cls:'stage-rlayout' },
+      { wk:31, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:31, fromQ:1, len:4,  label:'RL V2', cls:'stage-rlayout' },
+      { wk:32, fromQ:1, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:32, fromQ:2, len:4,  label:'RL V3', cls:'stage-rlayout' },
+      { wk:33, fromQ:2, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:33, fromQ:3, len:5,  label:'LINE ART V1', cls:'stage-lineart' },
+      { wk:35, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:35, fromQ:1, len:7,  label:'LINE ART V2', cls:'stage-lineart' },
+      { wk:37, fromQ:0, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:37, fromQ:1, len:4,  label:'LA V3', cls:'stage-lineart' },
+      { wk:38, fromQ:1, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:38, fromQ:2, len:1,  label:'COLOR V1', cls:'stage-color' },
+      { wk:38, fromQ:3, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:39, fromQ:0, len:6,  label:'COLOR V2', cls:'stage-color' },
+      { wk:40, fromQ:2, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:40, fromQ:3, len:2,  label:'COLOR', cls:'stage-color-t' },
+      { wk:41, fromQ:1, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:41, fromQ:2, len:6,  label:'ANIMATION V1', cls:'stage-animation' },
+      { wk:43, fromQ:0, len:1,  label:'I', cls:'stage-internal micro' },
+      { wk:43, fromQ:1, len:4,  label:'ANIMATION', cls:'stage-animation' },
+      { wk:44, fromQ:1, len:4,  label:'W + LICENSORS', cls:'stage-licensors' },
+      { wk:45, fromQ:1, len:5,  label:'VFX/SFX/MIX V2', cls:'stage-vfx' },
+      { wk:46, fromQ:2, len:1,  label:'W', cls:'stage-wait micro' },
+      { wk:46, fromQ:3, len:5,  label:'VFX/SFX/MIX LICENSORS', cls:'stage-vfx' },
+      { wk:49, fromQ:0, len:1,  label:'REVS', cls:'stage-revs' },
+      { wk:49, fromQ:1, len:1,  label:'L', cls:'stage-lock micro' },
+      { wk:49, fromQ:2, len:2,  label:'FD', cls:'stage-fd' }
+    ]
+  }
+};
+
+const SCHED_ZOOM = { s: 55, m: 85, l: 120 };
+let schedCurrentZoom = 'm';
+let schedRendered = false;
+
+function openSchedule() {
+  document.getElementById('schedule-modal').classList.add('open');
+  if(!schedRendered) {
+    renderSchedule();
+    schedRendered = true;
+  }
+  setTimeout(schedJumpToday, 50);
+}
+function closeSchedule() {
+  document.getElementById('schedule-modal').classList.remove('open');
+}
+function schedZoom(size) {
+  schedCurrentZoom = size;
+  document.querySelectorAll('.sched-zoom-btn').forEach(b => {
+    if(b.id === 'sz-'+size) b.classList.add('active');
+    else if(b.id && b.id.startsWith('sz-')) b.classList.remove('active');
+  });
+  renderSchedule();
+}
+function schedJumpToday() {
+  const scroll = document.getElementById('sched-scroll');
+  if(!scroll) return;
+  const px = SCHED_ZOOM[schedCurrentZoom];
+  const epColWidth = 70;
+  const weekIdx = SCHED_WEEKS.findIndex(w => w.n === SCHED_TODAY.wk);
+  if(weekIdx >= 0) {
+    const targetX = epColWidth + weekIdx * px - scroll.clientWidth * 0.35;
+    scroll.scrollTo({ left: Math.max(0, targetX), behavior: 'smooth' });
+  }
+}
+
+function renderSchedule() {
+  const grid = document.getElementById('sched-grid');
+  if(!grid) return;
+
+  const px = SCHED_ZOOM[schedCurrentZoom];
+  const epColWidth = 70;
+  const numWeeks = SCHED_WEEKS.length;
+
+  grid.style.gridTemplateColumns = `${epColWidth}px repeat(${numWeeks}, ${px}px)`;
+
+  let html = '';
+
+  // Row 1: header
+  html += `<div class="sched-ep-head topleft"></div>`;
+  SCHED_WEEKS.forEach(w => {
+    const isToday = w.n === SCHED_TODAY.wk;
+    const isFullBlackout = SCHED_BLACKOUTS.some(b => b.wk === w.n && (b.toQ - b.fromQ) >= 4);
+    const cls = isToday ? 'today' : (isFullBlackout ? 'blackout' : '');
+    html += `<div class="sched-col-head ${cls}">
+      <div class="sched-week-num">${w.n}</div>
+      <div class="sched-week-date">${w.from}</div>
+      <div class="sched-week-date">${w.to}</div>
+    </div>`;
+  });
+
+  const episodes = [101,102,103,104,105,106,107,108];
+  episodes.forEach((ep, idx) => {
+    const epBg = idx%2===0 ? '#F57C00' : '#FB8C00';
+    html += `<div class="sched-ep-head" style="grid-row: span 2; background:${epBg};">${ep}</div>`;
+    html += `<div style="grid-column: 2 / ${numWeeks+2}; position:relative; height:38px; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border);" id="sched-row-top-${ep}"></div>`;
+    html += `<div style="grid-column: 2 / ${numWeeks+2}; position:relative; height:38px; background: rgba(255,255,255,0.05); border-bottom: 2px solid var(--border);" id="sched-row-bot-${ep}"></div>`;
+    if(idx < episodes.length - 1) {
+      html += `<div style="grid-column: 1 / ${numWeeks+2}; height:12px; background: var(--bg);"></div>`;
+    }
+  });
+
+  grid.innerHTML = html;
+
+  episodes.forEach(ep => {
+    const data = SCHED_DATA[ep];
+    if(!data) return;
+    placeTasksInRow(`sched-row-top-${ep}`, data.top, px);
+    placeTasksInRow(`sched-row-bot-${ep}`, data.bot, px);
+  });
+
+  applyOverlays(px);
+}
+
+function placeTasksInRow(rowId, tasks, px) {
+  const row = document.getElementById(rowId);
+  if(!row) return;
+  const qWidth = px / 4;
+  tasks.forEach(t => {
+    const weekIdx = SCHED_WEEKS.findIndex(w => w.n === t.wk);
+    if(weekIdx < 0) return;
+    const left = weekIdx * px + t.fromQ * qWidth;
+    const width = t.len * qWidth;
+    const bar = document.createElement('div');
+    bar.className = 'sched-task ' + t.cls;
+    bar.style.left = left + 'px';
+    bar.style.width = (width - 1) + 'px';
+    bar.textContent = t.label;
+    bar.title = `${t.label} · W${t.wk}`;
+    row.appendChild(bar);
+  });
+}
+
+function applyOverlays(px) {
+  const qWidth = px / 4;
+  const rows = [];
+  [101,102,103,104,105,106,107,108].forEach(ep => {
+    rows.push(document.getElementById(`sched-row-top-${ep}`));
+    rows.push(document.getElementById(`sched-row-bot-${ep}`));
+  });
+
+  rows.forEach(row => {
+    if(!row) return;
+    SCHED_BLACKOUTS.forEach(b => {
+      const wIdx = SCHED_WEEKS.findIndex(w => w.n === b.wk);
+      if(wIdx < 0) return;
+      const left = wIdx * px + b.fromQ * qWidth;
+      const width = (b.toQ - b.fromQ) * qWidth;
+      const strip = document.createElement('div');
+      strip.className = 'sched-blackout-strip';
+      strip.style.left = left + 'px';
+      strip.style.width = width + 'px';
+      row.appendChild(strip);
+    });
+    const tIdx = SCHED_WEEKS.findIndex(w => w.n === SCHED_TODAY.wk);
+    if(tIdx >= 0) {
+      const left = tIdx * px + SCHED_TODAY.fromQ * qWidth;
+      const width = (SCHED_TODAY.toQ - SCHED_TODAY.fromQ) * qWidth;
+      const tstrip = document.createElement('div');
+      tstrip.className = 'sched-today-strip';
+      tstrip.style.left = left + 'px';
+      tstrip.style.width = width + 'px';
+      row.appendChild(tstrip);
+    }
+  });
+}
+
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape') {
+    const m = document.getElementById('schedule-modal');
+    if(m && m.classList.contains('open')) closeSchedule();
+  }
+});
 
 // ════════════════════════════════════════
 // PANELS DATA

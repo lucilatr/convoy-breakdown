@@ -723,6 +723,167 @@
     color: var(--pink); border: 1px solid var(--border-pink); font-family: var(--font);
   }
 
+  /* ─── TRACKER ─── */
+  .tracker-name-modal {
+    position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.85);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .tracker-name-modal.hidden { display: none; }
+  .tracker-name-box {
+    background: var(--bg-card); border: 1px solid var(--border-pink); border-radius: 8px;
+    padding: 28px 32px; display: flex; flex-direction: column; gap: 12px; min-width: 280px;
+  }
+  .tracker-name-title {
+    font-family: var(--font); font-size: 18px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 1px; color: var(--text);
+  }
+  .tracker-name-box input {
+    background: #1a1a1a; border: 1px solid var(--border); color: var(--text);
+    font-family: var(--fontb); font-size: 16px; padding: 8px 12px; border-radius: 4px; outline: none;
+  }
+  .tracker-name-box input:focus { border-color: var(--pink); }
+
+  .tracker-overlay {
+    position: fixed; inset: 0; z-index: 9000; background: #0d0d0d;
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  .tracker-overlay.hidden { display: none; }
+  .tracker-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.06); background: #111; flex-shrink: 0;
+  }
+  .tracker-title {
+    font-family: var(--font); font-size: 20px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 2px; color: var(--pink);
+  }
+  .tracker-user {
+    font-family: var(--fontb); font-size: 14px; color: rgba(255,255,255,0.35);
+    margin-left: auto;
+  }
+  .tracker-user strong { color: rgba(255,255,255,0.65); font-weight: 700; }
+  .tracker-close {
+    background: none; border: 1px solid var(--border); color: var(--text-muted);
+    width: 28px; height: 28px; border-radius: 4px; font-size: 22px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: all .15s;
+  }
+  .tracker-close:hover { border-color: var(--pink); color: var(--pink); }
+
+  .tracker-actions { display: flex; gap: 6px; margin-left: 16px; }
+  .tracker-action-btn {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.5); font-family: var(--font); font-size: 11px;
+    font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    padding: 5px 12px; border-radius: 4px; cursor: pointer; transition: all .15s;
+  }
+  .tracker-action-btn:hover { border-color: var(--pink); color: var(--pink); }
+  .tracker-sync-status {
+    font-family: var(--fontb); font-size: 10px; color: rgba(255,255,255,0.25);
+    margin-left: 8px;
+  }
+
+  .tracker-ep-bar {
+    display: flex; align-items: center; gap: 10px; padding: 10px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.04); background: #0f0f0f; flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+  .tracker-ep-label {
+    font-family: var(--fontb); font-size: 12px; color: rgba(255,255,255,0.3);
+    text-transform: uppercase; letter-spacing: 2px; font-weight: 700;
+  }
+  .tracker-ep-bar select {
+    background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.7);
+    font-size: 14px; padding: 5px 10px; border-radius: 3px; font-family: var(--fontb); outline: none;
+  }
+  .tracker-legend { display: flex; gap: 5px; flex-wrap: wrap; margin-left: 12px; }
+
+  .tracker-body { flex: 1; overflow-y: auto; padding: 16px 20px; }
+  .tracker-empty {
+    padding: 48px; text-align: center; color: var(--text-muted);
+    font-family: var(--fontb); font-size: 15px; letter-spacing: 2px; text-transform: uppercase;
+  }
+
+  .trk-section-title {
+    font-family: var(--font); font-weight: 800; font-size: 15px;
+    text-transform: uppercase; letter-spacing: 3px; color: var(--pink);
+    margin: 20px 0 6px; padding-bottom: 4px; border-bottom: 1px solid rgba(255,0,102,0.15);
+  }
+  .trk-section-title:first-child { margin-top: 0; }
+  .trk-wrap { overflow-x: auto; margin-bottom: 4px; }
+  .trk-table { border-collapse: collapse; font-size: 14px; width: 100%; }
+  .trk-table th {
+    text-align: center; padding: 7px 10px; font-size: 11px; color: rgba(255,255,255,0.3);
+    text-transform: uppercase; letter-spacing: 2px; font-weight: 700;
+    border-bottom: 1px solid rgba(255,255,255,0.08); background: #111;
+    white-space: nowrap;
+  }
+  .trk-table th.left { text-align: left; }
+  .trk-table td {
+    padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: rgba(255,255,255,0.65); vertical-align: middle; white-space: nowrap;
+  }
+  .trk-table td.center { text-align: center; }
+  .trk-table tr:hover td { background: rgba(255,255,255,0.015); }
+
+  .trk-type { font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; color: rgba(255,255,255,0.4); width: 90px; }
+  .trk-asset { font-weight: 600; color: rgba(255,255,255,0.8); min-width: 120px; }
+  .trk-status-col { width: 140px; min-width: 140px; }
+  .trk-notes-col { min-width: 130px; }
+  .trk-due-col { width: 90px; min-width: 90px; }
+  .trk-panel-col { width: 60px; min-width: 60px; }
+
+  .trk-sep td { height: 4px; border: none; background: #0a0a0a; }
+
+  .trk-select {
+    appearance: none; -webkit-appearance: none;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.35); font-family: var(--fontb); font-size: 10px;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+    padding: 4px 22px 4px 8px; border-radius: 3px; cursor: pointer; outline: none;
+    width: 100%; text-align: center; transition: all .15s;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(255,255,255,0.3)' fill='none' stroke-width='1.2'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 6px center;
+  }
+  .trk-select:hover { border-color: rgba(255,255,255,0.2); }
+  .trk-select:focus { border-color: var(--pink); }
+  .trk-select.s-wip { background-color: rgba(250,200,50,0.12); color: #ddb020; border-color: rgba(250,200,50,0.2); }
+  .trk-select.s-wait { background-color: rgba(240,60,60,0.12); color: #f05050; border-color: rgba(240,60,60,0.2); }
+  .trk-select.s-app-play { background-color: rgba(80,180,255,0.1); color: #50b4ff; border-color: rgba(80,180,255,0.2); }
+  .trk-select.s-app-mattel { background-color: rgba(0,220,120,0.08); color: #00dc78; border-color: rgba(0,220,120,0.2); }
+  .trk-select.s-review { background-color: rgba(160,100,255,0.1); color: #b47fff; border-color: rgba(160,100,255,0.2); }
+  .trk-select.s-reviewed { background-color: rgba(240,150,40,0.12); color: #e09020; border-color: rgba(240,150,40,0.2); }
+  .trk-select.s-ready { background-color: rgba(255,255,255,0.04); color: rgba(255,255,255,0.3); border-color: rgba(255,255,255,0.08); }
+  .trk-select.s-na { background-color: transparent; color: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.04); }
+  .trk-select.s-none { background-color: rgba(255,255,255,0.02); color: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.06); }
+
+  .trk-legend-badge {
+    display: inline-block; padding: 3px 8px; border-radius: 3px;
+    font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+    cursor: default;
+  }
+  .trk-b-wip { background: rgba(250,200,50,0.12); color: #ddb020; border: 1px solid rgba(250,200,50,0.2); }
+  .trk-b-wait { background: rgba(240,60,60,0.12); color: #f05050; border: 1px solid rgba(240,60,60,0.2); }
+  .trk-b-app-play { background: rgba(80,180,255,0.1); color: #50b4ff; border: 1px solid rgba(80,180,255,0.2); }
+  .trk-b-app-mattel { background: rgba(0,220,120,0.08); color: #00dc78; border: 1px solid rgba(0,220,120,0.2); }
+  .trk-b-review { background: rgba(160,100,255,0.1); color: #b47fff; border: 1px solid rgba(160,100,255,0.2); }
+  .trk-b-reviewed { background: rgba(240,150,40,0.12); color: #e09020; border: 1px solid rgba(240,150,40,0.2); }
+  .trk-b-ready { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.08); }
+  .trk-b-na { background: transparent; color: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.04); }
+
+  .trk-notes-input {
+    background: transparent; border: 1px solid rgba(255,255,255,0.06); color: rgba(255,255,255,0.5);
+    font-family: var(--fontb); font-size: 13px; padding: 4px 7px; border-radius: 3px;
+    width: 100%; min-width: 110px; outline: none; transition: border-color .15s;
+  }
+  .trk-notes-input:focus { border-color: var(--pink); color: rgba(255,255,255,0.8); }
+  .trk-notes-input::placeholder { color: rgba(255,255,255,0.15); }
+
+  .trk-due-input {
+    background: transparent; border: 1px solid rgba(255,255,255,0.06); color: rgba(255,255,255,0.4);
+    font-family: var(--fontb); font-size: 13px; padding: 4px 7px; border-radius: 3px;
+    width: 80px; outline: none;
+  }
+  .trk-due-input:focus { border-color: var(--pink); }
+
   /* ─── BOARDMATIC ─── */
   .bm-container { padding: 16px 24px; max-width: 960px; }
   .bm-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; }
@@ -864,9 +1025,9 @@
     <div class="topbar-logo">CONV<span>O</span>Y</div>
     <div class="topbar-meta">Matchbox Adventure Squad · S01 · v1.0</div>
     <div class="topbar-right">
+      <button class="topbar-export" id="tracker-btn" onclick="toggleTracker()">▦ Tracker</button>
       <button class="topbar-export" onclick="openPipeline()">⚙ Pipeline</button>
       <button class="topbar-export" onclick="exportZip()">↓ Export ZIP</button>
-
     </div>
   </div>
 
@@ -1001,6 +1162,38 @@
 
   </div>
 </div>
+
+<!-- ══════════════ TRACKER USERNAME PROMPT ══════════════ -->
+<div class="tracker-name-modal hidden" id="tracker-name-modal">
+  <div class="tracker-name-box">
+    <div class="tracker-name-title">Enter your name for the Tracker</div>
+    <input type="text" id="tracker-name-input" placeholder="Your name…" maxlength="20" autocomplete="off" onkeydown="if(event.key==='Enter') saveTrackerName()">
+    <button class="bm-save-btn" onclick="saveTrackerName()">Continue</button>
+  </div>
+</div>
+
+<!-- ══════════════ TRACKER PANEL ══════════════ -->
+<div class="tracker-overlay hidden" id="tracker-overlay">
+  <div class="tracker-header">
+    <div class="tracker-title">Production Tracker</div>
+    <div class="tracker-actions">
+      <button class="tracker-action-btn" onclick="syncTrackerFromJSONBin()" title="Sync latest data">↻ Sync</button>
+      <button class="tracker-action-btn" onclick="exportTrackerCSV()" title="Download as CSV">↓ CSV</button>
+      <button class="tracker-action-btn" onclick="exportTrackerPDF()" title="Download as PDF">↓ PDF</button>
+    </div>
+    <div class="tracker-user" id="tracker-user"></div>
+    <button class="tracker-close" onclick="toggleTracker()">×</button>
+  </div>
+  <div class="tracker-ep-bar">
+    <span class="tracker-ep-label">Episode</span>
+    <select id="tracker-ep-select" onchange="switchTrackerEp(this.value)"></select>
+    <div class="tracker-legend" id="tracker-legend"></div>
+  </div>
+  <div class="tracker-body" id="tracker-body">
+    <div class="tracker-empty">Select an episode</div>
+  </div>
+</div>
+
 <button class="bot-fab" id="bot-fab" onclick="toggleBot()" title="Ask the script bot">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
 </button>
@@ -1338,6 +1531,7 @@ function loadLocal() {
     loadPanelImages();
     loadWardrobeImages();
     loadBoardmaticUrls();
+    loadTrackerData();
   } catch(e) {}
 }
 
@@ -2149,6 +2343,10 @@ async function loadJSONBin() {
       Object.entries(record.boardmaticUrls).forEach(([k,v]) => { if(v) boardmaticUrls[k]=v; });
       saveBoardmaticUrlsLocal();
     }
+    if(record.trackerData) {
+      Object.entries(record.trackerData).forEach(([k,v]) => { if(v) trackerData[k]=v; });
+      saveTrackerDataLocal();
+    }
     saveLocal();
     renderActive();
     updateStats();
@@ -2293,6 +2491,465 @@ function resetAll() {
   renderActive();
   updateStats();
   showToast('All cleared. Starting fresh.');
+}
+
+// ════════════════════════════════════════
+// PRODUCTION TRACKER
+// ════════════════════════════════════════
+let trackerData = {};
+let trackerUser = localStorage.getItem('convoy_tracker_user') || '';
+
+const TRK_STATUSES = [
+  { id:'ready',      label:'Ready to start',    cls:'trk-b-ready' },
+  { id:'wip',        label:'WIP',               cls:'trk-b-wip' },
+  { id:'review',     label:'Review',            cls:'trk-b-review' },
+  { id:'reviewed',   label:'Reviewed',          cls:'trk-b-reviewed' },
+  { id:'app-play',   label:'App Playmation',    cls:'trk-b-app-play' },
+  { id:'app-mattel', label:'App Mattel',        cls:'trk-b-app-mattel' },
+  { id:'wait',       label:'Waiting material',  cls:'trk-b-wait' },
+  { id:'na',         label:'N/A',               cls:'trk-b-na' },
+];
+
+const VEHICLES_WITH_ACTIONS = ['skidster','excavator','f650-rollback','turf-hauler'];
+
+function loadTrackerData() {
+  try { const r = localStorage.getItem('convoy_tracker_data'); if(r) trackerData = JSON.parse(r); } catch(e) {}
+}
+function saveTrackerDataLocal() {
+  localStorage.setItem('convoy_tracker_data', JSON.stringify(trackerData));
+}
+
+function trkKey(ep, assetId, stage) { return ep + '|' + assetId + '|' + stage; }
+
+function getTrkVal(ep, assetId, stage, field) {
+  const k = trkKey(ep, assetId, stage);
+  if(!trackerData[k]) return field === 'status' ? 'none' : '';
+  return trackerData[k][field] || (field === 'status' ? 'none' : '');
+}
+
+function setTrkVal(ep, assetId, stage, field, val) {
+  const k = trkKey(ep, assetId, stage);
+  if(!trackerData[k]) trackerData[k] = {};
+  trackerData[k][field] = val;
+  if(field === 'status' || field === 'notes') {
+    trackerData[k].updatedBy = trackerUser;
+    trackerData[k].updatedAt = new Date().toISOString();
+  }
+  saveTrackerDataLocal();
+  syncTrackerToJSONBin();
+}
+
+function toggleTracker() {
+  const overlay = document.getElementById('tracker-overlay');
+  if(overlay.classList.contains('hidden')) {
+    if(!trackerUser) {
+      document.getElementById('tracker-name-modal').classList.remove('hidden');
+      setTimeout(() => document.getElementById('tracker-name-input').focus(), 100);
+      return;
+    }
+    overlay.classList.remove('hidden');
+    initTrackerEpSelect();
+    renderTracker();
+  } else {
+    overlay.classList.add('hidden');
+  }
+}
+
+function saveTrackerName() {
+  const input = document.getElementById('tracker-name-input');
+  const name = input.value.trim();
+  if(!name) return;
+  trackerUser = name;
+  localStorage.setItem('convoy_tracker_user', name);
+  document.getElementById('tracker-name-modal').classList.add('hidden');
+  document.getElementById('tracker-overlay').classList.remove('hidden');
+  initTrackerEpSelect();
+  renderTracker();
+}
+
+function initTrackerEpSelect() {
+  const sel = document.getElementById('tracker-ep-select');
+  sel.innerHTML = '<option value="">— Select —</option>' +
+    EPISODES.map(ep => {
+      const s = EP_SYNOPSES[ep];
+      return '<option value="'+ep+'"'+(currentChapter===ep?' selected':'')+'>'+
+        (s ? EP_LABELS[ep]+' — '+s.title : EP_LABELS[ep])+'</option>';
+    }).join('');
+  if(currentChapter && currentChapter !== 'all') sel.value = currentChapter;
+}
+
+let trackerEp = '';
+function switchTrackerEp(ep) { trackerEp = ep; renderTracker(); }
+
+function renderTracker() {
+  const body = document.getElementById('tracker-body');
+  const userEl = document.getElementById('tracker-user');
+  userEl.innerHTML = 'Logged as <strong>'+trackerUser+'</strong>';
+
+  const legendEl = document.getElementById('tracker-legend');
+  legendEl.innerHTML = TRK_STATUSES.map(s =>
+    '<span class="trk-legend-badge '+s.cls+'">'+s.label+'</span>'
+  ).join('');
+
+  const sel = document.getElementById('tracker-ep-select');
+  const ep = sel.value;
+  trackerEp = ep;
+  if(!ep) { body.innerHTML = '<div class="tracker-empty">Select an episode</div>'; return; }
+
+  const chars = CHARACTERS.filter(c => c.episodes.includes(ep));
+  const vehs = VEHICLES.filter(v => v.episodes.includes(ep));
+  const envs = ENVIRONMENTS.filter(e => e.episodes.includes(ep));
+  const panels = (PANELS_BY_EP[ep] || []);
+
+  // Separate playsets from vehicles/envs
+  const playsets = vehs.filter(v => v.name.includes('Playset') || v.name.includes('Crusher') || v.name.includes('Getaway') || v.name.includes('Mountain Escape'));
+  const regularVehs = vehs.filter(v => !playsets.includes(v));
+
+  let html = '';
+
+  // ─── ASSETS TABLE ───
+  html += '<div class="trk-section-title">Assets</div><div class="trk-wrap"><table class="trk-table"><thead><tr>';
+  html += '<th class="left" style="width:90px">Type</th>';
+  html += '<th class="left" style="min-width:120px">Asset</th>';
+  html += '<th class="trk-status-col">Concept</th>';
+  html += '<th class="trk-status-col">Views</th>';
+  html += '<th class="trk-status-col">Expressions</th>';
+  html += '<th class="trk-status-col">Actions</th>';
+  html += '<th class="left trk-notes-col">Notes</th>';
+  html += '<th class="trk-due-col">Due date</th>';
+  html += '</tr></thead><tbody>';
+
+  // Characters
+  chars.forEach(c => {
+    html += '<tr>';
+    html += '<td class="trk-type">Character</td>';
+    html += '<td class="trk-asset">'+c.name+'</td>';
+    html += statusCell(ep, c.id, 'concept');
+    html += statusCell(ep, c.id, 'views');
+    html += statusCell(ep, c.id, 'expressions');
+    html += statusCell(ep, c.id, 'actions');
+    html += notesCell(ep, c.id);
+    html += dueCell(ep, c.id);
+    html += '</tr>';
+  });
+
+  // Separator
+  html += '<tr class="trk-sep"><td colspan="8"></td></tr>';
+
+  // Vehicles
+  regularVehs.forEach(v => {
+    const hasActions = VEHICLES_WITH_ACTIONS.includes(v.id);
+    html += '<tr>';
+    html += '<td class="trk-type">Vehicle</td>';
+    html += '<td class="trk-asset">'+v.name+'</td>';
+    html += statusCell(ep, v.id, 'concept');
+    html += statusCell(ep, v.id, 'views');
+    html += naCell();
+    html += (hasActions ? statusCell(ep, v.id, 'actions') : naCell());
+    html += notesCell(ep, v.id);
+    html += dueCell(ep, v.id);
+    html += '</tr>';
+  });
+
+  // Separator
+  html += '<tr class="trk-sep"><td colspan="8"></td></tr>';
+
+  // Environments
+  envs.forEach(e => {
+    html += '<tr>';
+    html += '<td class="trk-type">Environment</td>';
+    html += '<td class="trk-asset">'+e.name+'</td>';
+    html += statusCell(ep, e.id, 'concept');
+    html += naCell();
+    html += naCell();
+    html += naCell();
+    html += notesCell(ep, e.id);
+    html += dueCell(ep, e.id);
+    html += '</tr>';
+  });
+
+  // Playsets
+  if(playsets.length) {
+    html += '<tr class="trk-sep"><td colspan="8"></td></tr>';
+    playsets.forEach(p => {
+      html += '<tr>';
+      html += '<td class="trk-type">Playset</td>';
+      html += '<td class="trk-asset">'+p.name+'</td>';
+      html += statusCell(ep, p.id, 'concept');
+      html += naCell();
+      html += naCell();
+      html += naCell();
+      html += notesCell(ep, p.id);
+      html += dueCell(ep, p.id);
+      html += '</tr>';
+    });
+  }
+
+  html += '</tbody></table></div>';
+
+  // ─── PANELS TABLE ───
+  html += '<div class="trk-section-title" style="margin-top:24px">Panels</div><div class="trk-wrap"><table class="trk-table"><thead><tr>';
+  html += '<th class="left" style="width:90px">Type</th>';
+  html += '<th style="width:60px">Panel</th>';
+  html += '<th class="trk-status-col">Layout</th>';
+  html += '<th class="trk-status-col">Line art</th>';
+  html += '<th class="trk-status-col">Color</th>';
+  html += '<th class="trk-status-col">Animation</th>';
+  html += '<th class="left trk-notes-col">Notes</th>';
+  html += '<th class="trk-due-col">Due date</th>';
+  html += '</tr></thead><tbody>';
+
+  panels.forEach(p => {
+    html += '<tr>';
+    html += '<td class="trk-type">Panel</td>';
+    html += '<td class="trk-asset center">'+p.label+'</td>';
+    html += statusCell(ep, p.id, 'layout');
+    html += statusCell(ep, p.id, 'lineart');
+    html += statusCell(ep, p.id, 'color');
+    html += statusCell(ep, p.id, 'animation');
+    html += notesCell(ep, p.id);
+    html += dueCell(ep, p.id);
+    html += '</tr>';
+  });
+
+  html += '</tbody></table></div>';
+
+  body.innerHTML = html;
+}
+
+function statusCell(ep, assetId, stage) {
+  const val = getTrkVal(ep, assetId, stage, 'status');
+  const clsMap = { 'wip':'s-wip','wait':'s-wait','app-play':'s-app-play','app-mattel':'s-app-mattel','review':'s-review','reviewed':'s-reviewed','ready':'s-ready','na':'s-na','none':'s-none' };
+  const cls = clsMap[val] || 's-none';
+  let opts = '<option value="none"'+(val==='none'||!val?' selected':'')+'>— Select —</option>';
+  TRK_STATUSES.forEach(s => {
+    opts += '<option value="'+s.id+'"'+(val===s.id?' selected':'')+'>'+s.label+'</option>';
+  });
+  return '<td class="center"><select class="trk-select '+cls+'" onchange="changeStatus(\''+ep+'\',\''+assetId+'\',\''+stage+'\',this)">' + opts + '</select></td>';
+}
+
+function naCell() {
+  return '<td class="center"><select class="trk-select s-na" disabled><option>N/A</option></select></td>';
+}
+
+function changeStatus(ep, assetId, stage, el) {
+  const val = el.value;
+  setTrkVal(ep, assetId, stage, 'status', val);
+  const clsMap = { 'wip':'s-wip','wait':'s-wait','app-play':'s-app-play','app-mattel':'s-app-mattel','review':'s-review','reviewed':'s-reviewed','ready':'s-ready','na':'s-na','none':'s-none' };
+  el.className = 'trk-select ' + (clsMap[val] || 's-none');
+}
+
+function notesCell(ep, assetId) {
+  const note = getTrkVal(ep, assetId, 'meta', 'notes');
+  const user = getTrkVal(ep, assetId, 'meta', 'updatedBy');
+  const display = user && note ? user + ': ' + note : note;
+  return '<td><input class="trk-notes-input" value="'+escHtml(note)+'" placeholder="Add note…" '
+    + 'data-ep="'+ep+'" data-asset="'+assetId+'" '
+    + 'onfocus="this.dataset.orig=this.value" '
+    + 'onblur="saveNote(\''+ep+'\',\''+assetId+'\',this.value,this)"></td>';
+}
+
+function dueCell(ep, assetId) {
+  const due = getTrkVal(ep, assetId, 'meta', 'due');
+  return '<td class="center"><input type="date" class="trk-due-input" value="'+(due||'')+'" onchange="saveDue(\''+ep+'\',\''+assetId+'\',this.value)"></td>';
+}
+
+function escHtml(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function saveNote(ep, assetId, val) {
+  setTrkVal(ep, assetId, 'meta', 'notes', val.trim());
+  setTrkVal(ep, assetId, 'meta', 'updatedBy', trackerUser);
+}
+
+function saveDue(ep, assetId, val) {
+  setTrkVal(ep, assetId, 'meta', 'due', val);
+}
+
+async function syncTrackerToJSONBin() {
+  if(!pipeline.binId || !pipeline.binKey) return;
+  try {
+    const res = await fetch('https://api.jsonbin.io/v3/b/'+pipeline.binId+'/latest', {
+      headers:{'X-Master-Key':pipeline.binKey,'X-Bin-Meta':'false'}
+    });
+    const existing = await res.json(); const record = existing.record || existing;
+    record.trackerData = trackerData;
+    await fetch('https://api.jsonbin.io/v3/b/'+pipeline.binId, {
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Master-Key':pipeline.binKey},
+      body: JSON.stringify(record)
+    });
+  } catch(e) { console.warn('Tracker JSONBin sync failed:', e); }
+}
+
+async function syncTrackerFromJSONBin() {
+  if(!pipeline.binId || !pipeline.binKey) { showToast('Pipeline not configured.'); return; }
+  try {
+    const res = await fetch('https://api.jsonbin.io/v3/b/'+pipeline.binId+'/latest', {
+      headers:{'X-Master-Key':pipeline.binKey,'X-Bin-Meta':'false'}
+    });
+    const existing = await res.json(); const record = existing.record || existing;
+    if(record.trackerData) {
+      trackerData = record.trackerData;
+      saveTrackerDataLocal();
+      renderTracker();
+      showToast('Tracker synced.');
+    } else { showToast('No tracker data found.'); }
+  } catch(e) { showToast('Sync failed.'); console.warn(e); }
+}
+
+// Auto-refresh every 60 seconds when tracker is open
+setInterval(() => {
+  const overlay = document.getElementById('tracker-overlay');
+  if(overlay && !overlay.classList.contains('hidden') && pipeline.binId && pipeline.binKey) {
+    syncTrackerFromJSONBin();
+  }
+}, 60000);
+
+// ─── CSV Export ───
+function exportTrackerCSV() {
+  const ep = trackerEp;
+  if(!ep) { showToast('Select an episode first.'); return; }
+
+  const chars = CHARACTERS.filter(c => c.episodes.includes(ep));
+  const vehs = VEHICLES.filter(v => v.episodes.includes(ep));
+  const envs = ENVIRONMENTS.filter(e => e.episodes.includes(ep));
+  const panels = (PANELS_BY_EP[ep] || []);
+  const playsets = vehs.filter(v => v.name.includes('Playset') || v.name.includes('Crusher') || v.name.includes('Getaway') || v.name.includes('Mountain Escape'));
+  const regularVehs = vehs.filter(v => !playsets.includes(v));
+
+  const statusLabel = (id) => { const s = TRK_STATUSES.find(x=>x.id===id); return s ? s.label : (id==='none' ? '' : id); };
+  const g = (assetId, stage) => statusLabel(getTrkVal(ep, assetId, stage, 'status'));
+  const gn = (assetId) => getTrkVal(ep, assetId, 'meta', 'notes');
+  const gu = (assetId) => getTrkVal(ep, assetId, 'meta', 'updatedBy');
+  const gd = (assetId) => getTrkVal(ep, assetId, 'meta', 'due');
+
+  let rows = [];
+  const esc = (s) => '"' + (s||'').replace(/"/g,'""') + '"';
+  const epLabel = EP_SYNOPSES[ep] ? EP_LABELS[ep] + ' — ' + EP_SYNOPSES[ep].title : EP_LABELS[ep];
+
+  // Assets header
+  rows.push(['TYPE','ASSET','CONCEPT','VIEWS','EXPRESSIONS','ACTIONS','NOTES','UPDATED BY','DUE DATE'].map(esc).join(','));
+
+  chars.forEach(c => {
+    rows.push([esc('Character'),esc(c.name),esc(g(c.id,'concept')),esc(g(c.id,'views')),esc(g(c.id,'expressions')),esc(g(c.id,'actions')),esc(gn(c.id)),esc(gu(c.id)),esc(gd(c.id))].join(','));
+  });
+  regularVehs.forEach(v => {
+    const hasAct = VEHICLES_WITH_ACTIONS.includes(v.id);
+    rows.push([esc('Vehicle'),esc(v.name),esc(g(v.id,'concept')),esc(g(v.id,'views')),esc('N/A'),esc(hasAct?g(v.id,'actions'):'N/A'),esc(gn(v.id)),esc(gu(v.id)),esc(gd(v.id))].join(','));
+  });
+  envs.forEach(e => {
+    rows.push([esc('Environment'),esc(e.name),esc(g(e.id,'concept')),esc('N/A'),esc('N/A'),esc('N/A'),esc(gn(e.id)),esc(gu(e.id)),esc(gd(e.id))].join(','));
+  });
+  playsets.forEach(p => {
+    rows.push([esc('Playset'),esc(p.name),esc(g(p.id,'concept')),esc('N/A'),esc('N/A'),esc('N/A'),esc(gn(p.id)),esc(gu(p.id)),esc(gd(p.id))].join(','));
+  });
+
+  // Blank separator
+  rows.push('');
+
+  // Panels header
+  rows.push(['TYPE','PANEL','LAYOUT','LINE ART','COLOR','ANIMATION','NOTES','UPDATED BY','DUE DATE'].map(esc).join(','));
+  panels.forEach(p => {
+    rows.push([esc('Panel'),esc(p.label),esc(g(p.id,'layout')),esc(g(p.id,'lineart')),esc(g(p.id,'color')),esc(g(p.id,'animation')),esc(gn(p.id)),esc(gu(p.id)),esc(gd(p.id))].join(','));
+  });
+
+  const blob = new Blob(['\uFEFF' + rows.join('\n')], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'tracker_' + ep + '_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click(); URL.revokeObjectURL(url);
+  showToast('CSV downloaded.');
+}
+
+// ─── PDF Export ───
+function exportTrackerPDF() {
+  const ep = trackerEp;
+  if(!ep) { showToast('Select an episode first.'); return; }
+
+  const chars = CHARACTERS.filter(c => c.episodes.includes(ep));
+  const vehs = VEHICLES.filter(v => v.episodes.includes(ep));
+  const envs = ENVIRONMENTS.filter(e => e.episodes.includes(ep));
+  const panels = (PANELS_BY_EP[ep] || []);
+  const playsets = vehs.filter(v => v.name.includes('Playset') || v.name.includes('Crusher') || v.name.includes('Getaway') || v.name.includes('Mountain Escape'));
+  const regularVehs = vehs.filter(v => !playsets.includes(v));
+
+  const statusLabel = (id) => { const s = TRK_STATUSES.find(x=>x.id===id); return s ? s.label : (id==='none' ? '—' : id); };
+  const statusColor = (id) => {
+    const map = { 'wip':'#ddb020','wait':'#f05050','app-play':'#50b4ff','app-mattel':'#00dc78','review':'#b47fff','reviewed':'#e09020','ready':'#888','na':'#555','none':'#444' };
+    return map[id] || '#444';
+  };
+  const g = (assetId, stage) => getTrkVal(ep, assetId, stage, 'status');
+  const gl = (assetId, stage) => statusLabel(g(assetId, stage));
+  const gc = (assetId, stage) => statusColor(g(assetId, stage));
+  const gn = (assetId) => getTrkVal(ep, assetId, 'meta', 'notes');
+  const gu = (assetId) => getTrkVal(ep, assetId, 'meta', 'updatedBy');
+  const gd = (assetId) => getTrkVal(ep, assetId, 'meta', 'due');
+
+  const epLabel = EP_SYNOPSES[ep] ? EP_LABELS[ep] + ' — ' + EP_SYNOPSES[ep].title : EP_LABELS[ep];
+  const today = new Date().toLocaleDateString('en-US', {year:'numeric',month:'short',day:'numeric'});
+
+  const sCell = (assetId, stage) => {
+    const val = g(assetId, stage);
+    const c = gc(assetId, stage);
+    return '<td style="text-align:center;padding:4px 6px;"><span style="background:'+c+'22;color:'+c+';border:1px solid '+c+'44;padding:2px 8px;border-radius:3px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">'+gl(assetId,stage)+'</span></td>';
+  };
+  const naC = '<td style="text-align:center;padding:4px 6px;color:#555;font-size:9px;">N/A</td>';
+  const noteC = (id) => '<td style="padding:4px 6px;font-size:9px;color:#666;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+(gu(id)&&gn(id)?gu(id)+': ':'')+escHtml(gn(id))+'</td>';
+  const dueC = (id) => '<td style="text-align:center;padding:4px 6px;font-size:9px;color:#888;">'+(gd(id)||'')+'</td>';
+
+  let html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Tracker — '+escHtml(epLabel)+'</title>';
+  html += '<style>body{font-family:Helvetica,Arial,sans-serif;font-size:11px;color:#222;margin:24px;} ';
+  html += 'h1{font-size:16px;margin:0 0 4px;} h2{font-size:12px;color:#FF0066;margin:20px 0 6px;text-transform:uppercase;letter-spacing:2px;border-bottom:1px solid #fce;padding-bottom:3px;} ';
+  html += '.meta{font-size:9px;color:#999;margin-bottom:16px;} ';
+  html += 'table{border-collapse:collapse;width:100%;margin-bottom:8px;} ';
+  html += 'th{text-align:center;font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:#999;padding:5px 6px;border-bottom:1px solid #ddd;font-weight:700;} ';
+  html += 'th.left{text-align:left;} ';
+  html += 'td{padding:4px 6px;border-bottom:1px solid #f0f0f0;font-size:10px;} ';
+  html += '.type{font-weight:700;text-transform:uppercase;font-size:9px;color:#999;letter-spacing:0.5px;} ';
+  html += '.asset{font-weight:600;} ';
+  html += '@media print{body{margin:12px;} h1{font-size:14px;}} ';
+  html += '</style></head><body>';
+  html += '<h1>CONVOY — Production Tracker</h1>';
+  html += '<div class="meta">'+escHtml(epLabel)+' · Exported '+today+' by '+escHtml(trackerUser)+'</div>';
+
+  // Assets table
+  html += '<h2>Assets</h2><table><thead><tr>';
+  html += '<th class="left">Type</th><th class="left">Asset</th><th>Concept</th><th>Views</th><th>Expressions</th><th>Actions</th><th class="left">Notes</th><th>Due</th>';
+  html += '</tr></thead><tbody>';
+
+  chars.forEach(c => {
+    html += '<tr><td class="type">Character</td><td class="asset">'+c.name+'</td>'+sCell(c.id,'concept')+sCell(c.id,'views')+sCell(c.id,'expressions')+sCell(c.id,'actions')+noteC(c.id)+dueC(c.id)+'</tr>';
+  });
+  regularVehs.forEach(v => {
+    const hasAct = VEHICLES_WITH_ACTIONS.includes(v.id);
+    html += '<tr><td class="type">Vehicle</td><td class="asset">'+v.name+'</td>'+sCell(v.id,'concept')+sCell(v.id,'views')+naC+(hasAct?sCell(v.id,'actions'):naC)+noteC(v.id)+dueC(v.id)+'</tr>';
+  });
+  envs.forEach(e => {
+    html += '<tr><td class="type">Environment</td><td class="asset">'+e.name+'</td>'+sCell(e.id,'concept')+naC+naC+naC+noteC(e.id)+dueC(e.id)+'</tr>';
+  });
+  playsets.forEach(p => {
+    html += '<tr><td class="type">Playset</td><td class="asset">'+p.name+'</td>'+sCell(p.id,'concept')+naC+naC+naC+noteC(p.id)+dueC(p.id)+'</tr>';
+  });
+  html += '</tbody></table>';
+
+  // Panels table
+  html += '<h2>Panels</h2><table><thead><tr>';
+  html += '<th class="left">Type</th><th>Panel</th><th>Layout</th><th>Line Art</th><th>Color</th><th>Animation</th><th class="left">Notes</th><th>Due</th>';
+  html += '</tr></thead><tbody>';
+  panels.forEach(p => {
+    html += '<tr><td class="type">Panel</td><td class="asset" style="text-align:center">'+p.label+'</td>'+sCell(p.id,'layout')+sCell(p.id,'lineart')+sCell(p.id,'color')+sCell(p.id,'animation')+noteC(p.id)+dueC(p.id)+'</tr>';
+  });
+  html += '</tbody></table></body></html>';
+
+  const blob = new Blob([html], {type:'text/html;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const w = window.open(url, '_blank');
+  if(w) {
+    w.onload = () => { setTimeout(()=>{ w.print(); }, 500); };
+  }
+  showToast('PDF ready — use Print dialog to save as PDF.');
 }
 
 // ════════════════════════════════════════

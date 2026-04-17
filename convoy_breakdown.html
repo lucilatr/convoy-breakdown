@@ -2604,27 +2604,44 @@ function renderTracker() {
   }
 }
 
+function trkTableHead() {
+  return '<div class="trk-wrap"><table class="trk-table"><thead><tr>'
+    + '<th class="left" style="width:90px">Type</th>'
+    + '<th class="left" style="min-width:140px">Asset</th>'
+    + '<th class="trk-status-col">Concept</th>'
+    + '<th class="trk-status-col">Views</th>'
+    + '<th class="trk-status-col">Expressions</th>'
+    + '<th class="trk-status-col">Actions</th>'
+    + '<th class="left trk-notes-col">Notes</th>'
+    + '<th class="trk-due-col">Due date</th>'
+    + '</tr></thead><tbody>';
+}
+function trkTableHeadPanels() {
+  return '<div class="trk-wrap"><table class="trk-table"><thead><tr>'
+    + '<th class="left" style="width:90px">Type</th>'
+    + '<th style="width:70px">Panel</th>'
+    + '<th class="trk-status-col">Layout</th>'
+    + '<th class="trk-status-col">Line art</th>'
+    + '<th class="trk-status-col">Color</th>'
+    + '<th class="trk-status-col">Animation</th>'
+    + '<th class="left trk-notes-col">Notes</th>'
+    + '<th class="trk-due-col">Due date</th>'
+    + '</tr></thead><tbody>';
+}
+function trkSectionRow(label) {
+  return '<tr class="trk-sep"><td colspan="8"></td></tr>';
+}
+
 function renderTrackerGeneral(body) {
   const multiChars = CHARACTERS.filter(c => isMultiEp(c));
-  const allVehs = VEHICLES.filter(v => !isPlayset(v));
-  const multiVehs = allVehs.filter(v => isMultiEp(v));
+  const multiVehs = VEHICLES.filter(v => !isPlayset(v) && isMultiEp(v));
   const multiEnvs = ENVIRONMENTS.filter(e => isMultiEp(e));
   const multiPlaysets = VEHICLES.filter(v => isPlayset(v) && isMultiEp(v));
 
-  let html = '';
+  let html = '<div class="trk-section-title">General assets</div>';
+  html += trkTableHead();
 
-  // ─── Characters Base ───
-  html += '<div class="trk-section-title">Characters — Base wardrobe</div><div class="trk-wrap"><table class="trk-table"><thead><tr>';
-  html += '<th class="left" style="width:90px">Type</th>';
-  html += '<th class="left" style="min-width:120px">Asset</th>';
-  html += '<th class="trk-status-col">Concept</th>';
-  html += '<th class="trk-status-col">Views</th>';
-  html += '<th class="trk-status-col">Expressions</th>';
-  html += '<th class="trk-status-col">Actions</th>';
-  html += '<th class="left trk-notes-col">Notes</th>';
-  html += '<th class="trk-due-col">Due date</th>';
-  html += '</tr></thead><tbody>';
-
+  // Characters
   multiChars.forEach(c => {
     html += '<tr>';
     html += '<td class="trk-type">Character</td>';
@@ -2637,20 +2654,9 @@ function renderTrackerGeneral(body) {
     html += dueCell('general', c.id);
     html += '</tr>';
   });
-  html += '</tbody></table></div>';
 
-  // ─── Vehicles ───
   if(multiVehs.length) {
-    html += '<div class="trk-section-title">Vehicles</div><div class="trk-wrap"><table class="trk-table"><thead><tr>';
-    html += '<th class="left" style="width:90px">Type</th>';
-    html += '<th class="left" style="min-width:120px">Asset</th>';
-    html += '<th class="trk-status-col">Concept</th>';
-    html += '<th class="trk-status-col">Views</th>';
-    html += '<th class="trk-status-col">Actions</th>';
-    html += '<th class="left trk-notes-col">Notes</th>';
-    html += '<th class="trk-due-col">Due date</th>';
-    html += '</tr></thead><tbody>';
-
+    html += trkSectionRow();
     multiVehs.forEach(v => {
       const hasActions = VEHICLES_WITH_ACTIONS.includes(v.id);
       html += '<tr>';
@@ -2658,87 +2664,73 @@ function renderTrackerGeneral(body) {
       html += '<td class="trk-asset">'+v.name+'</td>';
       html += statusCell('general', v.id, 'concept');
       html += statusCell('general', v.id, 'views');
+      html += naCell();
       html += (hasActions ? statusCell('general', v.id, 'actions') : naCell());
       html += notesCell('general', v.id);
       html += dueCell('general', v.id);
       html += '</tr>';
     });
-    html += '</tbody></table></div>';
   }
 
-  // ─── Environments ───
   if(multiEnvs.length) {
-    html += '<div class="trk-section-title">Environments</div><div class="trk-wrap"><table class="trk-table"><thead><tr>';
-    html += '<th class="left" style="width:90px">Type</th>';
-    html += '<th class="left" style="min-width:120px">Asset</th>';
-    html += '<th class="trk-status-col">Concept</th>';
-    html += '<th class="left trk-notes-col">Notes</th>';
-    html += '<th class="trk-due-col">Due date</th>';
-    html += '</tr></thead><tbody>';
-
+    html += trkSectionRow();
     multiEnvs.forEach(e => {
       html += '<tr>';
       html += '<td class="trk-type">Environment</td>';
       html += '<td class="trk-asset">'+e.name+'</td>';
       html += statusCell('general', e.id, 'concept');
+      html += naCell();
+      html += naCell();
+      html += naCell();
       html += notesCell('general', e.id);
       html += dueCell('general', e.id);
       html += '</tr>';
     });
-    html += '</tbody></table></div>';
   }
 
-  // ─── Playsets ───
   if(multiPlaysets.length) {
-    html += '<div class="trk-section-title">Playsets</div><div class="trk-wrap"><table class="trk-table"><thead><tr>';
-    html += '<th class="left" style="width:90px">Type</th>';
-    html += '<th class="left" style="min-width:120px">Asset</th>';
-    html += '<th class="trk-status-col">Concept</th>';
-    html += '<th class="left trk-notes-col">Notes</th>';
-    html += '<th class="trk-due-col">Due date</th>';
-    html += '</tr></thead><tbody>';
-
+    html += trkSectionRow();
     multiPlaysets.forEach(p => {
       html += '<tr>';
       html += '<td class="trk-type">Playset</td>';
       html += '<td class="trk-asset">'+p.name+'</td>';
       html += statusCell('general', p.id, 'concept');
+      html += naCell();
+      html += naCell();
+      html += naCell();
       html += notesCell('general', p.id);
       html += dueCell('general', p.id);
       html += '</tr>';
     });
-    html += '</tbody></table></div>';
   }
 
+  html += '</tbody></table></div>';
   body.innerHTML = html;
 }
 
 function renderTrackerEpisode(body, ep) {
   let html = '';
 
-  // ─── Character Wardrobes (episode-specific only) ───
   const epChars = CHARACTERS.filter(c => c.episodes.includes(ep));
   const epWardrobes = [];
   epChars.forEach(c => {
     if(!c.wardrobe) return;
     c.wardrobe.forEach(w => {
       if(w.episodes.includes(ep) && w.name !== 'Base') {
-        epWardrobes.push({ charName: c.name, charId: c.id, wardrobeId: w.id, wardrobeName: w.name, wardrobeDesc: w.desc });
+        epWardrobes.push({ charName: c.name, charId: c.id, wardrobeId: w.id, wardrobeName: w.name });
       }
     });
   });
 
-  if(epWardrobes.length) {
-    html += '<div class="trk-section-title">Character wardrobes — '+EP_LABELS[ep]+'</div><div class="trk-wrap"><table class="trk-table"><thead><tr>';
-    html += '<th class="left" style="width:90px">Type</th>';
-    html += '<th class="left" style="min-width:180px">Asset</th>';
-    html += '<th class="trk-status-col">Concept</th>';
-    html += '<th class="trk-status-col">Views</th>';
-    html += '<th class="trk-status-col">Expressions</th>';
-    html += '<th class="trk-status-col">Actions</th>';
-    html += '<th class="left trk-notes-col">Notes</th>';
-    html += '<th class="trk-due-col">Due date</th>';
-    html += '</tr></thead><tbody>';
+  const allVehs = VEHICLES.filter(v => v.episodes.includes(ep) && !isPlayset(v));
+  const exclusiveEnvs = ENVIRONMENTS.filter(e => e.episodes.includes(ep) && !isMultiEp(e));
+  const exclusivePlaysets = VEHICLES.filter(v => isPlayset(v) && v.episodes.includes(ep) && !isMultiEp(v));
+
+  const hasAssets = epWardrobes.length || allVehs.length || exclusiveEnvs.length || exclusivePlaysets.length;
+
+  if(hasAssets) {
+    html += '<div class="trk-section-title">Assets — '+EP_LABELS[ep]+'</div>';
+    html += trkTableHead();
 
     epWardrobes.forEach(w => {
       html += '<tr>';
@@ -2752,96 +2744,63 @@ function renderTrackerEpisode(body, ep) {
       html += dueCell(ep, w.wardrobeId);
       html += '</tr>';
     });
+
+    if(allVehs.length) {
+      if(epWardrobes.length) html += trkSectionRow();
+      allVehs.forEach(v => {
+        const hasActions = VEHICLES_WITH_ACTIONS.includes(v.id);
+        html += '<tr>';
+        html += '<td class="trk-type">Vehicle</td>';
+        html += '<td class="trk-asset">'+v.name+'</td>';
+        html += statusCell('general', v.id, 'concept');
+        html += statusCell('general', v.id, 'views');
+        html += naCell();
+        html += (hasActions ? statusCell('general', v.id, 'actions') : naCell());
+        html += notesCell('general', v.id);
+        html += dueCell('general', v.id);
+        html += '</tr>';
+      });
+    }
+
+    if(exclusiveEnvs.length) {
+      html += trkSectionRow();
+      exclusiveEnvs.forEach(e => {
+        html += '<tr>';
+        html += '<td class="trk-type">Environment</td>';
+        html += '<td class="trk-asset">'+e.name+'</td>';
+        html += statusCell(ep, e.id, 'concept');
+        html += naCell();
+        html += naCell();
+        html += naCell();
+        html += notesCell(ep, e.id);
+        html += dueCell(ep, e.id);
+        html += '</tr>';
+      });
+    }
+
+    if(exclusivePlaysets.length) {
+      html += trkSectionRow();
+      exclusivePlaysets.forEach(p => {
+        html += '<tr>';
+        html += '<td class="trk-type">Playset</td>';
+        html += '<td class="trk-asset">'+p.name+'</td>';
+        html += statusCell(ep, p.id, 'concept');
+        html += naCell();
+        html += naCell();
+        html += naCell();
+        html += notesCell(ep, p.id);
+        html += dueCell(ep, p.id);
+        html += '</tr>';
+      });
+    }
+
     html += '</tbody></table></div>';
   }
 
-  // ─── Vehicles (all in episode, using general key) ───
-  const allVehs = VEHICLES.filter(v => v.episodes.includes(ep) && !isPlayset(v));
-  if(allVehs.length) {
-    html += '<div class="trk-section-title">Vehicles — '+EP_LABELS[ep]+'</div><div class="trk-wrap"><table class="trk-table"><thead><tr>';
-    html += '<th class="left" style="width:90px">Type</th>';
-    html += '<th class="left" style="min-width:120px">Asset</th>';
-    html += '<th class="trk-status-col">Concept</th>';
-    html += '<th class="trk-status-col">Views</th>';
-    html += '<th class="trk-status-col">Actions</th>';
-    html += '<th class="left trk-notes-col">Notes</th>';
-    html += '<th class="trk-due-col">Due date</th>';
-    html += '</tr></thead><tbody>';
-
-    allVehs.forEach(v => {
-      const hasActions = VEHICLES_WITH_ACTIONS.includes(v.id);
-      html += '<tr>';
-      html += '<td class="trk-type">Vehicle</td>';
-      html += '<td class="trk-asset">'+v.name+'</td>';
-      html += statusCell('general', v.id, 'concept');
-      html += statusCell('general', v.id, 'views');
-      html += (hasActions ? statusCell('general', v.id, 'actions') : naCell());
-      html += notesCell('general', v.id);
-      html += dueCell('general', v.id);
-      html += '</tr>';
-    });
-    html += '</tbody></table></div>';
-  }
-
-  // ─── Environments (episode-exclusive only) ───
-  const exclusiveEnvs = ENVIRONMENTS.filter(e => e.episodes.includes(ep) && !isMultiEp(e));
-  if(exclusiveEnvs.length) {
-    html += '<div class="trk-section-title">Environments — '+EP_LABELS[ep]+'</div><div class="trk-wrap"><table class="trk-table"><thead><tr>';
-    html += '<th class="left" style="width:90px">Type</th>';
-    html += '<th class="left" style="min-width:120px">Asset</th>';
-    html += '<th class="trk-status-col">Concept</th>';
-    html += '<th class="left trk-notes-col">Notes</th>';
-    html += '<th class="trk-due-col">Due date</th>';
-    html += '</tr></thead><tbody>';
-
-    exclusiveEnvs.forEach(e => {
-      html += '<tr>';
-      html += '<td class="trk-type">Environment</td>';
-      html += '<td class="trk-asset">'+e.name+'</td>';
-      html += statusCell(ep, e.id, 'concept');
-      html += notesCell(ep, e.id);
-      html += dueCell(ep, e.id);
-      html += '</tr>';
-    });
-    html += '</tbody></table></div>';
-  }
-
-  // ─── Playsets (episode-exclusive) ───
-  const exclusivePlaysets = VEHICLES.filter(v => isPlayset(v) && v.episodes.includes(ep) && !isMultiEp(v));
-  if(exclusivePlaysets.length) {
-    html += '<div class="trk-section-title">Playsets — '+EP_LABELS[ep]+'</div><div class="trk-wrap"><table class="trk-table"><thead><tr>';
-    html += '<th class="left" style="width:90px">Type</th>';
-    html += '<th class="left" style="min-width:120px">Asset</th>';
-    html += '<th class="trk-status-col">Concept</th>';
-    html += '<th class="left trk-notes-col">Notes</th>';
-    html += '<th class="trk-due-col">Due date</th>';
-    html += '</tr></thead><tbody>';
-
-    exclusivePlaysets.forEach(p => {
-      html += '<tr>';
-      html += '<td class="trk-type">Playset</td>';
-      html += '<td class="trk-asset">'+p.name+'</td>';
-      html += statusCell(ep, p.id, 'concept');
-      html += notesCell(ep, p.id);
-      html += dueCell(ep, p.id);
-      html += '</tr>';
-    });
-    html += '</tbody></table></div>';
-  }
-
-  // ─── Panels ───
   const panels = (PANELS_BY_EP[ep] || []);
   if(panels.length) {
-    html += '<div class="trk-section-title">Panels — '+EP_LABELS[ep]+'</div><div class="trk-wrap"><table class="trk-table"><thead><tr>';
-    html += '<th class="left" style="width:90px">Type</th>';
-    html += '<th style="width:60px">Panel</th>';
-    html += '<th class="trk-status-col">Layout</th>';
-    html += '<th class="trk-status-col">Line art</th>';
-    html += '<th class="trk-status-col">Color</th>';
-    html += '<th class="trk-status-col">Animation</th>';
-    html += '<th class="left trk-notes-col">Notes</th>';
-    html += '<th class="trk-due-col">Due date</th>';
-    html += '</tr></thead><tbody>';
+    html += '<div class="trk-section-title" style="margin-top:24px">Panels — '+EP_LABELS[ep]+'</div>';
+    html += trkTableHeadPanels();
 
     panels.forEach(p => {
       html += '<tr>';
@@ -2855,6 +2814,7 @@ function renderTrackerEpisode(body, ep) {
       html += dueCell(ep, p.id);
       html += '</tr>';
     });
+
     html += '</tbody></table></div>';
   }
 

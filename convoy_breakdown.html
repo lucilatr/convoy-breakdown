@@ -253,6 +253,7 @@
   }
   .badge-character { background: var(--pink-dim); color: var(--pink); border: 1px solid var(--border-pink); }
   .badge-vehicle { background: rgba(0,180,255,0.1); color: #00b4ff; border: 1px solid rgba(0,180,255,0.25); }
+  .badge-playset { background: rgba(180,100,255,0.1); color: #b464ff; border: 1px solid rgba(180,100,255,0.25); }
   .badge-env { background: rgba(0,220,120,0.1); color: #00dc78; border: 1px solid rgba(0,220,120,0.25); }
   .badge-villain { background: rgba(255,80,0,0.1); color: #ff5000; border: 1px solid rgba(255,80,0,0.25); }
 
@@ -1224,6 +1225,9 @@
     <button class="tab-btn" onclick="switchTab('vehicles', this)">
       Vehicles <span class="tab-count" id="tc-vehicles">0</span>
     </button>
+    <button class="tab-btn" onclick="switchTab('playsets', this)">
+      Playsets <span class="tab-count" id="tc-playsets">0</span>
+    </button>
     <button class="tab-btn" onclick="switchTab('environments', this)">
       Environments <span class="tab-count" id="tc-envs">0</span>
     </button>
@@ -1270,6 +1274,11 @@
     <!-- VEHICLES TAB -->
     <div id="tab-vehicles" class="tab-panel hidden">
       <div id="vehicles-grid" class="cards-grid"></div>
+    </div>
+
+    <!-- PLAYSETS TAB -->
+    <div id="tab-playsets" class="tab-panel hidden">
+      <div id="playsets-grid" class="cards-grid"></div>
     </div>
 
     <!-- ENVIRONMENTS TAB -->
@@ -1357,24 +1366,8 @@
   </div>
 </div>
 
-<button class="bot-fab" id="bot-fab" onclick="toggleBot()" title="Ask the script bot">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-</button>
+<!-- SCRIPT BOT oculto temporalmente — se retoma en el futuro -->
 
-<div class="bot-panel hidden" id="bot-panel">
-  <div class="bot-header">
-    <div class="bot-title">Script <span>Bot</span></div>
-    <button class="bot-close" onclick="toggleBot()">×</button>
-  </div>
-  <div class="bot-messages" id="bot-messages">
-    <div class="bot-msg assistant">Ask me anything about the scripts — characters, scenes, vehicles, dialogue, panels.</div>
-  </div>
-  <div class="bot-input-row">
-    <textarea class="bot-input" id="bot-input" placeholder="Ask about the scripts..." rows="1"
-      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendBotMessage();}"></textarea>
-    <button class="bot-send" id="bot-send" onclick="sendBotMessage()">Send</button>
-  </div>
-</div>
 
 <!-- ══════════════ SCHEDULE MODAL (fullscreen) ══════════════ -->
 <div class="sched-overlay" id="schedule-modal">
@@ -1607,7 +1600,6 @@ const VEHICLES = [
   { id:'chevy-stock', name:'Chevy Stock Car', sku:'JKH33', badge:'vehicle', detail:"Aimee's fast car. Ep 102 jungle sprint, Ep 104 city race rescue.", episodes:['ep102','ep104'], notes:'' },
   { id:'polaris-rzr', name:'Polaris RZR', sku:'BL251', badge:'vehicle', detail:"Von Steele's lumberjack henchmen. Chainsaw attachments (paperclip). Ep 102.", episodes:['ep102'], notes:'' },
   { id:'super-hercules', name:'Super Hercules', sku:'JKH51', badge:'vehicle', detail:"Charmaine's cargo plane. Ep 102 extraction mission.", episodes:['ep102'], notes:'' },
-  { id:'mountain-escape', name:'Mountain Escape Getaway', sku:'JMG57', badge:'vehicle', detail:'Playset. Ep 101 city skyline diorama (Real World). Ep 102 finale multi-level ramp chase.', episodes:['ep101','ep102'], notes:'' },
   // Ep 103
   { id:'blaze-blaster', name:'Blaze Blaster III', sku:'JHN10', badge:'vehicle', detail:"Ted's primary fire engine. Ep 103.", episodes:['ep103'], notes:'' },
   { id:'blaze-buster', name:'Blaze Buster', sku:'HVP56', badge:'vehicle', detail:"Crosby's fire engine. Ep 103.", episodes:['ep103'], notes:'' },
@@ -1618,7 +1610,11 @@ const VEHICLES = [
   { id:'vw-bus', name:'VW Bus Moving Parts', sku:'JHV23', badge:'vehicle', detail:'Runaway mobile dog washing van. Three wet sheepdogs inside. No driver. Ep 104 central MacGuffin.', episodes:['ep104'], notes:'' },
   { id:'porsche-911', name:'Porsche 911', sku:'BL252', badge:'vehicle', detail:"Charmaine's Ep 101 bridge car. Also Charmaine's race car in Ep 104 Grand Prix.", episodes:['ep101','ep104'], notes:'' },
   { id:'ford-gt40', name:'Ford GT40 Moving Parts', sku:'JKH53', badge:'vehicle', detail:"Sean's race car. Ep 104 Grand Prix.", episodes:['ep104'], notes:'' },
-  { id:'smalleys-crusher', name:"Smalley's Garage Crusher Playset", sku:'JMG56', badge:'vehicle', detail:'Ep 101 city skyline diorama (Real World). Ep 104 finish line trap — padded car catcher with pillows.', episodes:['ep101','ep104'], notes:'' },
+];
+
+const PLAYSETS = [
+  { id:'smalleys-crusher', name:"Smalley's Garage Crusher Playset", sku:'JMG56', badge:'playset', detail:'Ep 101 city skyline diorama (Real World). Ep 104 finish line trap — padded car catcher with pillows.', episodes:['ep101','ep104'], notes:'' },
+  { id:'mountain-escape', name:'Mountain Escape Getaway', sku:'JMG57', badge:'playset', detail:'Ep 101 city skyline diorama (Real World). Ep 102 finale multi-level ramp chase.', episodes:['ep101','ep102'], notes:'' },
 ];
 
 const ENVIRONMENTS = [
@@ -1831,6 +1827,7 @@ function getFiltered(arr) {
 function updateTabCounts() {
   document.getElementById('tc-chars').textContent = getFiltered(CHARACTERS).length;
   document.getElementById('tc-vehicles').textContent = getFiltered(VEHICLES).length;
+  document.getElementById('tc-playsets').textContent = getFiltered(PLAYSETS).length;
   document.getElementById('tc-envs').textContent = getFiltered(ENVIRONMENTS).length;
   const p = getPanelsForChapter();
   document.getElementById('tc-panels').textContent = p.length || '—';
@@ -1840,6 +1837,7 @@ function renderActive() {
   updateTabCounts();
   if(currentTab === 'characters') renderCharacters();
   if(currentTab === 'vehicles') renderVehicles();
+  if(currentTab === 'playsets') renderPlaysets();
   if(currentTab === 'environments') renderEnvironments();
   if(currentTab === 'panels') renderPanels();
   if(currentTab === 'boardmatic') renderBoardmatic();
@@ -1850,7 +1848,7 @@ function renderActive() {
 // STATS & PROGRESS
 // ════════════════════════════════════════
 function updateStats() {
-  const all = [...getFiltered(CHARACTERS), ...getFiltered(VEHICLES), ...getFiltered(ENVIRONMENTS)];
+  const all = [...getFiltered(CHARACTERS), ...getFiltered(VEHICLES), ...getFiltered(PLAYSETS), ...getFiltered(ENVIRONMENTS)];
   const total = all.length;
   const imaged = all.filter(a => getImages(a.id).length > 0).length;
   const pending = total - imaged;
@@ -1880,6 +1878,14 @@ function renderVehicles() {
   attachCardEvents(items);
 }
 
+function renderPlaysets() {
+  const grid = document.getElementById('playsets-grid');
+  const items = getFiltered(PLAYSETS);
+  if(!items.length) { grid.innerHTML = '<div style="color:var(--text-muted);font-family:var(--fontb);padding:20px;">Sin resultados.</div>'; return; }
+  grid.innerHTML = items.map(v => buildItemCard(v)).join('');
+  attachCardEvents(items);
+}
+
 function buildItemCard(item) {
   const imgUrl = imageData[item.id]?.url || '';
   const hasImg = !!imgUrl;
@@ -1889,7 +1895,8 @@ function buildItemCard(item) {
   ).join('');
   const badgeClass = `badge-${item.badge}`;
   const badgeLabel = item.badge === 'villain' ? 'Villain' :
-                     item.badge === 'vehicle' ? 'Vehicle' : 'Character';
+                     item.badge === 'vehicle' ? 'Vehicle' :
+                     item.badge === 'playset' ? 'Playset' : 'Character';
 
   return `
   <div class="item-card" id="card-${item.id}">
@@ -2949,7 +2956,10 @@ function getPanelsForChapter() {
   return PANELS_BY_EP[currentChapter];
 }
 function getCharName(id) { const c = CHARACTERS.find(x=>x.id===id); return c ? c.name : id; }
-function getVehName(id) { const v = VEHICLES.find(x=>x.id===id); return v ? v.name : id; }
+function getVehName(id) {
+  const v = VEHICLES.find(x=>x.id===id) || PLAYSETS.find(x=>x.id===id);
+  return v ? v.name : id;
+}
 function getEnvShortName(id) { const e = ENVIRONMENTS.find(x=>x.id===id); if(!e) return ''; return e.name.split('(')[0].trim().split(' ').slice(0,2).join(' '); }
 function getEnvName(id) { const e = ENVIRONMENTS.find(x=>x.id===id); return e ? e.name : ''; }
 
@@ -3142,7 +3152,7 @@ async function loadJSONBin() {
 // EXPORT ZIP
 // ════════════════════════════════════════
 function exportZip() {
-  const allItems = [...CHARACTERS, ...VEHICLES, ...ENVIRONMENTS];
+  const allItems = [...CHARACTERS, ...VEHICLES, ...PLAYSETS, ...ENVIRONMENTS];
   const rows = ['ID,NAME,TYPE,EPISODES,SKU,HAS_IMAGE,CLOUDINARY_URL,NOTES'];
   allItems.forEach(item => {
     const img = imageData[item.id];
@@ -3168,6 +3178,7 @@ function exportZip() {
     breakdown: {
       characters: CHARACTERS.map(c => ({ id:c.id, name:c.name, role:c.role, episodes:c.episodes, notes:notesData[c.id]||'', image:imageData[c.id]?.cloudinaryUrl||'' })),
       vehicles: VEHICLES.map(v => ({ id:v.id, name:v.name, sku:v.sku, episodes:v.episodes, notes:notesData[v.id]||'', image:imageData[v.id]?.cloudinaryUrl||'' })),
+      playsets: PLAYSETS.map(p => ({ id:p.id, name:p.name, sku:p.sku, episodes:p.episodes, notes:notesData[p.id]||'', image:imageData[p.id]?.cloudinaryUrl||'' })),
       environments: ENVIRONMENTS.map(e => ({ id:e.id, name:e.name, episodes:e.episodes, notes:notesData[e.id]||'', image:imageData[e.id]?.cloudinaryUrl||'' }))
     }
   };
@@ -3416,9 +3427,9 @@ function trkSectionRow(label) {
 
 function renderTrackerGeneral(body) {
   const multiChars = CHARACTERS.filter(c => isMultiEp(c));
-  const multiVehs = VEHICLES.filter(v => !isPlayset(v) && isMultiEp(v));
+  const multiVehs = VEHICLES.filter(v => isMultiEp(v));
   const multiEnvs = ENVIRONMENTS.filter(e => isMultiEp(e));
-  const multiPlaysets = VEHICLES.filter(v => isPlayset(v) && isMultiEp(v));
+  const multiPlaysets = PLAYSETS.filter(p => isMultiEp(p));
 
   let html = '<div class="trk-section-title">General assets</div>';
   html += trkTableHead();
@@ -3504,9 +3515,9 @@ function renderTrackerEpisode(body, ep) {
     });
   });
 
-  const allVehs = VEHICLES.filter(v => v.episodes.includes(ep) && !isPlayset(v));
+  const allVehs = VEHICLES.filter(v => v.episodes.includes(ep));
   const exclusiveEnvs = ENVIRONMENTS.filter(e => e.episodes.includes(ep) && !isMultiEp(e));
-  const exclusivePlaysets = VEHICLES.filter(v => isPlayset(v) && v.episodes.includes(ep) && !isMultiEp(v));
+  const exclusivePlaysets = PLAYSETS.filter(p => p.episodes.includes(ep) && !isMultiEp(p));
 
   const hasAssets = epWardrobes.length || allVehs.length || exclusiveEnvs.length || exclusivePlaysets.length;
 
@@ -3711,14 +3722,14 @@ function exportTrackerCSV() {
     CHARACTERS.filter(c=>isMultiEp(c)).forEach(c => {
       rows.push([esc('Character'),esc(c.name),esc(gs('general',c.id,'concept')),esc(gs('general',c.id,'views')),esc(gs('general',c.id,'expressions')),esc(gs('general',c.id,'actions')),esc(gn('general',c.id)),esc(gu('general',c.id)),esc(gd('general',c.id))].join(','));
     });
-    VEHICLES.filter(v=>!isPlayset(v)&&isMultiEp(v)).forEach(v => {
+    VEHICLES.filter(v=>isMultiEp(v)).forEach(v => {
       const hasAct = VEHICLES_WITH_ACTIONS.includes(v.id);
       rows.push([esc('Vehicle'),esc(v.name),esc(gs('general',v.id,'concept')),esc(gs('general',v.id,'views')),esc('N/A'),esc(hasAct?gs('general',v.id,'actions'):'N/A'),esc(gn('general',v.id)),esc(gu('general',v.id)),esc(gd('general',v.id))].join(','));
     });
     ENVIRONMENTS.filter(e=>isMultiEp(e)).forEach(e => {
       rows.push([esc('Environment'),esc(e.name),esc(gs('general',e.id,'concept')),esc('N/A'),esc('N/A'),esc('N/A'),esc(gn('general',e.id)),esc(gu('general',e.id)),esc(gd('general',e.id))].join(','));
     });
-    VEHICLES.filter(v=>isPlayset(v)&&isMultiEp(v)).forEach(p => {
+    PLAYSETS.filter(p=>isMultiEp(p)).forEach(p => {
       rows.push([esc('Playset'),esc(p.name),esc(gs('general',p.id,'concept')),esc('N/A'),esc('N/A'),esc('N/A'),esc(gn('general',p.id)),esc(gu('general',p.id)),esc(gd('general',p.id))].join(','));
     });
   } else {
@@ -3732,7 +3743,7 @@ function exportTrackerCSV() {
       rows.push('');
     }
     // Vehicles
-    const allVehs = VEHICLES.filter(v=>v.episodes.includes(ep)&&!isPlayset(v));
+    const allVehs = VEHICLES.filter(v=>v.episodes.includes(ep));
     if(allVehs.length) {
       rows.push(['TYPE','ASSET','CONCEPT','VIEWS','ACTIONS','NOTES','UPDATED BY','DUE DATE'].map(esc).join(','));
       allVehs.forEach(v => {
@@ -3809,10 +3820,16 @@ function exportTrackerPDF() {
       html += '<tr><td class="type">Character</td><td class="asset">'+c.name+'</td>'+sCell('general',c.id,'concept')+sCell('general',c.id,'views')+sCell('general',c.id,'expressions')+sCell('general',c.id,'actions')+noteC('general',c.id)+dueC('general',c.id)+'</tr>';
     });
     html += '</tbody></table>';
-    const mv = VEHICLES.filter(v=>!isPlayset(v)&&isMultiEp(v));
+    const mv = VEHICLES.filter(v=>isMultiEp(v));
     if(mv.length) {
       html += '<h2>Vehicles</h2><table><thead><tr><th class="left">Type</th><th class="left">Asset</th><th>Concept</th><th>Views</th><th>Actions</th><th class="left">Notes</th><th>Due</th></tr></thead><tbody>';
       mv.forEach(v => { const ha=VEHICLES_WITH_ACTIONS.includes(v.id); html += '<tr><td class="type">Vehicle</td><td class="asset">'+v.name+'</td>'+sCell('general',v.id,'concept')+sCell('general',v.id,'views')+(ha?sCell('general',v.id,'actions'):naC)+noteC('general',v.id)+dueC('general',v.id)+'</tr>'; });
+      html += '</tbody></table>';
+    }
+    const mp = PLAYSETS.filter(p=>isMultiEp(p));
+    if(mp.length) {
+      html += '<h2>Playsets</h2><table><thead><tr><th class="left">Type</th><th class="left">Asset</th><th>Concept</th><th class="left">Notes</th><th>Due</th></tr></thead><tbody>';
+      mp.forEach(p => { html += '<tr><td class="type">Playset</td><td class="asset">'+p.name+'</td>'+sCell('general',p.id,'concept')+noteC('general',p.id)+dueC('general',p.id)+'</tr>'; });
       html += '</tbody></table>';
     }
     const me = ENVIRONMENTS.filter(e=>isMultiEp(e));
@@ -3829,10 +3846,16 @@ function exportTrackerPDF() {
       wRows.forEach(w=>{html+='<tr><td class="type">Wardrobe</td><td class="asset">'+w.cn+' — '+w.wn+'</td>'+sCell(ep,w.wId,'concept')+sCell(ep,w.wId,'views')+sCell(ep,w.wId,'expressions')+sCell(ep,w.wId,'actions')+noteC(ep,w.wId)+dueC(ep,w.wId)+'</tr>';});
       html += '</tbody></table>';
     }
-    const av = VEHICLES.filter(v=>v.episodes.includes(ep)&&!isPlayset(v));
+    const av = VEHICLES.filter(v=>v.episodes.includes(ep));
     if(av.length) {
       html += '<h2>Vehicles</h2><table><thead><tr><th class="left">Type</th><th class="left">Asset</th><th>Concept</th><th>Views</th><th>Actions</th><th class="left">Notes</th><th>Due</th></tr></thead><tbody>';
       av.forEach(v=>{const ha=VEHICLES_WITH_ACTIONS.includes(v.id);html+='<tr><td class="type">Vehicle</td><td class="asset">'+v.name+'</td>'+sCell('general',v.id,'concept')+sCell('general',v.id,'views')+(ha?sCell('general',v.id,'actions'):naC)+noteC('general',v.id)+dueC('general',v.id)+'</tr>';});
+      html += '</tbody></table>';
+    }
+    const ap = PLAYSETS.filter(p=>p.episodes.includes(ep)&&!isMultiEp(p));
+    if(ap.length) {
+      html += '<h2>Playsets</h2><table><thead><tr><th class="left">Type</th><th class="left">Asset</th><th>Concept</th><th class="left">Notes</th><th>Due</th></tr></thead><tbody>';
+      ap.forEach(p=>{html+='<tr><td class="type">Playset</td><td class="asset">'+p.name+'</td>'+sCell('general',p.id,'concept')+noteC('general',p.id)+dueC('general',p.id)+'</tr>';});
       html += '</tbody></table>';
     }
     const ee = ENVIRONMENTS.filter(e=>e.episodes.includes(ep)&&!isMultiEp(e));

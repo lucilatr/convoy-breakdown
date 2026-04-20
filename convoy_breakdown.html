@@ -1237,6 +1237,7 @@
     <button class="chapter-btn" onclick="filterChapter('ep102', this)">Ep 102 — The Jungle Chase</button>
     <button class="chapter-btn" onclick="filterChapter('ep103', this)">Ep 103 — Fireworks Firefighting</button>
     <button class="chapter-btn" onclick="filterChapter('ep104', this)">Ep 104 — Dog Race Rescue!</button>
+    <button class="chapter-btn" onclick="filterChapter('ep105', this)">Ep 105 — Skyscraper of Doom!</button>
   </div>
 
   <div class="synopsis-box" id="synopsis-box">
@@ -1298,7 +1299,7 @@
 
       <div class="stat-card">
         <div class="stat-label">Episodes</div>
-        <div class="stat-num">4 / 8</div>
+        <div class="stat-num">5 / 8</div>
       </div>
     </div>
 
@@ -1509,8 +1510,8 @@
 // ════════════════════════════════════════
 // DATA
 // ════════════════════════════════════════
-const EPISODES = ['ep101','ep102','ep103','ep104'];
-const EP_LABELS = { ep101:'Ep 101', ep102:'Ep 102', ep103:'Ep 103', ep104:'Ep 104' };
+const EPISODES = ['ep101','ep102','ep103','ep104','ep105'];
+const EP_LABELS = { ep101:'Ep 101', ep102:'Ep 102', ep103:'Ep 103', ep104:'Ep 104', ep105:'Ep 105' };
 
 const EP_SYNOPSES = {
   ep101: {
@@ -1544,6 +1545,14 @@ const EP_SYNOPSES = {
     script: 'https://drive.google.com/file/d/1ngC373Xxvl8DdeRTfHvkDmK_2hO8rCoz/view?usp=drive_link',
     en: "The Matchbox Grand Prix turns from a race into a rescue when a runaway mobile dog washing van full of wet pups pulls into the lead. Aimee must use a dog bone as bait to guide the driverless van to the finish line, while the rest of the squad converts the Smalley's Garage car crusher into a soft landing zone using pillows. A dog-gone rescue race unlike anything the squad has tackled before.",
     es: 'El Gran Premio Matchbox se convierte en una misión de rescate cuando una furgoneta de baño canino sin conductor llena de perros mojados toma la delantera. Aimee debe usar un hueso como señuelo para guiar la furgoneta hasta la meta, mientras el resto del equipo convierte la aplastadora del garage Smalley en una zona de aterrizaje con almohadas. Una carrera de rescate perruna como nunca antes había enfrentado el equipo.'
+  },
+  ep105: {
+    label: 'Episode 105',
+    title: 'Skyscraper of Doom!',
+    panels: 45,
+    script: 'https://drive.google.com/file/d/1_UPMcSAacwC7mmKarQqOnhF45Vb7tJeN/view?usp=drive_link',
+    en: "An ancient booby trap turns a race to finish building the tallest high-rise into a subterranean adventure. Crosby leads the construction crew to install fire safety systems on time — until the Excavator triggers a crocodile-shaped trap and drops the entire building into an underground cavern. The squad must improvise a ramp and bridge with their construction vehicles to reach the giant stone crocodile before the cavern floods.",
+    es: 'Una antigua trampa convierte la carrera por terminar el rascacielos más alto en una aventura subterránea. Crosby lidera al equipo de construcción para instalar sistemas de seguridad a tiempo — hasta que la Excavadora activa una trampa con forma de cocodrilo y hace caer todo el edificio a una caverna subterránea. El equipo debe improvisar una rampa y un puente con sus vehículos de construcción para alcanzar al cocodrilo de piedra gigante antes de que la caverna se inunde.'
   }
 };
 
@@ -1556,10 +1565,10 @@ const CHARACTERS = [
     vehicle:'Drives Rover 6x6',
     badge:'character',
     detail:'Protagonist. Recurring across all episodes.',
-    episodes: ['ep101','ep102','ep103','ep104'],
+    episodes: ['ep101','ep102','ep103','ep104','ep105'],
     wardrobe: [
-      { id:'sean-base', name:'Base', desc:'Casual everyday outfit', episodes:['ep101','ep102','ep103','ep104'] },
-      { id:'sean-hardhat', name:'Construction Gear', desc:'Orange hard hat, seatbelt — bridge construction scene', episodes:['ep101'] },
+      { id:'sean-base', name:'Base', desc:'Casual everyday outfit', episodes:['ep101','ep102','ep103','ep104','ep105'] },
+      { id:'sean-hardhat', name:'Construction Gear', desc:'Orange hard hat, seatbelt — construction scenes', episodes:['ep101','ep105'] },
     ],
     notes: ''
   },
@@ -1568,10 +1577,10 @@ const CHARACTERS = [
     vehicle:'Drives Blaze Blaster III & Triumph Scrambler',
     badge:'character',
     detail:'Commands fire rescue ops. Wears full firefighter gear including helmet.',
-    episodes: ['ep101','ep102','ep103','ep104'],
+    episodes: ['ep101','ep102','ep103','ep104','ep105'],
     wardrobe: [
       { id:'ted-base',        name:'Base',            desc:'Casual everyday outfit',                          episodes:['ep101','ep102','ep104'] },
-      { id:'ted-hardhat',     name:'Construction Gear', desc:'Orange hard hat over casual outfit',             episodes:['ep101'] },
+      { id:'ted-hardhat',     name:'Construction Gear', desc:'Orange hard hat over casual outfit',             episodes:['ep101','ep105'] },
       { id:'ted-firefighter', name:'Firefighter',     desc:'Full gear — helmet, coat, breathing apparatus',   episodes:['ep103'] },
       { id:'ted-race',        name:'Race Spectator',  desc:'Helmet on, visor up, race outfit',                episodes:['ep104'] },
     ],
@@ -1582,10 +1591,10 @@ const CHARACTERS = [
     vehicle:'Pilots Rescue Helicopter & Super Hercules',
     badge:'character',
     detail:'Aerial recon, water bucket drops and cargo extractions. Uses headset.',
-    episodes: ['ep101','ep102','ep103','ep104'],
+    episodes: ['ep101','ep102','ep103','ep104','ep105'],
     wardrobe: [
-      { id:'charmaine-base',    name:'Base',              desc:'Casual outfit with headset',              episodes:['ep101','ep103','ep104'] },
-      { id:'charmaine-hardhat', name:'Construction Gear', desc:'Orange hard hat over casual outfit',       episodes:['ep101'] },
+      { id:'charmaine-base',    name:'Base',              desc:'Casual outfit with headset',              episodes:['ep101','ep103','ep104','ep105'] },
+      { id:'charmaine-hardhat', name:'Construction Gear', desc:'Orange hard hat over casual outfit',       episodes:['ep101','ep105'] },
       { id:'charmaine-pilot',   name:'Pilot Gear',        desc:'Flight suit, cargo extraction gear',      episodes:['ep102'] },
     ],
     notes: ''
@@ -1595,10 +1604,10 @@ const CHARACTERS = [
     vehicle:'Drives Ambulance, Toyota Tacoma & Chevy Stock Car',
     badge:'character',
     detail:'Fast and resourceful. Handles crowd control, medical support and high-speed chases.',
-    episodes: ['ep101','ep102','ep103','ep104'],
+    episodes: ['ep101','ep102','ep103','ep104','ep105'],
     wardrobe: [
-      { id:'aimee-base',        name:'Base',              desc:'Casual everyday outfit',                   episodes:['ep101','ep102','ep103'] },
-      { id:'aimee-hardhat',     name:'Construction Gear', desc:'Orange hard hat over casual outfit',        episodes:['ep101'] },
+      { id:'aimee-base',        name:'Base',              desc:'Casual everyday outfit',                   episodes:['ep101','ep102','ep103','ep105'] },
+      { id:'aimee-hardhat',     name:'Construction Gear', desc:'Orange hard hat over casual outfit',        episodes:['ep101','ep105'] },
       { id:'aimee-firefighter', name:'Firefighter',       desc:'Fire gear — helmet, hose, assists Ted',    episodes:['ep103'] },
       { id:'aimee-race',        name:'Race Driver',       desc:'Seatbelt on, focused race look',           episodes:['ep104'] },
     ],
@@ -1609,9 +1618,9 @@ const CHARACTERS = [
     vehicle:'Operates Excavator & Turf Hauler',
     badge:'character',
     detail:'Engineering mindset. Demolition and heavy construction rigs. Wears orange hard hat.',
-    episodes: ['ep101','ep102','ep103','ep104'],
+    episodes: ['ep101','ep102','ep103','ep104','ep105'],
     wardrobe: [
-      { id:'crosby-base',        name:'Base',              desc:'Casual outfit with orange hard hat',          episodes:['ep101','ep102','ep103'] },
+      { id:'crosby-base',        name:'Base',              desc:'Casual outfit with orange hard hat',          episodes:['ep101','ep102','ep103','ep105'] },
       { id:'crosby-firefighter', name:'Firefighter',       desc:'Full gear — helmet, coat, fire hose',         episodes:['ep103'] },
       { id:'crosby-race',        name:'Race Driver',       desc:'Race outfit, Nismo driver look',              episodes:['ep104'] },
     ],
@@ -1633,13 +1642,13 @@ const CHARACTERS = [
 const VEHICLES = [
   // Ep 101
   { id:'rover-6x6', name:'Rover 6x6', sku:'JKH28', badge:'vehicle', detail:"Sean's primary pursuit vehicle. Eps 101 & 103.", episodes:['ep101','ep103'], notes:'' },
-  { id:'rescue-heli', name:'Rescue Helicopter', sku:'JKH39', badge:'vehicle', detail:"Charmaine. Air support, cargo drops, water bucket. Eps 101, 103 & 104.", episodes:['ep101','ep103','ep104'], notes:'' },
+  { id:'rescue-heli', name:'Rescue Helicopter', sku:'JKH39', badge:'vehicle', detail:"Charmaine. Air support, cargo drops, water bucket. Eps 101, 103, 104 & 105.", episodes:['ep101','ep103','ep104','ep105'], notes:'' },
   { id:'dodge-durango', name:'Dodge Durango', sku:'HFP46', badge:'vehicle', detail:"Von Steele's black villain vehicle. Recurring across all eps.", episodes:['ep101','ep102','ep103'], notes:'' },
   { id:'ford-f150', name:'Ford F-150', sku:'JKH36', badge:'vehicle', detail:"Ted's truck in Ep 101. Used with Skidster to tear bridge gap.", episodes:['ep101'], notes:'' },
-  { id:'f650-rollback', name:'F-650 Rollback', sku:'JKH49', badge:'vehicle', detail:'Tow truck. Stolen by Von Steele in Ep 101 bridge sequence.', episodes:['ep101'], notes:'' },
+  { id:'f650-rollback', name:'F-650 Rollback', sku:'JKH49', badge:'vehicle', detail:'Tow truck. Ep 101 bridge (stolen by Von Steele). Ep 105 electrical transformer delivery.', episodes:['ep101','ep105'], notes:'' },
   { id:'skidster', name:'Skidster', sku:'JBW03', badge:'vehicle', detail:'Compact loader. Ep 101 bridge gap creation.', episodes:['ep101'], notes:'' },
-  { id:'excavator', name:'Excavator', sku:'JKH38', badge:'vehicle', detail:"Crosby. Ep 101 bridge demolition. Ep 102 jungle tree felling.", episodes:['ep101','ep102'], notes:'' },
-  { id:'turf-hauler', name:'Turf Hauler', sku:'HFB90', badge:'vehicle', detail:'Construction hauler. Ep 101 bridge rubble.', episodes:['ep101'], notes:'' },
+  { id:'excavator', name:'Excavator', sku:'JKH38', badge:'vehicle', detail:"Crosby. Ep 101 bridge demolition. Ep 102 jungle tree felling. Ep 105 skyscraper construction — triggers the booby trap, later swings through cavern gap.", episodes:['ep101','ep102','ep105'], notes:'' },
+  { id:'turf-hauler', name:'Turf Hauler', sku:'HFB90', badge:'vehicle', detail:'Construction hauler. Ep 101 bridge rubble. Ep 105 fresh soil for flower bed + ramp building.', episodes:['ep101','ep105'], notes:'' },
   { id:'mustang-fastback', name:'Mustang Fastback', sku:'JKH34', badge:'vehicle', detail:"Aimee's signature vehicle. Ep 101.", episodes:['ep101'], notes:'' },
   { id:'triumph-scrambler', name:'Triumph Scrambler', sku:'JKH31', badge:'vehicle', detail:"Ted's motorcycle. Eps 101, 102 & 104. Used for jungle rescue and city race.", episodes:['ep101','ep102','ep104'], notes:'' },
   // Ep 102
@@ -1656,11 +1665,13 @@ const VEHICLES = [
   { id:'vw-bus', name:'VW Bus Moving Parts', sku:'JHV23', badge:'vehicle', detail:'Runaway mobile dog washing van. Three wet sheepdogs inside. No driver. Ep 104 central MacGuffin.', episodes:['ep104'], notes:'' },
   { id:'porsche-911', name:'Porsche 911', sku:'BL252', badge:'vehicle', detail:"Charmaine's Ep 101 bridge car. Also Charmaine's race car in Ep 104 Grand Prix.", episodes:['ep101','ep104'], notes:'' },
   { id:'ford-gt40', name:'Ford GT40 Moving Parts', sku:'JKH53', badge:'vehicle', detail:"Sean's race car. Ep 104 Grand Prix.", episodes:['ep104'], notes:'' },
+  // Ep 105
+  { id:'bulldozer', name:'Bulldozer', sku:'JFB96', badge:'vehicle', detail:"Sean's vehicle in Ep 105. Clears concrete rubble, pushes dirt for the ramp, gives the Excavator a boost to swing across the cavern.", episodes:['ep105'], notes:'' },
 ];
 
 const PLAYSETS = [
   { id:'smalleys-crusher', name:"Smalley's Garage Crusher Playset", sku:'JMG56', badge:'playset', detail:'Ep 101 city skyline diorama (Real World). Ep 104 finish line trap — padded car catcher with pillows.', episodes:['ep101','ep104'], notes:'' },
-  { id:'mountain-escape', name:'Mountain Escape Getaway', sku:'JMG57', badge:'playset', detail:'Ep 101 city skyline diorama (Real World). Ep 102 finale multi-level ramp chase.', episodes:['ep101','ep102'], notes:'' },
+  { id:'mountain-escape', name:'Mountain Escape Getaway', sku:'JMG57', badge:'playset', detail:'Ep 101 city skyline diorama (Real World). Ep 102 finale multi-level ramp chase. Ep 105 used with crocodile head attached to simulate the ancient booby trap.', episodes:['ep101','ep102','ep105'], notes:'' },
   { id:'mountain-convoy', name:'Mountain Convoy Pursuit', sku:'JJB32', badge:'playset', detail:"Sean's Secret Hideout playset. Ep 103 water tower sequence.", episodes:['ep103'], notes:'' },
 ];
 
@@ -1668,7 +1679,7 @@ const ENVIRONMENTS = [
   {
     id:'smalleys-garage', name:"Smalley's Garage", badge:'env',
     detail:'INT. Hub location. Professional mechanic garage converted into ultimate Matchbox play space. Large central diorama table. Appears in ALL episodes as Real World framing device.',
-    episodes:['ep101','ep102','ep103','ep104'], notes:''
+    episodes:['ep101','ep102','ep103','ep104','ep105'], notes:''
   },
   {
     id:'matchbox-bridge', name:'Matchbox Bridge', badge:'env',
@@ -1704,6 +1715,16 @@ const ENVIRONMENTS = [
     id:'city-race-course', name:'City Race Course', badge:'env',
     detail:'EXT. Street-level road circuit through Matchbox City. Curved sections, downtown chicanes, hay bale barriers, spectators behind safety barriers. Finish line at Smalley\'s Garage. Ep 104 primary location.',
     episodes:['ep104'], notes:''
+  },
+  {
+    id:'construction-site', name:'Construction Site', badge:'env',
+    detail:'EXT. Active construction site in Matchbox City. 10-story building 70% built (7 finished floors + 3 pending windows). Giant crane, vehicle platforms, flower bed, electrical transformer. Setting for the ribbon-cutting ceremony. Ep 105 primary location (surface).',
+    episodes:['ep105'], notes:''
+  },
+  {
+    id:'underground-cavern', name:'Underground Cavern of the Stone Crocodile', badge:'env',
+    detail:'EXT. Subterranean cross-section. Ancient legendary cavern with an 8-story stone crocodile statue on its hind legs. Building falls in and sits inside. Well-lit with shadows (not dark). Water flows from croc\'s mouth when triggered. Ep 105 main action location.',
+    episodes:['ep105'], notes:''
   },
 ];
 

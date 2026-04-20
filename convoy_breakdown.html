@@ -204,6 +204,11 @@
     background: var(--bg-card); border: 1px solid var(--border);
     padding: 16px 20px;
   }
+  .stat-card.clickable { cursor: pointer; transition: border-color .15s; }
+  .stat-card.clickable:hover { border-color: rgba(255,255,255,0.22); }
+  .stat-card.clickable.ready:hover { border-color: rgba(136,136,136,0.5); }
+  .stat-card.clickable.wait:hover { border-color: rgba(240,80,80,0.5); }
+  .stat-card.clickable.feedback:hover { border-color: rgba(180,127,255,0.5); }
   .stat-label {
     font-size: 10px; letter-spacing: 3px; text-transform:uppercase;
     color: var(--text-muted); font-family: var(--fontb); margin-bottom:6px;
@@ -212,6 +217,12 @@
     font-size: 36px; font-weight: 900; color: var(--text); line-height:1;
   }
   .stat-num.pink { color: var(--pink); }
+  .stat-num.wait { color: #f05050; }
+  .stat-num.feedback { color: #b47fff; }
+  .stat-sub {
+    font-size: 10px; color: var(--text-muted); font-family: var(--fontb);
+    margin-top: 6px; letter-spacing: 1px;
+  }
 
   /* GRID LAYOUT */
   .cards-grid {
@@ -1020,10 +1031,26 @@
   .trk-select.s-none { background-color: rgba(255,255,255,0.02); color: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.06); }
 
   .trk-legend-badge {
-    display: inline-block; padding: 3px 8px; border-radius: 3px;
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 8px; border-radius: 3px;
     font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
-    cursor: default;
+    cursor: pointer; transition: transform .1s, opacity .15s;
+    user-select: none;
   }
+  .trk-legend-badge:hover { opacity: 0.85; }
+  .trk-legend-badge.active { transform: scale(1.04); box-shadow: inset 0 0 0 1px currentColor; }
+  .trk-legend-badge.dim { opacity: 0.35; }
+  .trk-legend-count {
+    background: rgba(0,0,0,0.35); padding: 1px 5px; border-radius: 2px;
+    font-size: 9px; font-weight: 700; min-width: 14px; text-align: center;
+  }
+  .trk-clear-btn {
+    background: transparent; border: none; color: var(--pink);
+    font-family: var(--font); font-size: 10px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    cursor: pointer; padding: 3px 6px; margin-left: 4px;
+  }
+  .trk-clear-btn:hover { opacity: 0.75; }
   .trk-b-wip { background: rgba(250,200,50,0.12); color: #ddb020; border: 1px solid rgba(250,200,50,0.2); }
   .trk-b-wait { background: rgba(240,60,60,0.12); color: #f05050; border: 1px solid rgba(240,60,60,0.2); }
   .trk-b-app-play { background: rgba(80,180,255,0.1); color: #50b4ff; border: 1px solid rgba(80,180,255,0.2); }
@@ -1032,6 +1059,13 @@
   .trk-b-reviewed { background: rgba(240,150,40,0.12); color: #e09020; border: 1px solid rgba(240,150,40,0.2); }
   .trk-b-ready { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.08); }
   .trk-b-na { background: transparent; color: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.04); }
+
+  .trk-cell-match { position: relative; }
+  .trk-cell-match::after {
+    content: ''; position: absolute; inset: 2px;
+    border: 2px solid var(--pink); pointer-events: none;
+    border-radius: 3px;
+  }
 
   .trk-notes-input {
     background: transparent; border: 1px solid rgba(255,255,255,0.06); color: rgba(255,255,255,0.5);
@@ -1244,9 +1278,22 @@
 
     <!-- STATS -->
     <div class="stats-row" id="stats-row">
-      <div class="stat-card">
-        <div class="stat-label">Total Assets</div>
-        <div class="stat-num pink" id="stat-total">0</div>
+      <div class="stat-card clickable ready" onclick="openTrackerWithFilter('ready')">
+        <div class="stat-label">Ready to start</div>
+        <div class="stat-num" id="stat-ready">0</div>
+        <div class="stat-sub">assets</div>
+      </div>
+
+      <div class="stat-card clickable wait" onclick="openTrackerWithFilter('wait')">
+        <div class="stat-label">Waiting material</div>
+        <div class="stat-num wait" id="stat-wait">0</div>
+        <div class="stat-sub">Client side</div>
+      </div>
+
+      <div class="stat-card clickable feedback" onclick="openTrackerWithFilter('review')">
+        <div class="stat-label">Waiting feedback</div>
+        <div class="stat-num feedback" id="stat-feedback">0</div>
+        <div class="stat-sub">Client side</div>
       </div>
 
       <div class="stat-card">
@@ -1478,7 +1525,7 @@ const EP_SYNOPSES = {
     label: 'Episode 102',
     title: 'The Jungle Chase!',
     panels: 46,
-    script: 'https://drive.google.com/file/d/1wNxis4QV6E2WDu_SstxoLhQMa-QIsJU0/view?usp=drive_link',
+    script: 'https://drive.google.com/file/d/16HcKXNluKagDj7Q_Zet4jse-w8O7hxfV/view?usp=drive_link',
     en: "Aimee races to recover a top-secret crate deep in the jungle and deliver it to the plane before time runs out. Von Steele and his chainsaw-wielding lumberjacks block her path, felling trees and sabotaging the airstrip. With the team's help and the Mountain Escape Getaway, Aimee must prove that speed and resourcefulness can overcome any obstacle.",
     es: 'Aimee recupera una caja secreta en la jungla y debe llevarla hasta el avión antes de que sea demasiado tarde. Von Steele y sus leñadores con motosierras le cierran el paso, tumban árboles y bloquean la pista de aterrizaje. Con la ayuda del equipo y el Mountain Escape Getaway, Aimee deberá demostrar que la velocidad y el ingenio pueden superar cualquier obstáculo.'
   },
@@ -1585,13 +1632,13 @@ const CHARACTERS = [
 
 const VEHICLES = [
   // Ep 101
-  { id:'rover-6x6', name:'Rover 6x6', sku:'JKH28', badge:'vehicle', detail:"Sean's primary pursuit vehicle. Appears in all 3 episodes.", episodes:['ep101','ep102','ep103'], notes:'' },
-  { id:'rescue-heli', name:'Rescue Helicopter', sku:'JKH39', badge:'vehicle', detail:'Charmaine. Air support, cargo drops, water bucket. Appears in all eps.', episodes:['ep101','ep102','ep103','ep104'], notes:'' },
+  { id:'rover-6x6', name:'Rover 6x6', sku:'JKH28', badge:'vehicle', detail:"Sean's primary pursuit vehicle. Eps 101 & 103.", episodes:['ep101','ep103'], notes:'' },
+  { id:'rescue-heli', name:'Rescue Helicopter', sku:'JKH39', badge:'vehicle', detail:"Charmaine. Air support, cargo drops, water bucket. Eps 101, 103 & 104.", episodes:['ep101','ep103','ep104'], notes:'' },
   { id:'dodge-durango', name:'Dodge Durango', sku:'HFP46', badge:'vehicle', detail:"Von Steele's black villain vehicle. Recurring across all eps.", episodes:['ep101','ep102','ep103'], notes:'' },
   { id:'ford-f150', name:'Ford F-150', sku:'JKH36', badge:'vehicle', detail:"Ted's truck in Ep 101. Used with Skidster to tear bridge gap.", episodes:['ep101'], notes:'' },
   { id:'f650-rollback', name:'F-650 Rollback', sku:'JKH49', badge:'vehicle', detail:'Tow truck. Stolen by Von Steele in Ep 101 bridge sequence.', episodes:['ep101'], notes:'' },
   { id:'skidster', name:'Skidster', sku:'JBW03', badge:'vehicle', detail:'Compact loader. Ep 101 bridge gap creation.', episodes:['ep101'], notes:'' },
-  { id:'excavator', name:'Excavator', sku:'JKH38', badge:'vehicle', detail:'Crosby. Ep 101 bridge demolition and pursuit. Key to trap.', episodes:['ep101'], notes:'' },
+  { id:'excavator', name:'Excavator', sku:'JKH38', badge:'vehicle', detail:"Crosby. Ep 101 bridge demolition. Ep 102 jungle tree felling.", episodes:['ep101','ep102'], notes:'' },
   { id:'turf-hauler', name:'Turf Hauler', sku:'HFB90', badge:'vehicle', detail:'Construction hauler. Ep 101 bridge rubble.', episodes:['ep101'], notes:'' },
   { id:'mustang-fastback', name:'Mustang Fastback', sku:'JKH34', badge:'vehicle', detail:"Aimee's signature vehicle. Ep 101.", episodes:['ep101'], notes:'' },
   { id:'triumph-scrambler', name:'Triumph Scrambler', sku:'JKH31', badge:'vehicle', detail:"Ted's motorcycle. Eps 101, 102 & 104. Used for jungle rescue and city race.", episodes:['ep101','ep102','ep104'], notes:'' },
@@ -1851,12 +1898,68 @@ function updateStats() {
   const all = [...getFiltered(CHARACTERS), ...getFiltered(VEHICLES), ...getFiltered(PLAYSETS), ...getFiltered(ENVIRONMENTS)];
   const total = all.length;
   const imaged = all.filter(a => getImages(a.id).length > 0).length;
-  const pending = total - imaged;
-  const elTotal = document.getElementById('stat-total');
-  if(elTotal) elTotal.textContent = total;
+
+  // Contadores de estado (respetan el filtro de episodio activo)
+  const ready = countAssetsWithStatus('ready');
+  const wait = countAssetsWithStatus('wait');
+  const feedback = countAssetsWithStatus('review');
+  const elReady = document.getElementById('stat-ready');
+  const elWait = document.getElementById('stat-wait');
+  const elFb = document.getElementById('stat-feedback');
+  if(elReady) elReady.textContent = ready;
+  if(elWait) elWait.textContent = wait;
+  if(elFb) elFb.textContent = feedback;
+
   const pct = total > 0 ? Math.round((imaged/total)*100) : 0;
   document.getElementById('progress-fill').style.width = pct+'%';
   document.getElementById('progress-label').textContent = pct+'% complete';
+}
+
+// Cuenta assets (character/vehicle/playset/environment/wardrobe) que tienen
+// al menos UNA celda del tracker en el estado dado.
+// Respeta el filtro de episodio activo (currentChapter).
+function countAssetsWithStatus(statusId) {
+  const stages = ['concept','views','expressions','actions'];
+  let count = 0;
+  const chapter = currentChapter;
+
+  const cellHas = (scope, id) => stages.some(st => getTrkVal(scope, id, st, 'status') === statusId);
+
+  // General scope (assets multi-ep)
+  CHARACTERS.forEach(c => { if(isMultiEp(c) && cellHas('general', c.id)) count++; });
+  VEHICLES.forEach(v => { if(isMultiEp(v) && cellHas('general', v.id)) count++; });
+  PLAYSETS.forEach(p => { if(isMultiEp(p) && cellHas('general', p.id)) count++; });
+  ENVIRONMENTS.forEach(e => { if(isMultiEp(e) && cellHas('general', e.id)) count++; });
+
+  // Per-episode scope
+  const eps = chapter === 'all' ? EPISODES : [chapter];
+  eps.forEach(ep => {
+    // Wardrobes (solo cambios que aplican al ep)
+    CHARACTERS.forEach(c => {
+      if(!c.wardrobe) return;
+      c.wardrobe.forEach(w => {
+        if(w.name === 'Base') return;
+        if(w.episodes.includes(ep) && cellHas(ep, w.id)) count++;
+      });
+    });
+    // Vehicles/Playsets exclusivos del ep
+    VEHICLES.forEach(v => { if(!isMultiEp(v) && v.episodes.includes(ep) && cellHas('general', v.id)) count++; });
+    PLAYSETS.forEach(p => { if(!isMultiEp(p) && p.episodes.includes(ep) && cellHas('general', p.id)) count++; });
+    ENVIRONMENTS.forEach(e => { if(!isMultiEp(e) && e.episodes.includes(ep) && cellHas(ep, e.id)) count++; });
+  });
+
+  return count;
+}
+
+// Abre el tracker con un chip de filtro ya activo (abre si está cerrado, refresca si está abierto)
+function openTrackerWithFilter(statusId) {
+  trackerStatusFilter = new Set([statusId]);
+  const overlay = document.getElementById('tracker-overlay');
+  if(overlay.classList.contains('hidden')) {
+    toggleTracker();
+  } else {
+    renderTracker();
+  }
 }
 
 // ════════════════════════════════════════
@@ -3375,7 +3478,32 @@ function initTrackerEpSelect() {
 }
 
 let trackerEp = 'general';
+let trackerStatusFilter = new Set();
 function switchTrackerEp(ep) { trackerEp = ep; renderTracker(); }
+
+function toggleTrkStatusFilter(statusId) {
+  if(trackerStatusFilter.has(statusId)) trackerStatusFilter.delete(statusId);
+  else trackerStatusFilter.add(statusId);
+  renderTracker();
+}
+
+function clearTrkStatusFilter() {
+  trackerStatusFilter.clear();
+  renderTracker();
+}
+
+// Cuenta celdas del tracker en un estado dado, respetando episodio actual del tracker
+function countTrkCellsByStatus(statusId) {
+  const stages = ['concept','views','expressions','actions'];
+  let n = 0;
+  Object.keys(trackerData).forEach(k => {
+    if(trackerData[k] && trackerData[k].status === statusId) {
+      const [scope, , stage] = k.split('|');
+      if(stages.includes(stage)) n++;
+    }
+  });
+  return n;
+}
 
 function renderTracker() {
   const body = document.getElementById('tracker-body');
@@ -3383,9 +3511,17 @@ function renderTracker() {
   userEl.innerHTML = 'Logged as <strong>'+trackerUser+'</strong>';
 
   const legendEl = document.getElementById('tracker-legend');
-  legendEl.innerHTML = TRK_STATUSES.map(s =>
-    '<span class="trk-legend-badge '+s.cls+'">'+s.label+'</span>'
-  ).join('');
+  const hasFilter = trackerStatusFilter.size > 0;
+  legendEl.innerHTML = TRK_STATUSES.map(s => {
+    const isActive = trackerStatusFilter.has(s.id);
+    const isDim = hasFilter && !isActive;
+    const count = countTrkCellsByStatus(s.id);
+    return '<span class="trk-legend-badge '+s.cls+(isActive?' active':'')+(isDim?' dim':'')+'" '
+      +'onclick="toggleTrkStatusFilter(\''+s.id+'\')" title="Click para filtrar">'
+      + s.label
+      + '<span class="trk-legend-count">'+count+'</span>'
+      + '</span>';
+  }).join('') + (hasFilter ? '<button class="trk-clear-btn" onclick="clearTrkStatusFilter()">× Clear</button>' : '');
 
   const sel = document.getElementById('tracker-ep-select');
   trackerEp = sel.value;
@@ -3395,6 +3531,44 @@ function renderTracker() {
   } else {
     renderTrackerEpisode(body, trackerEp);
   }
+
+  // Post-proceso: ocultar filas sin celdas que matcheen el filtro
+  applyTrackerRowFilter();
+}
+
+function applyTrackerRowFilter() {
+  const body = document.getElementById('tracker-body');
+  if(!body) return;
+  const hasFilter = trackerStatusFilter.size > 0;
+  // Todas las filas de data (no section rows, no headers)
+  body.querySelectorAll('tr').forEach(tr => {
+    // saltear header rows y separator rows
+    if(tr.querySelector('th') || tr.classList.contains('trk-sep')) return;
+    if(!hasFilter) {
+      tr.style.display = '';
+      return;
+    }
+    const hasMatch = tr.querySelector('.trk-cell-match');
+    tr.style.display = hasMatch ? '' : 'none';
+  });
+  // Ocultar section titles y tablas vacías si todas sus filas están ocultas
+  body.querySelectorAll('.trk-section-title').forEach(title => {
+    if(!hasFilter) { title.style.display = ''; return; }
+    // La siguiente tabla: ver si tiene filas visibles
+    let next = title.nextElementSibling;
+    let hasVisibleRow = false;
+    while(next && !next.classList.contains('trk-section-title')) {
+      if(next.tagName === 'TABLE' || next.classList.contains('trk-wrap')) {
+        const rows = next.querySelectorAll('tr');
+        rows.forEach(r => {
+          if(r.querySelector('th') || r.classList.contains('trk-sep')) return;
+          if(r.style.display !== 'none') hasVisibleRow = true;
+        });
+      }
+      next = next.nextElementSibling;
+    }
+    title.style.display = hasVisibleRow ? '' : 'none';
+  });
 }
 
 function trkTableHead() {
@@ -3619,11 +3793,12 @@ function statusCell(scope, assetId, stage) {
   const val = getTrkVal(scope, assetId, stage, 'status');
   const clsMap = { 'wip':'s-wip','wait':'s-wait','app-play':'s-app-play','app-mattel':'s-app-mattel','review':'s-review','reviewed':'s-reviewed','ready':'s-ready','na':'s-na','none':'s-none' };
   const cls = clsMap[val] || 's-none';
+  const matchCls = trackerStatusFilter.size > 0 && trackerStatusFilter.has(val) ? ' trk-cell-match' : '';
   let opts = '<option value="none"'+(val==='none'||!val?' selected':'')+'>— Select —</option>';
   TRK_STATUSES.forEach(s => {
     opts += '<option value="'+s.id+'"'+(val===s.id?' selected':'')+'>'+s.label+'</option>';
   });
-  return '<td class="center"><select class="trk-select '+cls+'" onchange="changeStatus(\''+scope+'\',\''+assetId+'\',\''+stage+'\',this)">' + opts + '</select></td>';
+  return '<td class="center'+matchCls+'"><select class="trk-select '+cls+'" onchange="changeStatus(\''+scope+'\',\''+assetId+'\',\''+stage+'\',this)">' + opts + '</select></td>';
 }
 
 function naCell() {
@@ -4097,15 +4272,18 @@ function saveWardrobeImages() {
 }
 
 function buildWardrobeSection(item) {
-  // In 'all' view show everything, otherwise filter to current episode
+  // Excluir siempre el Base (se asume visible en foto principal del personaje)
+  const nonBase = item.wardrobe.filter(v => v.name !== 'Base');
+
+  // En 'all' mostrar todos los cambios, en ep filtrar al episodio
   const filtered = currentChapter === 'all'
-    ? item.wardrobe
-    : item.wardrobe.filter(v => v.episodes.includes(currentChapter));
+    ? nonBase
+    : nonBase.filter(v => v.episodes.includes(currentChapter));
 
   if(!filtered.length) return '';
 
   const count = filtered.length;
-  const totalCount = item.wardrobe.length;
+  const totalCount = nonBase.length;
 
   const rows = filtered.map(v => {
     const img = wardrobeImageData[v.id] || '';
@@ -4128,13 +4306,13 @@ function buildWardrobeSection(item) {
   }).join('');
 
   const label = currentChapter === 'all'
-    ? `${totalCount} ${totalCount === 1 ? 'variation' : 'variations'}`
-    : `${count} of ${totalCount} ${totalCount === 1 ? 'variation' : 'variations'}`;
+    ? `${totalCount} ${totalCount === 1 ? 'change' : 'changes'}`
+    : `${count} of ${totalCount} ${totalCount === 1 ? 'change' : 'changes'}`;
 
   return `
   <div class="wardrobe-section">
     <div class="wardrobe-header">
-      <span class="wardrobe-label">Wardrobe</span>
+      <span class="wardrobe-label">Wardrobe changes</span>
       <span class="wardrobe-count">${label}</span>
     </div>
     ${rows}

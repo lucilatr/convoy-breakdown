@@ -3492,17 +3492,10 @@ function clearTrkStatusFilter() {
   renderTracker();
 }
 
-// Cuenta celdas del tracker en un estado dado, respetando episodio actual del tracker
+// Cuenta assets únicos con al menos una celda en el estado dado.
+// Misma lógica que countAssetsWithStatus del home, para que ambos números coincidan.
 function countTrkCellsByStatus(statusId) {
-  const stages = ['concept','views','expressions','actions'];
-  let n = 0;
-  Object.keys(trackerData).forEach(k => {
-    if(trackerData[k] && trackerData[k].status === statusId) {
-      const [scope, , stage] = k.split('|');
-      if(stages.includes(stage)) n++;
-    }
-  });
-  return n;
+  return countAssetsWithStatus(statusId);
 }
 
 function renderTracker() {
@@ -3691,9 +3684,9 @@ function renderTrackerEpisode(body, ep) {
 
   const allVehs = VEHICLES.filter(v => v.episodes.includes(ep));
   const exclusiveEnvs = ENVIRONMENTS.filter(e => e.episodes.includes(ep) && !isMultiEp(e));
-  const exclusivePlaysets = PLAYSETS.filter(p => p.episodes.includes(ep) && !isMultiEp(p));
+  const epPlaysets = PLAYSETS.filter(p => p.episodes.includes(ep));
 
-  const hasAssets = epWardrobes.length || allVehs.length || exclusiveEnvs.length || exclusivePlaysets.length;
+  const hasAssets = epWardrobes.length || allVehs.length || exclusiveEnvs.length || epPlaysets.length;
 
   if(hasAssets) {
     html += '<div class="trk-section-title">Assets — '+EP_LABELS[ep]+'</div>';
@@ -3745,18 +3738,18 @@ function renderTrackerEpisode(body, ep) {
       });
     }
 
-    if(exclusivePlaysets.length) {
+    if(epPlaysets.length) {
       html += trkSectionRow();
-      exclusivePlaysets.forEach(p => {
+      epPlaysets.forEach(p => {
         html += '<tr>';
         html += '<td class="trk-type">Playset</td>';
         html += '<td class="trk-asset">'+p.name+'</td>';
-        html += statusCell(ep, p.id, 'concept');
+        html += statusCell('general', p.id, 'concept');
         html += naCell();
         html += naCell();
         html += naCell();
-        html += notesCell(ep, p.id);
-        html += dueCell(ep, p.id);
+        html += notesCell('general', p.id);
+        html += dueCell('general', p.id);
         html += '</tr>';
       });
     }

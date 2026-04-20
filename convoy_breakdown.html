@@ -1225,7 +1225,9 @@
     <div class="topbar-right">
       <button class="topbar-export" onclick="openSchedule()">▤ Schedule</button>
       <button class="topbar-export" id="tracker-btn" onclick="toggleTracker()">▦ Tracker</button>
+      <button class="topbar-export" onclick="manualSyncFromBin()" title="Bajar últimas imágenes y datos del servidor">↻ Sync</button>
       <button class="topbar-export" onclick="exportZip()">↓ Export ZIP</button>
+      <button class="topbar-export" onclick="openPipeline()" title="Configuración de Cloudinary y JSONBin">⚙</button>
     </div>
   </div>
 
@@ -2321,7 +2323,7 @@ async function saveJSONBin() {
     const data = await existing.json();
     const record = data.record || data || {};
 
-    // Update only images and notes — preserve everything else
+    // Update ALL data — preserve everything on the bin
     const images = {};
     Object.entries(imageData).forEach(([k,v]) => {
       if(v.images?.length) images[k] = v.images.map(i => i.cloudinaryUrl).filter(Boolean);
@@ -2330,6 +2332,10 @@ async function saveJSONBin() {
     record.timestamp = new Date().toISOString();
     record.images = images;
     record.notes = notesData;
+    record.panelImages = panelImageData;
+    record.wardrobeImages = wardrobeImageData;
+    record.boardmaticUrls = boardmaticUrls;
+    record.trackerData = trackerData;
 
     await fetch('https://api.jsonbin.io/v3/b/' + pipeline.binId, {
       method:'PUT',
@@ -3218,6 +3224,20 @@ async function syncPanelImagesToJSONBin() {
   } catch(e) { console.warn('Panel JSONBin sync failed:', e); }
 }
 
+
+async function manualSyncFromBin() {
+  if(!pipeline.binId || !pipeline.binKey) {
+    showToast('⚠ Configurá el Pipeline primero (botón ⚙).');
+    return;
+  }
+  showToast('Sincronizando...');
+  try {
+    await loadJSONBin();
+    showToast('✓ Datos actualizados.');
+  } catch(e) {
+    showToast('✗ Error al sincronizar.');
+  }
+}
 
 async function loadJSONBin() {
   if(!pipeline.binId || !pipeline.binKey) return;

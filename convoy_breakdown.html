@@ -1951,13 +1951,17 @@ function countAssetsWithStatus(statusId) {
   return count;
 }
 
-// Abre el tracker con un chip de filtro ya activo (abre si está cerrado, refresca si está abierto)
+// Abre el tracker con un chip de filtro ya activo (en modo All para ver todo de una)
 function openTrackerWithFilter(statusId) {
   trackerStatusFilter = new Set([statusId]);
+  trackerEp = 'all';
   const overlay = document.getElementById('tracker-overlay');
   if(overlay.classList.contains('hidden')) {
     toggleTracker();
   } else {
+    // Tracker ya abierto: refrescar select y render
+    const sel = document.getElementById('tracker-ep-select');
+    if(sel) sel.value = 'all';
     renderTracker();
   }
 }
@@ -3468,7 +3472,8 @@ function saveTrackerName() {
 
 function initTrackerEpSelect() {
   const sel = document.getElementById('tracker-ep-select');
-  sel.innerHTML = '<option value="general">General</option>' +
+  sel.innerHTML = '<option value="all">All episodes</option>' +
+    '<option value="general">General</option>' +
     EPISODES.map(ep => {
       const s = EP_SYNOPSES[ep];
       return '<option value="'+ep+'">'+
@@ -3519,7 +3524,9 @@ function renderTracker() {
   const sel = document.getElementById('tracker-ep-select');
   trackerEp = sel.value;
 
-  if(trackerEp === 'general') {
+  if(trackerEp === 'all') {
+    renderTrackerAll(body);
+  } else if(trackerEp === 'general') {
     renderTrackerGeneral(body);
   } else {
     renderTrackerEpisode(body, trackerEp);
@@ -3666,6 +3673,29 @@ function renderTrackerGeneral(body) {
 
   html += '</tbody></table></div>';
   body.innerHTML = html;
+}
+
+function renderTrackerAll(body) {
+  // Renderiza General + los 4 episodios en una sola vista
+  const tmp = document.createElement('div');
+  let combinedHtml = '';
+
+  // General
+  tmp.innerHTML = '';
+  renderTrackerGeneral(tmp);
+  combinedHtml += tmp.innerHTML;
+
+  // Cada episodio
+  EPISODES.forEach(ep => {
+    tmp.innerHTML = '';
+    renderTrackerEpisode(tmp, ep);
+    // Si el ep no tiene data devuelve el empty state: lo saltamos
+    if(tmp.innerHTML.indexOf('tracker-empty') === -1) {
+      combinedHtml += tmp.innerHTML;
+    }
+  });
+
+  body.innerHTML = combinedHtml;
 }
 
 function renderTrackerEpisode(body, ep) {

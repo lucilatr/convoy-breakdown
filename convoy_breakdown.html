@@ -1946,40 +1946,45 @@ function updateStats() {
   document.getElementById('progress-label').textContent = pct+'% complete';
 }
 
-// Cuenta assets (character/vehicle/playset/environment/wardrobe) que tienen
-// al menos UNA celda del tracker en el estado dado.
+// Cuenta assets ÚNICOS (character/vehicle/playset/environment/wardrobe) que tienen
+// al menos UNA celda del tracker en el estado dado, en CUALQUIER scope (general o ep).
+// Cada asset se cuenta una sola vez aunque aparezca en múltiples episodios.
 // Respeta el filtro de episodio activo (currentChapter).
 function countAssetsWithStatus(statusId) {
   const stages = ['concept','views','expressions','actions'];
-  let count = 0;
   const chapter = currentChapter;
+  const uniqueIds = new Set();
 
   const cellHas = (scope, id) => stages.some(st => getTrkVal(scope, id, st, 'status') === statusId);
 
-  // General scope (assets multi-ep)
-  CHARACTERS.forEach(c => { if(isMultiEp(c) && cellHas('general', c.id)) count++; });
-  VEHICLES.forEach(v => { if(isMultiEp(v) && cellHas('general', v.id)) count++; });
-  PLAYSETS.forEach(p => { if(isMultiEp(p) && cellHas('general', p.id)) count++; });
-  ENVIRONMENTS.forEach(e => { if(isMultiEp(e) && cellHas('general', e.id)) count++; });
+  // Para cada asset, verifico si TIENE ese status en cualquier scope relevante.
+  // Si sí → agrego el ID al Set (se cuenta una sola vez).
 
-  // Per-episode scope
+  // Multi-ep assets (scope 'general')
+  CHARACTERS.forEach(c => { if(isMultiEp(c) && cellHas('general', c.id)) uniqueIds.add(c.id); });
+  VEHICLES.forEach(v => { if(isMultiEp(v) && cellHas('general', v.id)) uniqueIds.add(v.id); });
+  PLAYSETS.forEach(p => { if(isMultiEp(p) && cellHas('general', p.id)) uniqueIds.add(p.id); });
+  ENVIRONMENTS.forEach(e => { if(isMultiEp(e) && cellHas('general', e.id)) uniqueIds.add(e.id); });
+
+  // Single-ep assets + wardrobe variants
   const eps = chapter === 'all' ? EPISODES : [chapter];
   eps.forEach(ep => {
-    // Wardrobes (solo cambios que aplican al ep)
+    // Wardrobes — check in THIS ep's scope
     CHARACTERS.forEach(c => {
       if(!c.wardrobe) return;
       c.wardrobe.forEach(w => {
         if(w.name === 'Base') return;
-        if(w.episodes.includes(ep) && cellHas(ep, w.id)) count++;
+        if(w.episodes.includes(ep) && cellHas(ep, w.id)) uniqueIds.add(w.id);
       });
     });
-    // Vehicles/Playsets exclusivos del ep
-    VEHICLES.forEach(v => { if(!isMultiEp(v) && v.episodes.includes(ep) && cellHas('general', v.id)) count++; });
-    PLAYSETS.forEach(p => { if(!isMultiEp(p) && p.episodes.includes(ep) && cellHas('general', p.id)) count++; });
-    ENVIRONMENTS.forEach(e => { if(!isMultiEp(e) && e.episodes.includes(ep) && cellHas(ep, e.id)) count++; });
+    // Single-ep vehicles/playsets (scope 'general' como sus multi-ep counterparts)
+    VEHICLES.forEach(v => { if(!isMultiEp(v) && v.episodes.includes(ep) && cellHas('general', v.id)) uniqueIds.add(v.id); });
+    PLAYSETS.forEach(p => { if(!isMultiEp(p) && p.episodes.includes(ep) && cellHas('general', p.id)) uniqueIds.add(p.id); });
+    // Single-ep envs (scope is ep)
+    ENVIRONMENTS.forEach(e => { if(!isMultiEp(e) && e.episodes.includes(ep) && cellHas(ep, e.id)) uniqueIds.add(e.id); });
   });
 
-  return count;
+  return uniqueIds.size;
 }
 
 // Abre el tracker con un chip de filtro ya activo (en modo All para ver todo de una)
@@ -3864,26 +3869,131 @@ function renderTrackerGeneral(body) {
 }
 
 function renderTrackerAll(body) {
-  // Renderiza General + los 4 episodios en una sola vista
-  const tmp = document.createElement('div');
-  let combinedHtml = '';
+  // Vista consolidada: una fila única por asset, sin repeticiones por episodio.
+  // Para multi-ep assets usa scope 'general' (donde se guarda su estado).
+  // Para wardrobe / single-ep envs usa el scope del ep donde aparecen.
+  let html = '';
 
-  // General
-  tmp.innerHTML = '';
-  renderTrackerGeneral(tmp);
-  combinedHtml += tmp.innerHTML;
+  // Junto todo en arrays con su scope
+  const charsList = CHARACTERS.map(c => ({ asset: c, scope: 'general' }));
+  const vehsList = VEHICLES.map(v => ({ asset: v, scope: 'general' }));
+  const playsetsList = PLAYSETS.map(p => ({ asset: p, scope: 'general' }));
+  const envsList = ENVIRONMENTS.map(e => ({
+    asset: e,
+    scope: isMultiEp(e) ? 'general' : (e.episodes[0] || 'general')
+  }));
 
-  // Cada episodio
-  EPISODES.forEach(ep => {
-    tmp.innerHTML = '';
-    renderTrackerEpisode(tmp, ep);
-    // Si el ep no tiene data devuelve el empty state: lo saltamos
-    if(tmp.innerHTML.indexOf('tracker-empty') === -1) {
-      combinedHtml += tmp.innerHTML;
-    }
+  // Wardrobes: solo uno por variante (no duplicar por ep)
+  const wardrobeList = [];
+  CHARACTERS.forEach(c => {
+    if(!c.wardrobe) return;
+    c.wardrobe.forEach(w => {
+      if(w.name === 'Base') return;
+      wardrobeList.push({
+        asset: { id: w.id, name: c.name + ' — ' + w.name },
+        scope: w.episodes[0] || 'general',
+        isWardrobe: true
+      });
+    });
   });
 
-  body.innerHTML = combinedHtml;
+  // ── CHARACTERS ──────────────────────────────────────────────────
+  if(charsList.length) {
+    html += '<div class="trk-section-title">Characters</div>';
+    html += trkTableHead();
+    charsList.forEach(({asset, scope}) => {
+      html += '<tr>';
+      html += '<td class="trk-type">Character</td>';
+      html += '<td class="trk-asset">' + asset.name + '</td>';
+      html += statusCell(scope, asset.id, 'concept');
+      html += statusCell(scope, asset.id, 'views');
+      html += statusCell(scope, asset.id, 'expressions');
+      html += naCell();
+      html += notesCell(scope, asset.id);
+      html += dueCell(scope, asset.id);
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+  }
+
+  // ── WARDROBE CHANGES ────────────────────────────────────────────
+  if(wardrobeList.length) {
+    html += '<div class="trk-section-title">Wardrobe changes</div>';
+    html += trkTableHead();
+    wardrobeList.forEach(({asset, scope}) => {
+      html += '<tr>';
+      html += '<td class="trk-type">Wardrobe</td>';
+      html += '<td class="trk-asset">' + asset.name + '</td>';
+      html += statusCell(scope, asset.id, 'concept');
+      html += naCell();
+      html += naCell();
+      html += naCell();
+      html += notesCell(scope, asset.id);
+      html += dueCell(scope, asset.id);
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+  }
+
+  // ── VEHICLES ────────────────────────────────────────────────────
+  if(vehsList.length) {
+    html += '<div class="trk-section-title">Vehicles</div>';
+    html += trkTableHead();
+    vehsList.forEach(({asset, scope}) => {
+      const hasActions = VEHICLES_WITH_ACTIONS.includes(asset.id);
+      html += '<tr>';
+      html += '<td class="trk-type">Vehicle</td>';
+      html += '<td class="trk-asset">' + asset.name + '</td>';
+      html += statusCell(scope, asset.id, 'concept');
+      html += statusCell(scope, asset.id, 'views');
+      html += naCell();
+      html += hasActions ? statusCell(scope, asset.id, 'actions') : naCell();
+      html += notesCell(scope, asset.id);
+      html += dueCell(scope, asset.id);
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+  }
+
+  // ── PLAYSETS ────────────────────────────────────────────────────
+  if(playsetsList.length) {
+    html += '<div class="trk-section-title">Playsets</div>';
+    html += trkTableHead();
+    playsetsList.forEach(({asset, scope}) => {
+      html += '<tr>';
+      html += '<td class="trk-type">Playset</td>';
+      html += '<td class="trk-asset">' + asset.name + '</td>';
+      html += statusCell(scope, asset.id, 'concept');
+      html += naCell();
+      html += naCell();
+      html += naCell();
+      html += notesCell(scope, asset.id);
+      html += dueCell(scope, asset.id);
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+  }
+
+  // ── ENVIRONMENTS ────────────────────────────────────────────────
+  if(envsList.length) {
+    html += '<div class="trk-section-title">Environments</div>';
+    html += trkTableHead();
+    envsList.forEach(({asset, scope}) => {
+      html += '<tr>';
+      html += '<td class="trk-type">Environment</td>';
+      html += '<td class="trk-asset">' + asset.name + '</td>';
+      html += statusCell(scope, asset.id, 'concept');
+      html += naCell();
+      html += naCell();
+      html += naCell();
+      html += notesCell(scope, asset.id);
+      html += dueCell(scope, asset.id);
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+  }
+
+  body.innerHTML = html;
 }
 
 function renderTrackerEpisode(body, ep) {

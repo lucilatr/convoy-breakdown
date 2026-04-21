@@ -1493,6 +1493,14 @@
       </div>
 
       <button class="modal-save" onclick="savePipeline()">Guardar Configuración</button>
+
+      <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08);">
+        <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;">Recovery</div>
+        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.5;">
+          Si perdiste imágenes del mapping pero siguen en Cloudinary, este botón las busca y reconstruye el mapping.
+        </div>
+        <button class="modal-save" style="background: transparent; border: 1px solid var(--pink); color: var(--pink);" onclick="recoverFromCloudinary()">🔄 Recover from Cloudinary</button>
+      </div>
     </div>
   </div>
 </div>
@@ -2323,19 +2331,24 @@ async function saveJSONBin() {
     const data = await existing.json();
     const record = data.record || data || {};
 
-    // Update ALL data — preserve everything on the bin
+    // Build local images object
     const images = {};
     Object.entries(imageData).forEach(([k,v]) => {
       if(v.images?.length) images[k] = v.images.map(i => i.cloudinaryUrl).filter(Boolean);
     });
+
     record.project = 'CONVOY';
     record.timestamp = new Date().toISOString();
-    record.images = images;
-    record.notes = notesData;
-    record.panelImages = panelImageData;
-    record.wardrobeImages = wardrobeImageData;
-    record.boardmaticUrls = boardmaticUrls;
-    record.trackerData = trackerData;
+
+    // SAFE MERGE: only overwrite if local data is non-empty.
+    // This prevents wiping out remote data with an empty local state.
+    const hasLocalData = (obj) => obj && Object.keys(obj).length > 0;
+    if(hasLocalData(images)) record.images = images;
+    if(hasLocalData(notesData)) record.notes = notesData;
+    if(hasLocalData(panelImageData)) record.panelImages = panelImageData;
+    if(hasLocalData(wardrobeImageData)) record.wardrobeImages = wardrobeImageData;
+    if(hasLocalData(boardmaticUrls)) record.boardmaticUrls = boardmaticUrls;
+    if(hasLocalData(trackerData)) record.trackerData = trackerData;
 
     await fetch('https://api.jsonbin.io/v3/b/' + pipeline.binId, {
       method:'PUT',
@@ -2354,6 +2367,140 @@ function loadPipelineConfig() {
     if(p) pipeline = JSON.parse(p);
   } catch(e){}
 }
+// ====================================================================
+// RECOVERY: Reconstruye los mappings de imágenes buscando en Cloudinary
+// Usa los public_id conocidos (cada panel/card/wardrobe tiene un id único)
+// y verifica si existen en Cloudinary. Si existen, rearma el mapping.
+// ====================================================================
+async function recoverFromCloudinary() {
+  if(!pipeline.cloudName) {
+    showToast('⚠ Configurá Cloudinary primero (⚙).');
+    return;
+  }
+  if(!confirm('Esto va a intentar recuperar imágenes huérfanas de Cloudinary. Puede tardar 1-2 minutos. ¿Continuar?')) return;
+
+  const baseUrl = `https://res.cloudinary.com/${pipeline.cloudName}/image/upload/convoy_breakdown/`;
+
+  // Junto todos los IDs posibles
+  const cardIds = [
+    ...CHARACTERS.map(c => c.id),
+    ...VEHICLES.map(v => v.id),
+    ...PLAYSETS.map(p => p.id),
+    ...ENVIRONMENTS.map(e => e.id)
+  ];
+  const wardrobeIds = [];
+  CHARACTERS.forEach(c => {
+    if(c.wardrobe) c.wardrobe.forEach(w => wardrobeIds.push(w.id));
+  });
+  const panelIds = [];
+  Object.keys(PANELS_BY_EP || {}).forEach(ep => {
+    (PANELS_BY_EP[ep] || []).forEach(p => panelIds.push(p.id));
+  });
+
+  const totalIds = cardIds.length + wardrobeIds.length + panelIds.length;
+  console.log('🔍 Recovery iniciado. Verificando', totalIds, 'IDs en Cloudinary...');
+  showToast('🔍 Recuperando... (ver consola)');
+
+  const foundCards = {};
+  const foundWardrobe = {};
+  const foundPanels = {};
+
+  // Función que verifica si existe una URL con HEAD
+  async function probe(url) {
+    try {
+      const r = await fetch(url, { method: 'HEAD', mode: 'cors' });
+      return r.ok;
+    } catch { return false; }
+  }
+
+  let checked = 0;
+  const BATCH = 8; // concurrencia
+
+  async function runBatch(ids, collectInto, slotLabel) {
+    for(let i = 0; i < ids.length; i += BATCH) {
+      const chunk = ids.slice(i, i + BATCH);
+      await Promise.all(chunk.map(async id => {
+        const url = baseUrl + id;
+        const exists = await probe(url);
+        if(exists) {
+          if(slotLabel === 'cards') {
+            collectInto[id] = [url]; // imageData format: array of URLs
+          } else {
+            collectInto[id] = url;
+          }
+        }
+        checked++;
+        if(checked % 20 === 0) console.log(`  ...probado ${checked}/${totalIds}`);
+      }));
+    }
+  }
+
+  console.log('→ Verificando', cardIds.length, 'cards...');
+  await runBatch(cardIds, foundCards, 'cards');
+  console.log('→ Verificando', wardrobeIds.length, 'wardrobe variants...');
+  await runBatch(wardrobeIds, foundWardrobe, 'wardrobe');
+  console.log('→ Verificando', panelIds.length, 'paneles...');
+  await runBatch(panelIds, foundPanels, 'panels');
+
+  const cardCount = Object.keys(foundCards).length;
+  const wardrobeCount = Object.keys(foundWardrobe).length;
+  const panelCount = Object.keys(foundPanels).length;
+  const total = cardCount + wardrobeCount + panelCount;
+
+  console.log('✅ RECOVERY COMPLETO:');
+  console.log('  Cards recuperadas:', cardCount);
+  console.log('  Wardrobe recuperadas:', wardrobeCount);
+  console.log('  Panels recuperados:', panelCount);
+  console.log('  TOTAL:', total);
+
+  if(total === 0) {
+    showToast('❌ No se encontró nada en Cloudinary.');
+    return;
+  }
+
+  const proceed = confirm(
+    `Recovery encontró:\n` +
+    `  • ${cardCount} cards (personajes/vehículos/playsets/envs)\n` +
+    `  • ${wardrobeCount} wardrobe changes\n` +
+    `  • ${panelCount} paneles\n\n` +
+    `¿Aplicar y subir al bin? Se van a fusionar con lo que ya tenés (no reemplaza, agrega).`
+  );
+  if(!proceed) { showToast('Recovery cancelado.'); return; }
+
+  // APLICAR — mergear con lo existente en memoria
+  Object.entries(foundCards).forEach(([id, urls]) => {
+    if(!imageData[id]) imageData[id] = { images: [] };
+    // solo agregar URLs que no existan ya
+    const existing = new Set((imageData[id].images || []).map(i => i.cloudinaryUrl).filter(Boolean));
+    urls.forEach(u => {
+      if(!existing.has(u)) {
+        imageData[id].images = imageData[id].images || [];
+        imageData[id].images.push({ cloudinaryUrl: u });
+      }
+    });
+  });
+  Object.entries(foundWardrobe).forEach(([id, url]) => {
+    if(!wardrobeImageData[id]) wardrobeImageData[id] = url;
+  });
+  Object.entries(foundPanels).forEach(([id, url]) => {
+    if(!panelImageData[id]) panelImageData[id] = url;
+  });
+
+  // Guardar local
+  saveLocal();
+  savePanelImages();
+  try { localStorage.setItem('convoy_wardrobe_images', JSON.stringify(wardrobeImageData)); } catch(e){}
+
+  // Subir al bin
+  await saveJSONBin();
+
+  // Refrescar UI
+  renderActive();
+
+  showToast(`✅ Recuperadas ${total} imágenes. Subido al bin.`);
+  console.log('✅ Todo aplicado y subido al bin.');
+}
+
 function openPipeline() {
   document.getElementById('cf-cloud').value = pipeline.cloudName||'';
   document.getElementById('cf-preset').value = pipeline.preset||'';

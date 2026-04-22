@@ -3437,7 +3437,16 @@ async function loadJSONBin() {
       savePanelImages();
     }
     if(record.wardrobeImages !== undefined) {
-      wardrobeImageData = record.wardrobeImages || {};
+      const remote = record.wardrobeImages || {};
+      // Preserve any variation that was updated locally in the last 30s —
+      // remote might be stale because Cloudinary/JSONBin haven't caught up yet.
+      const merged = { ...remote };
+      Object.keys(wardrobeImageData).forEach(id => {
+        if(isWardrobeRecentlyUpdated(id)) {
+          merged[id] = wardrobeImageData[id];
+        }
+      });
+      wardrobeImageData = merged;
       saveWardrobeImages();
     }
     if(record.boardmaticUrls !== undefined) {
@@ -4587,6 +4596,24 @@ document.getElementById('pipeline-modal').addEventListener('click', function(e) 
 // WARDROBE
 // ════════════════════════════════════════
 let wardrobeImageData = {};
+// Track wardrobe variation IDs updated locally in the last 30s.
+// loadJSONBin and syncWardrobeToJSONBin will NOT overwrite these with remote data,
+// protecting against race conditions where a fresh upload gets clobbered by a stale GET.
+const recentlyUpdatedWardrobe = new Map(); // id -> timestamp
+const WARDROBE_PROTECT_MS = 30000;
+function markWardrobeRecentlyUpdated(id) {
+  recentlyUpdatedWardrobe.set(id, Date.now());
+  setTimeout(() => {
+    const t = recentlyUpdatedWardrobe.get(id);
+    if(t && Date.now() - t >= WARDROBE_PROTECT_MS) recentlyUpdatedWardrobe.delete(id);
+  }, WARDROBE_PROTECT_MS + 100);
+}
+function isWardrobeRecentlyUpdated(id) {
+  const t = recentlyUpdatedWardrobe.get(id);
+  if(!t) return false;
+  if(Date.now() - t >= WARDROBE_PROTECT_MS) { recentlyUpdatedWardrobe.delete(id); return false; }
+  return true;
+}
 
 function loadWardrobeImages() {
   try {
@@ -4656,6 +4683,10 @@ async function uploadWardrobeImage(variationId, charId, input) {
   if(!file) return;
   if(!file.type.startsWith('image/')) { showToast('Solo imágenes permitidas.'); return; }
 
+  // Marcar como recientemente actualizado ANTES de tocar el dato — así, si algún
+  // loadJSONBin o sync concurrente corre mientras subimos, no nos pisa.
+  markWardrobeRecentlyUpdated(variationId);
+
   // 1) Preview local INMEDIATO — esto arregla el bug de que "no mostraba nada".
   // Usamos el data-URL como fallback visible, y después intentamos subir a Cloudinary.
   const localUrl = await new Promise((resolve, reject) => {
@@ -4683,11 +4714,17 @@ async function uploadWardrobeImage(variationId, charId, input) {
     fd.append('file', file);
     fd.append('upload_preset', pipeline.preset);
     fd.append('folder', 'convoy_breakdown/wardrobe');
-    fd.append('public_id', variationId);
+    // Public_id ÚNICO por upload — si reutilizamos el mismo variationId como public_id,
+    // Cloudinary con preset unsigned (sin overwrite) devuelve la URL de la imagen existente,
+    // o el CDN sirve la versión vieja cacheada. Generar un ID único fuerza un asset nuevo.
+    fd.append('public_id', 'wardrobe_' + variationId + '_' + Date.now());
     const res = await fetch(`https://api.cloudinary.com/v1_1/${pipeline.cloudName}/image/upload`, { method:'POST', body:fd });
     if(!res.ok) throw new Error('HTTP '+res.status);
     const data = await res.json();
+    console.log('[wardrobe upload] Cloudinary response for', variationId, ':', data.secure_url);
     if(data.secure_url) {
+      // Re-mark para mantener la protección viva mientras actualizamos la URL final.
+      markWardrobeRecentlyUpdated(variationId);
       wardrobeImageData[variationId] = data.secure_url;
       saveWardrobeImages();
       renderCharacters();
@@ -4703,6 +4740,8 @@ async function uploadWardrobeImage(variationId, charId, input) {
 function deleteWardrobeImage(variationId) {
   if(!wardrobeImageData[variationId]) return;
   if(!confirm('¿Borrar esta imagen de vestuario?')) return;
+  // Marcar como recientemente modificado para que ningún sync reviva el valor viejo.
+  markWardrobeRecentlyUpdated(variationId);
   delete wardrobeImageData[variationId];
   saveWardrobeImages();
   renderCharacters();
@@ -4717,7 +4756,19 @@ async function syncWardrobeToJSONBin() {
       headers:{'X-Master-Key':pipeline.binKey,'X-Bin-Meta':'false'}
     });
     const existing = await res.json(); const record = existing.record || existing;
-    record.wardrobeImages = wardrobeImageData;
+    // Merge: start from remote, but ensure our local wardrobeImageData wins for
+    // every ID we have locally. This prevents concurrent uploads from clobbering
+    // each other via stale GET + PUT.
+    const remoteWardrobe = record.wardrobeImages || {};
+    const merged = { ...remoteWardrobe, ...wardrobeImageData };
+    // Also honor local deletions: if a key is absent locally but we updated it recently, remove it from remote.
+    Object.keys(remoteWardrobe).forEach(id => {
+      if(!(id in wardrobeImageData) && isWardrobeRecentlyUpdated(id)) delete merged[id];
+    });
+    record.wardrobeImages = merged;
+    // Keep our local state in sync with what we are about to persist.
+    wardrobeImageData = merged;
+    saveWardrobeImages();
     await fetch('https://api.jsonbin.io/v3/b/'+pipeline.binId, {
       method:'PUT',
       headers:{'Content-Type':'application/json','X-Master-Key':pipeline.binKey},

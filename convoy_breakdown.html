@@ -881,6 +881,15 @@
     transition: color .15s;
   }
   .wv-thumb:hover .wv-thumb-add { color: var(--pink); }
+  .wv-thumb-del {
+    position: absolute; top: 2px; right: 2px; z-index: 2;
+    background: rgba(0,0,0,.7); color: var(--pink);
+    border: none; font-size: 11px; width: 16px; height: 16px;
+    cursor: pointer; display: none; align-items: center; justify-content: center;
+    line-height: 1; padding: 0;
+  }
+  .wv-thumb:hover .wv-thumb-del { display: flex; }
+  .wv-thumb-del:hover { background: rgba(0,0,0,.9); color: #fff; }
   .wv-file { display: none; }
   .wv-info { flex: 1; min-width: 0; }
   .wv-name {
@@ -4611,9 +4620,9 @@ function buildWardrobeSection(item) {
     const epBadges = v.episodes.map(ep => `<span class="wv-ep">${EP_LABELS[ep]}</span>`).join('');
     return `
     <div class="wv-row">
-      <div class="wv-thumb" onclick="document.getElementById('wv-file-${v.id}').click()">
+      <div class="wv-thumb" onclick="document.getElementById('wv-file-${v.id}').click()" title="${img ? 'Click para reemplazar' : 'Click para agregar imagen'}">
         ${img
-          ? `<img src="${img}" alt="${v.name}">`
+          ? `<img src="${img}" alt="${v.name}"><button class="wv-thumb-del" onclick="event.stopPropagation(); deleteWardrobeImage('${v.id}')" title="Borrar imagen">×</button>`
           : `<span class="wv-thumb-add">+</span>`
         }
       </div>
@@ -4641,20 +4650,34 @@ function buildWardrobeSection(item) {
 }
 
 async function uploadWardrobeImage(variationId, charId, input) {
-  const file = input.files[0]; if(!file) return;
+  const file = input.files[0];
+  // Reset inmediato para que el mismo archivo pueda re-seleccionarse después
+  input.value = '';
+  if(!file) return;
+  if(!file.type.startsWith('image/')) { showToast('Solo imágenes permitidas.'); return; }
 
-  if(!pipeline.cloudName || !pipeline.preset) {
+  // 1) Preview local INMEDIATO — esto arregla el bug de que "no mostraba nada".
+  // Usamos el data-URL como fallback visible, y después intentamos subir a Cloudinary.
+  const localUrl = await new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = e => {
-      wardrobeImageData[variationId] = e.target.result;
-      saveWardrobeImages();
-      renderCharacters();
-      showToast('Wardrobe image saved locally.');
-    };
+    reader.onload = e => resolve(e.target.result);
+    reader.onerror = () => reject(new Error('read failed'));
     reader.readAsDataURL(file);
+  }).catch(() => null);
+
+  if(localUrl) {
+    wardrobeImageData[variationId] = localUrl;
+    saveWardrobeImages();
+    renderCharacters();
+  }
+
+  // 2) Si no hay Cloudinary configurado, queda como local-only.
+  if(!pipeline.cloudName || !pipeline.preset) {
+    showToast('Wardrobe image saved locally.');
     return;
   }
 
+  // 3) Subida a Cloudinary en background. Si falla, conservamos la local.
   try {
     const fd = new FormData();
     fd.append('file', file);
@@ -4662,6 +4685,7 @@ async function uploadWardrobeImage(variationId, charId, input) {
     fd.append('folder', 'convoy_breakdown/wardrobe');
     fd.append('public_id', variationId);
     const res = await fetch(`https://api.cloudinary.com/v1_1/${pipeline.cloudName}/image/upload`, { method:'POST', body:fd });
+    if(!res.ok) throw new Error('HTTP '+res.status);
     const data = await res.json();
     if(data.secure_url) {
       wardrobeImageData[variationId] = data.secure_url;
@@ -4670,7 +4694,20 @@ async function uploadWardrobeImage(variationId, charId, input) {
       syncWardrobeToJSONBin();
       showToast('Wardrobe uploaded to Cloudinary.');
     } else { throw new Error('No URL'); }
-  } catch(e) { showToast('Upload failed.'); }
+  } catch(e) {
+    console.warn('Cloudinary upload failed, keeping local copy:', e);
+    showToast('Upload to Cloudinary failed — saved locally.');
+  }
+}
+
+function deleteWardrobeImage(variationId) {
+  if(!wardrobeImageData[variationId]) return;
+  if(!confirm('¿Borrar esta imagen de vestuario?')) return;
+  delete wardrobeImageData[variationId];
+  saveWardrobeImages();
+  renderCharacters();
+  syncWardrobeToJSONBin();
+  showToast('Imagen de vestuario borrada.');
 }
 
 async function syncWardrobeToJSONBin() {

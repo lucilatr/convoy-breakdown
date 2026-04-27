@@ -1756,6 +1756,10 @@
   <div class="tracker-ep-bar">
     <span class="tracker-ep-label">Episode</span>
     <select id="tracker-ep-select" onchange="switchTrackerEp(this.value)"></select>
+    <span class="tracker-ep-label" style="margin-left:16px;">Person</span>
+    <select id="tracker-person-select" onchange="switchTrackerPerson(this.value)">
+      <option value="">All</option>
+    </select>
     <div class="tracker-legend" id="tracker-legend"></div>
   </div>
   <div class="tracker-body" id="tracker-body">
@@ -4505,7 +4509,9 @@ function initTrackerEpSelect() {
 
 let trackerEp = 'general';
 let trackerStatusFilter = new Set();
+let trackerPersonFilter = '';
 function switchTrackerEp(ep) { trackerEp = ep; renderTracker(); }
+function switchTrackerPerson(userId) { trackerPersonFilter = userId; renderTracker(); }
 
 function toggleTrkStatusFilter(statusId) {
   if(trackerStatusFilter.has(statusId)) trackerStatusFilter.delete(statusId);
@@ -4546,6 +4552,17 @@ function renderTracker() {
   const sel = document.getElementById('tracker-ep-select');
   trackerEp = sel.value;
 
+  // Repopulate person select preserving current selection
+  const personSel = document.getElementById('tracker-person-select');
+  if(personSel) {
+    const prev = trackerPersonFilter;
+    personSel.innerHTML = '<option value="">All</option>'
+      + users.map(u => '<option value="' + u.id + '">'
+          + (u.name || u.username) + '</option>').join('');
+    personSel.value = prev;
+    trackerPersonFilter = personSel.value; // empty string if prev not found
+  }
+
   if(trackerEp === 'all') {
     renderTrackerAll(body);
   } else if(trackerEp === 'general') {
@@ -4554,28 +4571,43 @@ function renderTracker() {
     renderTrackerEpisode(body, trackerEp);
   }
 
-  // Post-proceso: ocultar filas sin celdas que matcheen el filtro
+  // Post-proceso: ocultar filas sin celdas que matcheen los filtros activos
   applyTrackerRowFilter();
+}
+
+function rowMatchesPerson(tr, userId) {
+  // Parse onclick attrs of clickable cells to find scope|assetId|stage, then check assignedTo
+  let found = false;
+  tr.querySelectorAll('.cell-click').forEach(cell => {
+    if(found) return;
+    const onclick = cell.getAttribute('onclick') || '';
+    const m = onclick.match(/openTaskPopup\('([^']+)','([^']+)','([^']+)'\)/);
+    if(m) {
+      const key = trkKey(m[1], m[2], m[3]);
+      if(trackerData[key]?.assignedTo === userId) found = true;
+    }
+  });
+  return found;
 }
 
 function applyTrackerRowFilter() {
   const body = document.getElementById('tracker-body');
   if(!body) return;
-  const hasFilter = trackerStatusFilter.size > 0;
-  // Todas las filas de data (no section rows, no headers)
+  const hasStatusFilter = trackerStatusFilter.size > 0;
+  const hasPersonFilter = !!trackerPersonFilter;
+
   body.querySelectorAll('tr').forEach(tr => {
-    // saltear header rows y separator rows
     if(tr.querySelector('th') || tr.classList.contains('trk-sep')) return;
-    if(!hasFilter) {
-      tr.style.display = '';
-      return;
-    }
-    const hasMatch = tr.querySelector('.trk-cell-match');
-    tr.style.display = hasMatch ? '' : 'none';
+
+    let visible = true;
+    if(hasStatusFilter && !tr.querySelector('.trk-cell-match')) visible = false;
+    if(hasPersonFilter && !rowMatchesPerson(tr, trackerPersonFilter)) visible = false;
+
+    tr.style.display = visible ? '' : 'none';
   });
   // Ocultar section titles y tablas vacías si todas sus filas están ocultas
   body.querySelectorAll('.trk-section-title').forEach(title => {
-    if(!hasFilter) { title.style.display = ''; return; }
+    if(!hasStatusFilter && !hasPersonFilter) { title.style.display = ''; return; }
     // La siguiente tabla: ver si tiene filas visibles
     let next = title.nextElementSibling;
     let hasVisibleRow = false;

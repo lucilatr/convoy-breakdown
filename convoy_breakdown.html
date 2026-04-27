@@ -1809,44 +1809,46 @@
       <button class="modal-close" onclick="closePipeline()">×</button>
     </div>
     <div class="modal-body">
-      <div style="font-size:13px;color:var(--text-muted);font-family:var(--fontb);">
-        Configure storage integrations. Changes are saved in localStorage.
-      </div>
-
-      <div class="modal-field">
-        <label>Cloudinary Cloud Name</label>
-        <input type="text" id="cf-cloud" placeholder="my-cloud-name">
-      </div>
-      <div class="modal-field">
-        <label>Cloudinary Upload Preset (unsigned)</label>
-        <input type="text" id="cf-preset" placeholder="breakdown_preset">
-      </div>
-      <div class="modal-field">
-        <label>JSONBin Bin ID</label>
-        <input type="text" id="jb-bin" placeholder="64abc123def456...">
-      </div>
-      <div class="modal-field">
-        <label>JSONBin API Key</label>
-        <input type="text" id="jb-key" placeholder="$2a$10$...">
-      </div>
-
-      <div class="pipeline-status">
-        <div class="pipe-dot" id="pipe-dot-cf"></div>
-        <div class="pipe-text" id="pipe-text-cf">Cloudinary: no configurado</div>
-      </div>
-      <div class="pipeline-status">
-        <div class="pipe-dot" id="pipe-dot-jb"></div>
-        <div class="pipe-text" id="pipe-text-jb">JSONBin: no configurado</div>
-      </div>
-
-      <button class="modal-save" onclick="savePipeline()">Guardar Configuración</button>
-
-      <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08);">
-        <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;">Recovery</div>
-        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.5;">
-          Si perdiste imágenes del mapping pero siguen en Cloudinary, este botón las busca y reconstruye el mapping.
+      <div id="pipeline-admin-section">
+        <div style="font-size:13px;color:var(--text-muted);font-family:var(--fontb);">
+          Configure storage integrations. Changes are saved in localStorage.
         </div>
-        <button class="modal-save" style="background: transparent; border: 1px solid var(--pink); color: var(--pink);" onclick="recoverFromCloudinary()">🔄 Recover from Cloudinary</button>
+
+        <div class="modal-field">
+          <label>Cloudinary Cloud Name</label>
+          <input type="text" id="cf-cloud" placeholder="my-cloud-name">
+        </div>
+        <div class="modal-field">
+          <label>Cloudinary Upload Preset (unsigned)</label>
+          <input type="text" id="cf-preset" placeholder="breakdown_preset">
+        </div>
+        <div class="modal-field">
+          <label>JSONBin Bin ID</label>
+          <input type="text" id="jb-bin" placeholder="64abc123def456...">
+        </div>
+        <div class="modal-field">
+          <label>JSONBin API Key</label>
+          <input type="text" id="jb-key" placeholder="$2a$10$...">
+        </div>
+
+        <div class="pipeline-status">
+          <div class="pipe-dot" id="pipe-dot-cf"></div>
+          <div class="pipe-text" id="pipe-text-cf">Cloudinary: no configurado</div>
+        </div>
+        <div class="pipeline-status">
+          <div class="pipe-dot" id="pipe-dot-jb"></div>
+          <div class="pipe-text" id="pipe-text-jb">JSONBin: no configurado</div>
+        </div>
+
+        <button class="modal-save" onclick="savePipeline()">Guardar Configuración</button>
+
+        <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08);">
+          <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;">Recovery</div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.5;">
+            Si perdiste imágenes del mapping pero siguen en Cloudinary, este botón las busca y reconstruye el mapping.
+          </div>
+          <button class="modal-save" style="background: transparent; border: 1px solid var(--pink); color: var(--pink);" onclick="recoverFromCloudinary()">🔄 Recover from Cloudinary</button>
+        </div>
       </div>
 
       <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08);" id="my-account-section">
@@ -3205,14 +3207,25 @@ async function recoverFromCloudinary() {
 }
 
 function openPipeline() {
-  document.getElementById('cf-cloud').value = pipeline.cloudName||'';
-  document.getElementById('cf-preset').value = pipeline.preset||'';
-  document.getElementById('jb-bin').value = pipeline.binId||'';
-  document.getElementById('jb-key').value = pipeline.binKey||'';
-  updatePipeStatus();
-  // Show My Account section only when logged in
-  const section = document.getElementById('my-account-section');
-  if(section) section.style.display = currentUser ? '' : 'none';
+  // Pipeline config: admin only
+  const adminSection = document.getElementById('pipeline-admin-section');
+  if(adminSection) adminSection.style.display = isAdmin() ? '' : 'none';
+
+  // My Account: all logged-in users
+  const accountSection = document.getElementById('my-account-section');
+  if(accountSection) accountSection.style.display = currentUser ? '' : 'none';
+
+  // Title changes based on role
+  const titleEl = document.querySelector('#pipeline-modal .modal-title');
+  if(titleEl) titleEl.textContent = isAdmin() ? 'Settings' : 'My Account';
+
+  if(isAdmin()) {
+    document.getElementById('cf-cloud').value = pipeline.cloudName||'';
+    document.getElementById('cf-preset').value = pipeline.preset||'';
+    document.getElementById('jb-bin').value = pipeline.binId||'';
+    document.getElementById('jb-key').value = pipeline.binKey||'';
+    updatePipeStatus();
+  }
   document.getElementById('pipeline-modal').classList.add('open');
 }
 function closePipeline() {

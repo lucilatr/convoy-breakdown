@@ -1306,6 +1306,10 @@
     display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
   }
   .task-card:hover { border-color: rgba(255,255,255,0.15); }
+  .task-card.task-waiting { opacity: 0.35; filter: grayscale(70%); pointer-events: none; }
+  .task-card.task-reviewed { border-color: rgba(224,144,32,0.4); }
+  .task-card.task-reviewed:hover { border-color: rgba(224,144,32,0.65); }
+  .task-waiting-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.4); font-family: var(--fontb); }
   .task-card-left { flex: 1; min-width: 0; }
   .task-card-meta {
     font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
@@ -2365,18 +2369,24 @@ function renderMyTasks() {
     const dateText = t.dueDate ? relativeDate(t.dueDate) : '';
     const dateCls = !due ? '' : (diffDays < 0 ? ' overdue' : (diffDays === 0 ? ' today' : ''));
     const prioEmoji = PRIO_EMOJI[t.priority] || '';
+    const WAITING_STATUSES = ['review', 'app-play', 'app-mattel'];
+    const isWaiting = WAITING_STATUSES.includes(t.status);
+    const isReviewed = t.status === 'reviewed';
+    const cardCls = isWaiting ? ' task-waiting' : (isReviewed ? ' task-reviewed' : '');
     const statusOpts = '<option value="none"' + (t.status === 'none' ? ' selected' : '') + '>— Select —</option>'
       + TRK_STATUSES.map(s => '<option value="' + s.id + '"' + (t.status === s.id ? ' selected' : '') + '>' + s.label + '</option>').join('');
+    const waitingLabel = TRK_STATUSES.find(s => s.id === t.status)?.label || '';
+    const footer = isWaiting
+      ? '<span class="task-waiting-label">⏳ ' + waitingLabel + '</span>'
+      : '<select class="tc-status-sel" onchange="setTrkVal(\'' + t.scope + '\',\'' + t.assetId + '\',\'' + t.stage + '\',\'status\',this.value); renderMyTasks();">' + statusOpts + '</select>'
+        + '<input class="tc-notes-input" placeholder="Notes…" value="' + escHtml(t.notes) + '" onblur="setTrkVal(\'' + t.scope + '\',\'' + t.assetId + '\',\'' + t.stage + '\',\'notes\',this.value)">';
 
-    return '<div class="task-card">'
+    return '<div class="task-card' + cardCls + '">'
       + '<div class="task-card-left">'
       + '<div class="task-card-meta">' + (prioEmoji ? prioEmoji + ' ' : '') + t.assetType + ' · ' + t.stage + '</div>'
       + '<div class="task-card-name">' + escHtml(t.assetName) + '</div>'
       + '<div class="task-card-sub">' + (t.epLabel || 'General') + '</div>'
-      + '<div class="task-card-footer">'
-      + '<select class="tc-status-sel" onchange="setTrkVal(\'' + t.scope + '\',\'' + t.assetId + '\',\'' + t.stage + '\',\'status\',this.value); renderMyTasks();">' + statusOpts + '</select>'
-      + '<input class="tc-notes-input" placeholder="Notes…" value="' + escHtml(t.notes) + '" onblur="setTrkVal(\'' + t.scope + '\',\'' + t.assetId + '\',\'' + t.stage + '\',\'notes\',this.value)">'
-      + '</div>'
+      + '<div class="task-card-footer">' + footer + '</div>'
       + '</div>'
       + (dateText ? '<div class="task-card-right"><div class="task-card-date' + dateCls + '">' + dateText + '</div></div>' : '')
       + '</div>';

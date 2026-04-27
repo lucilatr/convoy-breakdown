@@ -1848,6 +1848,24 @@
         </div>
         <button class="modal-save" style="background: transparent; border: 1px solid var(--pink); color: var(--pink);" onclick="recoverFromCloudinary()">🔄 Recover from Cloudinary</button>
       </div>
+
+      <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08);" id="my-account-section">
+        <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px;">My Account</div>
+        <div class="modal-field">
+          <label>Current password</label>
+          <input type="password" id="pwd-current" placeholder="••••••••" autocomplete="off">
+        </div>
+        <div class="modal-field">
+          <label>New password</label>
+          <input type="password" id="pwd-new" placeholder="••••••••" autocomplete="new-password">
+        </div>
+        <div class="modal-field">
+          <label>Confirm new password</label>
+          <input type="password" id="pwd-confirm" placeholder="••••••••" autocomplete="new-password">
+        </div>
+        <div id="pwd-change-msg" style="font-size:12px; font-family:var(--fontb); min-height:16px; margin-bottom:8px;"></div>
+        <button class="modal-save" style="background: transparent; border: 1px solid var(--border); color: var(--text-dim);" onclick="changePassword()">Change password</button>
+      </div>
     </div>
   </div>
 </div>
@@ -2194,6 +2212,47 @@ function updateUserBadge() {
   `;
   const menuTeam = document.getElementById('menu-team');
   if(menuTeam) menuTeam.style.display = isAdmin() ? '' : 'none';
+}
+
+// ── Change Password ─────────────────────
+function changePassword() {
+  const current = document.getElementById('pwd-current')?.value || '';
+  const newPwd   = document.getElementById('pwd-new')?.value || '';
+  const confirm  = document.getElementById('pwd-confirm')?.value || '';
+  const msgEl    = document.getElementById('pwd-change-msg');
+
+  const showMsg = (text, isError) => {
+    msgEl.textContent = text;
+    msgEl.style.color = isError ? '#f05050' : '#00dc78';
+    setTimeout(() => { msgEl.textContent = ''; }, 3000);
+  };
+
+  if(!currentUser) return showMsg('No hay sesión activa.', true);
+  if(!current)     return showMsg('Ingresá tu contraseña actual.', true);
+  if(!newPwd)      return showMsg('Ingresá la nueva contraseña.', true);
+  if(newPwd.length < 4) return showMsg('Mínimo 4 caracteres.', true);
+  if(newPwd !== confirm) return showMsg('Las contraseñas no coinciden.', true);
+  if(current !== currentUser.password) return showMsg('Contraseña actual incorrecta.', true);
+
+  const idx = users.findIndex(u => u.id === currentUser.id);
+  if(idx === -1) return showMsg('Usuario no encontrado.', true);
+
+  users[idx].password = newPwd;
+  currentUser.password = newPwd;
+  localStorage.setItem('convoy_current_user', JSON.stringify(currentUser));
+  saveUsersLocal();
+  saveJSONBin();
+
+  document.getElementById('pwd-current').value = '';
+  document.getElementById('pwd-new').value = '';
+  document.getElementById('pwd-confirm').value = '';
+  showMsg('Contraseña actualizada.', false);
+}
+
+// También mostramos/ocultamos la sección según si hay usuario logueado
+function openPipelineWithAccount() {
+  const section = document.getElementById('my-account-section');
+  if(section) section.style.display = currentUser ? '' : 'none';
 }
 
 // ── Hamburger Menu ──────────────────────
@@ -3151,6 +3210,9 @@ function openPipeline() {
   document.getElementById('jb-bin').value = pipeline.binId||'';
   document.getElementById('jb-key').value = pipeline.binKey||'';
   updatePipeStatus();
+  // Show My Account section only when logged in
+  const section = document.getElementById('my-account-section');
+  if(section) section.style.display = currentUser ? '' : 'none';
   document.getElementById('pipeline-modal').classList.add('open');
 }
 function closePipeline() {

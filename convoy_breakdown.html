@@ -1060,6 +1060,27 @@
   .tracker-legend { display: flex; gap: 5px; flex-wrap: wrap; margin-left: 12px; }
 
   .tracker-body { flex: 1; overflow-y: auto; padding: 16px 20px; }
+
+  .trk-cell-selected { outline: 2px solid var(--accent) !important; background: rgba(255,80,80,0.12) !important; }
+
+  #cell-bulk-bar {
+    display: none; position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+    background: #1e1e1e; border: 1px solid rgba(255,255,255,0.12); border-radius: 8px;
+    padding: 10px 16px; gap: 10px; align-items: center; z-index: 3000;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.5); font-family: var(--fontb); z-index: 9500;
+  }
+  #cell-bulk-bar.visible { display: flex; }
+  #cell-bulk-bar span { color: rgba(255,255,255,0.6); font-size: 13px; letter-spacing: 1px; }
+  #cell-bulk-bar select {
+    background: #2a2a2a; border: 1px solid rgba(255,255,255,0.15); color: #fff;
+    font-size: 13px; padding: 5px 10px; border-radius: 4px; font-family: var(--fontb); outline: none;
+  }
+  #cell-bulk-bar button {
+    padding: 5px 14px; border-radius: 4px; border: none; cursor: pointer;
+    font-family: var(--fontb); font-size: 12px; letter-spacing: 1px; text-transform: uppercase;
+  }
+  #cell-bulk-apply { background: var(--accent); color: #fff; }
+  #cell-bulk-clear { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); }
   .tracker-empty {
     padding: 48px; text-align: center; color: var(--text-muted);
     font-family: var(--fontb); font-size: 15px; letter-spacing: 2px; text-transform: uppercase;
@@ -1139,38 +1160,6 @@
     cursor: pointer; padding: 3px 6px; margin-left: 4px;
   }
   .trk-clear-btn:hover { opacity: 0.75; }
-  .trk-cb-col { width: 28px; min-width: 28px; text-align: center; padding: 0 4px !important; }
-  .trk-cb-col input[type="checkbox"] { cursor: pointer; accent-color: var(--pink); }
-  .trk-row-selected td { background: var(--pink-dim) !important; }
-  #bulk-bar {
-    display: none; align-items: center; gap: 10px;
-    padding: 8px 20px; border-bottom: 1px solid var(--border);
-    background: var(--bg-card); flex-shrink: 0; flex-wrap: wrap;
-  }
-  #bulk-bar.visible { display: flex; }
-  #bulk-count {
-    font-family: var(--fontb); font-size: 12px; font-weight: 700;
-    color: var(--pink); letter-spacing: 1px; min-width: 110px;
-  }
-  .bulk-select {
-    background: var(--bg-card2); border: 1px solid var(--border);
-    color: var(--text); font-family: var(--fontb); font-size: 12px;
-    padding: 5px 10px; outline: none; cursor: pointer;
-  }
-  .bulk-apply-btn {
-    background: var(--pink); border: none; color: #fff;
-    font-family: var(--font); font-size: 12px; font-weight: 700;
-    letter-spacing: 2px; text-transform: uppercase;
-    padding: 6px 16px; cursor: pointer; transition: opacity .15s;
-  }
-  .bulk-apply-btn:hover { opacity: .85; }
-  .bulk-clear-btn {
-    background: transparent; border: 1px solid var(--border);
-    color: var(--text-dim); font-family: var(--font); font-size: 12px;
-    font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
-    padding: 6px 12px; cursor: pointer; transition: all .15s;
-  }
-  .bulk-clear-btn:hover { border-color: var(--text-dim); color: var(--text); }
   .trk-b-wip { background: rgba(250,200,50,0.12); color: #ddb020; border: 1px solid rgba(250,200,50,0.2); }
   .trk-b-wait { background: rgba(240,60,60,0.12); color: #f05050; border: 1px solid rgba(240,60,60,0.2); }
   .trk-b-app-play { background: rgba(80,180,255,0.1); color: #50b4ff; border: 1px solid rgba(80,180,255,0.2); }
@@ -1799,16 +1788,16 @@
     </select>
     <div class="tracker-legend" id="tracker-legend"></div>
   </div>
-  <div id="bulk-bar">
-    <span id="bulk-count"></span>
-    <select id="bulk-stage" class="bulk-select"></select>
-    <select id="bulk-status" class="bulk-select"></select>
-    <button class="bulk-apply-btn" onclick="applyBulkStatus()">Apply</button>
-    <button class="bulk-clear-btn" onclick="clearBulkSelection()">Clear</button>
-  </div>
   <div class="tracker-body" id="tracker-body">
     <div class="tracker-empty">Select an episode</div>
   </div>
+</div>
+
+<div id="cell-bulk-bar">
+  <span id="cell-bulk-count">0 celdas</span>
+  <select id="cell-bulk-status"></select>
+  <button id="cell-bulk-apply" onclick="applyCellBulk()">Apply</button>
+  <button id="cell-bulk-clear" onclick="clearCellSelection()">Clear</button>
 </div>
 
 <!-- SCRIPT BOT oculto temporalmente — se retoma en el futuro -->
@@ -4549,6 +4538,7 @@ function toggleTracker() {
     renderTracker();
   } else {
     overlay.classList.add('hidden');
+    clearCellSelection();
   }
 }
 
@@ -4579,8 +4569,8 @@ function initTrackerEpSelect() {
 let trackerEp = 'general';
 let trackerStatusFilter = new Set();
 let trackerPersonFilter = '';
-function switchTrackerEp(ep) { clearBulkSelection(); trackerEp = ep; renderTracker(); }
-function switchTrackerPerson(userId) { clearBulkSelection(); trackerPersonFilter = userId; renderTracker(); }
+function switchTrackerEp(ep) { trackerEp = ep; clearCellSelection(); renderTracker(); }
+function switchTrackerPerson(userId) { trackerPersonFilter = userId; clearCellSelection(); renderTracker(); }
 
 function toggleTrkStatusFilter(statusId) {
   if(trackerStatusFilter.has(statusId)) trackerStatusFilter.delete(statusId);
@@ -4696,7 +4686,6 @@ function applyTrackerRowFilter() {
 
 function trkTableHead() {
   return '<div class="trk-wrap"><table class="trk-table"><thead><tr>'
-    + '<th class="trk-cb-col"><input type="checkbox" class="trk-cb-all" onchange="toggleTrkSelectAll(this)"></th>'
     + '<th class="left" style="width:90px">Type</th>'
     + '<th class="left" style="min-width:140px">Asset</th>'
     + '<th class="trk-status-col">Concept</th>'
@@ -4709,7 +4698,6 @@ function trkTableHead() {
 }
 function trkTableHeadPanels() {
   return '<div class="trk-wrap"><table class="trk-table"><thead><tr>'
-    + '<th class="trk-cb-col"><input type="checkbox" class="trk-cb-all" onchange="toggleTrkSelectAll(this)"></th>'
     + '<th class="left" style="width:90px">Type</th>'
     + '<th style="width:70px">Panel</th>'
     + '<th class="trk-status-col">Layout</th>'
@@ -4721,11 +4709,7 @@ function trkTableHeadPanels() {
     + '</tr></thead><tbody>';
 }
 function trkSectionRow(label) {
-  return '<tr class="trk-sep"><td colspan="9"></td></tr>';
-}
-function trkCbCell(scope, assetId) {
-  const key = scope + '|' + assetId;
-  return '<td class="trk-cb-col"><input type="checkbox" class="trk-cb" data-key="' + key + '" onchange="toggleTrkRowSelect(\'' + key + '\',this)"></td>';
+  return '<tr class="trk-sep"><td colspan="8"></td></tr>';
 }
 
 function renderTrackerGeneral(body) {
@@ -4739,8 +4723,7 @@ function renderTrackerGeneral(body) {
 
   // Characters
   multiChars.forEach(c => {
-    html += '<tr id="trk-row-general-'+c.id+'">';
-    html += trkCbCell('general', c.id);
+    html += '<tr>';
     html += '<td class="trk-type">Character</td>';
     html += '<td class="trk-asset">'+c.name+'</td>';
     html += statusCell('general', c.id, 'concept');
@@ -4756,8 +4739,7 @@ function renderTrackerGeneral(body) {
     html += trkSectionRow();
     multiVehs.forEach(v => {
       const hasActions = VEHICLES_WITH_ACTIONS.includes(v.id);
-      html += '<tr id="trk-row-general-'+v.id+'">';
-      html += trkCbCell('general', v.id);
+      html += '<tr>';
       html += '<td class="trk-type">Vehicle</td>';
       html += '<td class="trk-asset">'+v.name+'</td>';
       html += statusCell('general', v.id, 'concept');
@@ -4773,8 +4755,7 @@ function renderTrackerGeneral(body) {
   if(multiEnvs.length) {
     html += trkSectionRow();
     multiEnvs.forEach(e => {
-      html += '<tr id="trk-row-general-'+e.id+'">';
-      html += trkCbCell('general', e.id);
+      html += '<tr>';
       html += '<td class="trk-type">Environment</td>';
       html += '<td class="trk-asset">'+e.name+'</td>';
       html += statusCell('general', e.id, 'concept');
@@ -4790,8 +4771,7 @@ function renderTrackerGeneral(body) {
   if(multiPlaysets.length) {
     html += trkSectionRow();
     multiPlaysets.forEach(p => {
-      html += '<tr id="trk-row-general-'+p.id+'">';
-      html += trkCbCell('general', p.id);
+      html += '<tr>';
       html += '<td class="trk-type">Playset</td>';
       html += '<td class="trk-asset">'+p.name+'</td>';
       html += statusCell('general', p.id, 'concept');
@@ -4842,8 +4822,7 @@ function renderTrackerAll(body) {
     html += '<div class="trk-section-title">Characters</div>';
     html += trkTableHead();
     charsList.forEach(({asset, scope}) => {
-      html += '<tr id="trk-row-'+scope+'-'+asset.id+'">';
-      html += trkCbCell(scope, asset.id);
+      html += '<tr>';
       html += '<td class="trk-type">Character</td>';
       html += '<td class="trk-asset">' + asset.name + '</td>';
       html += statusCell(scope, asset.id, 'concept');
@@ -4862,8 +4841,7 @@ function renderTrackerAll(body) {
     html += '<div class="trk-section-title">Wardrobe changes</div>';
     html += trkTableHead();
     wardrobeList.forEach(({asset, scope}) => {
-      html += '<tr id="trk-row-'+scope+'-'+asset.id+'">';
-      html += trkCbCell(scope, asset.id);
+      html += '<tr>';
       html += '<td class="trk-type">Wardrobe</td>';
       html += '<td class="trk-asset">' + asset.name + '</td>';
       html += statusCell(scope, asset.id, 'concept');
@@ -4883,8 +4861,7 @@ function renderTrackerAll(body) {
     html += trkTableHead();
     vehsList.forEach(({asset, scope}) => {
       const hasActions = VEHICLES_WITH_ACTIONS.includes(asset.id);
-      html += '<tr id="trk-row-'+scope+'-'+asset.id+'">';
-      html += trkCbCell(scope, asset.id);
+      html += '<tr>';
       html += '<td class="trk-type">Vehicle</td>';
       html += '<td class="trk-asset">' + asset.name + '</td>';
       html += statusCell(scope, asset.id, 'concept');
@@ -4903,8 +4880,7 @@ function renderTrackerAll(body) {
     html += '<div class="trk-section-title">Playsets</div>';
     html += trkTableHead();
     playsetsList.forEach(({asset, scope}) => {
-      html += '<tr id="trk-row-'+scope+'-'+asset.id+'">';
-      html += trkCbCell(scope, asset.id);
+      html += '<tr>';
       html += '<td class="trk-type">Playset</td>';
       html += '<td class="trk-asset">' + asset.name + '</td>';
       html += statusCell(scope, asset.id, 'concept');
@@ -4923,8 +4899,7 @@ function renderTrackerAll(body) {
     html += '<div class="trk-section-title">Environments</div>';
     html += trkTableHead();
     envsList.forEach(({asset, scope}) => {
-      html += '<tr id="trk-row-'+scope+'-'+asset.id+'">';
-      html += trkCbCell(scope, asset.id);
+      html += '<tr>';
       html += '<td class="trk-type">Environment</td>';
       html += '<td class="trk-asset">' + asset.name + '</td>';
       html += statusCell(scope, asset.id, 'concept');
@@ -4966,8 +4941,7 @@ function renderTrackerEpisode(body, ep) {
     html += trkTableHead();
 
     epWardrobes.forEach(w => {
-      html += '<tr id="trk-row-'+ep+'-'+w.wardrobeId+'">';
-      html += trkCbCell(ep, w.wardrobeId);
+      html += '<tr>';
       html += '<td class="trk-type">Wardrobe</td>';
       html += '<td class="trk-asset">'+w.charName+' — '+w.wardrobeName+'</td>';
       html += statusCell(ep, w.wardrobeId, 'concept');
@@ -4983,8 +4957,7 @@ function renderTrackerEpisode(body, ep) {
       if(epWardrobes.length) html += trkSectionRow();
       allVehs.forEach(v => {
         const hasActions = VEHICLES_WITH_ACTIONS.includes(v.id);
-        html += '<tr id="trk-row-general-'+v.id+'">';
-        html += trkCbCell('general', v.id);
+        html += '<tr>';
         html += '<td class="trk-type">Vehicle</td>';
         html += '<td class="trk-asset">'+v.name+'</td>';
         html += statusCell('general', v.id, 'concept');
@@ -5000,8 +4973,7 @@ function renderTrackerEpisode(body, ep) {
     if(exclusiveEnvs.length) {
       html += trkSectionRow();
       exclusiveEnvs.forEach(e => {
-        html += '<tr id="trk-row-'+ep+'-'+e.id+'">';
-        html += trkCbCell(ep, e.id);
+        html += '<tr>';
         html += '<td class="trk-type">Environment</td>';
         html += '<td class="trk-asset">'+e.name+'</td>';
         html += statusCell(ep, e.id, 'concept');
@@ -5017,8 +4989,7 @@ function renderTrackerEpisode(body, ep) {
     if(epPlaysets.length) {
       html += trkSectionRow();
       epPlaysets.forEach(p => {
-        html += '<tr id="trk-row-general-'+p.id+'">';
-        html += trkCbCell('general', p.id);
+        html += '<tr>';
         html += '<td class="trk-type">Playset</td>';
         html += '<td class="trk-asset">'+p.name+'</td>';
         html += statusCell('general', p.id, 'concept');
@@ -5040,8 +5011,7 @@ function renderTrackerEpisode(body, ep) {
     html += trkTableHeadPanels();
 
     panels.forEach(p => {
-      html += '<tr id="trk-row-'+ep+'-'+p.id+'">';
-      html += trkCbCell(ep, p.id);
+      html += '<tr>';
       html += '<td class="trk-type">Panel</td>';
       html += '<td class="trk-asset center">'+p.label+'</td>';
       html += statusCell(ep, p.id, 'layout');
@@ -5095,7 +5065,9 @@ function statusCell(scope, assetId, stage) {
 
   const meta = (avatarHtml || dueChip) ? '<div class="cell-meta">' + avatarHtml + dueChip + '</div>' : '';
 
-  return '<td class="cell-click' + matchCls + '" onclick="openTaskPopup(\'' + scope + '\',\'' + assetId + '\',\'' + stage + '\')">'
+  const key = scope + '|' + assetId + '|' + stage;
+  const selCls = selectedCells.has(key) ? ' trk-cell-selected' : '';
+  return '<td class="cell-click' + matchCls + selCls + '" data-key="' + key + '" onclick="toggleCellSelect(\'' + scope + '\',\'' + assetId + '\',\'' + stage + '\')" ondblclick="openTaskPopup(\'' + scope + '\',\'' + assetId + '\',\'' + stage + '\')">'
     + '<div class="cell-wrap">'
     + '<span class="status-pill ' + cls + '">' + statusLabel + '</span>'
     + meta
@@ -5794,97 +5766,56 @@ function deleteWardrobeImage(variationId) {
   showToast('Imagen de vestuario borrada.');
 }
 
-// ════════════════════════════════════════
-// BULK TRACKER EDIT
-// ════════════════════════════════════════
-let selectedTrkRows = new Set();
 
-function toggleTrkRowSelect(key, el) {
-  const tr = el.closest('tr');
-  if(el.checked) {
-    selectedTrkRows.add(key);
-    tr.classList.add('trk-row-selected');
+
+// ════════════════════════════════════════
+// CELL BULK EDIT
+// ════════════════════════════════════════
+let selectedCells = new Set();
+
+function toggleCellSelect(scope, assetId, stage) {
+  const key = scope + '|' + assetId + '|' + stage;
+  if(selectedCells.has(key)) {
+    selectedCells.delete(key);
   } else {
-    selectedTrkRows.delete(key);
-    tr.classList.remove('trk-row-selected');
+    selectedCells.add(key);
   }
-  updateBulkBar();
+  // update cell highlight without full re-render
+  const td = document.querySelector('[data-key="' + key + '"]');
+  if(td) td.classList.toggle('trk-cell-selected', selectedCells.has(key));
+  updateCellBulkBar();
 }
 
-function toggleTrkSelectAll(el) {
-  const cbs = document.querySelectorAll('#tracker-body .trk-cb');
-  cbs.forEach(cb => {
-    cb.checked = el.checked;
-    const key = cb.dataset.key;
-    const tr = cb.closest('tr');
-    if(el.checked) {
-      selectedTrkRows.add(key);
-      tr.classList.add('trk-row-selected');
-    } else {
-      selectedTrkRows.delete(key);
-      tr.classList.remove('trk-row-selected');
-    }
-  });
-  updateBulkBar();
-}
-
-function updateBulkBar() {
-  const bar = document.getElementById('bulk-bar');
-  const count = selectedTrkRows.size;
+function updateCellBulkBar() {
+  const bar = document.getElementById('cell-bulk-bar');
+  const count = selectedCells.size;
   if(count === 0) { bar.classList.remove('visible'); return; }
   bar.classList.add('visible');
-  document.getElementById('bulk-count').textContent = count + ' asset' + (count > 1 ? 's' : '') + ' selected';
-
-  const stageSelect = document.getElementById('bulk-stage');
-  const currentVal = stageSelect.value;
-  let stages;
-  if(trackerEp === 'general') {
-    stages = [
-      {id:'concept',label:'Concept'},{id:'views',label:'Views'},
-      {id:'expressions',label:'Expressions'},{id:'actions',label:'Actions'}
-    ];
-  } else {
-    stages = [
-      {id:'concept',label:'Concept'},{id:'views',label:'Views'},
-      {id:'expressions',label:'Expressions'},{id:'actions',label:'Actions'},
-      {id:'layout',label:'Layout'},{id:'lineart',label:'Line art'},
-      {id:'color',label:'Color'},{id:'animation',label:'Animation'}
-    ];
-  }
-  stageSelect.innerHTML = stages.map(s =>
-    '<option value="'+s.id+'"'+(s.id===currentVal?' selected':'')+'>'+s.label+'</option>'
-  ).join('');
-
-  const statusSelect = document.getElementById('bulk-status');
-  if(!statusSelect.children.length) {
-    statusSelect.innerHTML = TRK_STATUSES.map(s =>
-      '<option value="'+s.id+'">'+s.label+'</option>'
-    ).join('');
+  document.getElementById('cell-bulk-count').textContent = count + ' cell' + (count > 1 ? 's' : '') + ' selected';
+  const sel = document.getElementById('cell-bulk-status');
+  if(!sel.children.length) {
+    sel.innerHTML = TRK_STATUSES.map(s => '<option value="'+s.id+'">'+s.label+'</option>').join('');
   }
 }
 
-function applyBulkStatus() {
-  const stage = document.getElementById('bulk-stage').value;
-  const status = document.getElementById('bulk-status').value;
-  if(!stage || !status) return;
-  const count = selectedTrkRows.size;
-  selectedTrkRows.forEach(key => {
-    const pipeIdx = key.indexOf('|');
-    const scope = key.slice(0, pipeIdx);
-    const assetId = key.slice(pipeIdx + 1);
-    setTrkVal(scope, assetId, stage, 'status', status);
+function applyCellBulk() {
+  const status = document.getElementById('cell-bulk-status').value;
+  if(!status) return;
+  const count = selectedCells.size;
+  selectedCells.forEach(key => {
+    const parts = key.split('|');
+    setTrkVal(parts[0], parts[1], parts[2], 'status', status);
   });
-  clearBulkSelection();
+  clearCellSelection();
   renderTracker();
-  showToast(count + ' asset' + (count > 1 ? 's' : '') + ' updated.');
+  showToast(count + ' cell' + (count > 1 ? 's' : '') + ' updated.');
 }
 
-function clearBulkSelection() {
-  selectedTrkRows.clear();
-  const bar = document.getElementById('bulk-bar');
+function clearCellSelection() {
+  selectedCells.clear();
+  const bar = document.getElementById('cell-bulk-bar');
   if(bar) bar.classList.remove('visible');
 }
-
 
 async function syncWardrobeToJSONBin() {
   if(!pipeline.binId || !pipeline.binKey) return;

@@ -2476,6 +2476,7 @@ function renderMyTasks() {
 
 // ── Team CRUD ──────────────────────────
 function openTeam() {
+  if(!isAdmin()) return;
   renderTeamList();
   document.getElementById('team-overlay').classList.add('open');
 }

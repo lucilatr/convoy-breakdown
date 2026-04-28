@@ -2191,7 +2191,24 @@ let users = [
   { id: 'admin-lu', username: 'Lu', password: 'Matchbox', role: 'admin', name: 'Lu Trobbiani' }
 ];
 let currentUser = null;
-loadUsersLocal(); // cargar usuarios guardados antes de mostrar el lock screen
+loadUsersLocal(); // cargar usuarios de localStorage como base
+// Fetch usuarios desde JSONBin al startup para que estén disponibles en el login
+(async function prefetchUsers() {
+  try {
+    loadPipelineConfig();
+    if(!pipeline.binId || !pipeline.binKey) return;
+    const res = await fetch('https://api.jsonbin.io/v3/b/' + pipeline.binId + '/latest', {
+      headers: { 'X-Master-Key': pipeline.binKey, 'X-Bin-Meta': 'false' }
+    });
+    if(!res.ok) return;
+    const data = await res.json();
+    const record = data.record || data;
+    if(record.users && record.users.length > 0) {
+      users = record.users;
+      saveUsersLocal();
+    }
+  } catch(e) {}
+})();
 
 function isAdmin()  { return currentUser?.role === 'admin'; }
 function isLead()   { return currentUser?.role === 'lead' || isAdmin(); }

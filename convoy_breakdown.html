@@ -1689,7 +1689,7 @@
 
       <div class="stat-card">
         <div class="stat-label">Episodes</div>
-        <div class="stat-num">5 / 8</div>
+        <div class="stat-num" id="stat-ep">— / —</div>
       </div>
     </div>
 
@@ -2032,7 +2032,7 @@ const EP_SYNOPSES = {
   ep106: {
     label: 'Episode 106',
     title: 'The Matchbox Crew Volcano Treasure!',
-    panels: 45,
+    panels: 44,
     script: 'https://drive.google.com/file/d/1Tl1Fo72vfwwMoM3rZObdwI5wjBDYclWW/view?usp=drive_link',
     en: "A treasure hunt on the slopes of an erupting volcano turns into an extreme rally race. Charmaine leads the crew up Treasure Mountain to rescue an ancient chest before the lava destroys it — but when Aimee turns the mission into a race, the squad must swap their adventure rigs for race cars. As the volcano roars to life, Charmaine takes to the air in a rescue helicopter to guide the racers around boulders, lava streams and a collapsed bridge, proving that sometimes saving the day means racing together.",
     es: 'La búsqueda de un tesoro en las laderas de un volcán en erupción se transforma en una carrera extrema de rally. Charmaine lidera al equipo por la Montaña del Tesoro para rescatar un cofre antiguo antes de que la lava lo destruya — pero cuando Aimee convierte la misión en una carrera, el equipo debe cambiar sus vehículos de aventura por autos de carrera. Mientras el volcán ruge, Charmaine toma el aire en un helicóptero de rescate para guiar a los corredores esquivando rocas, ríos de lava y un puente derrumbado, demostrando que a veces salvar el día significa correr en equipo.'
@@ -2818,6 +2818,15 @@ function updateStats() {
   const pct = total > 0 ? Math.round((imaged/total)*100) : 0;
   document.getElementById('progress-fill').style.width = pct+'%';
   document.getElementById('progress-label').textContent = pct+'% complete';
+
+  const elEp = document.getElementById('stat-ep');
+  if(elEp) {
+    const totalEp = EPISODES.length;
+    const withLayouts = EPISODES.filter(ep =>
+      Object.keys(panelImageData).some(k => k.startsWith(ep + '-'))
+    ).length;
+    elEp.textContent = withLayouts + ' / ' + totalEp;
+  }
 }
 
 // Cuenta assets ÚNICOS (character/vehicle/playset/environment/wardrobe) que tienen

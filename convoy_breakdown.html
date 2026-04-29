@@ -2821,11 +2821,7 @@ function updateStats() {
 
   const elEp = document.getElementById('stat-ep');
   if(elEp) {
-    const totalEp = EPISODES.length;
-    const withLayouts = EPISODES.filter(ep =>
-      Object.keys(panelImageData).some(k => k.startsWith(ep + '-'))
-    ).length;
-    elEp.textContent = withLayouts + ' / ' + totalEp;
+    elEp.textContent = EPISODES.length + ' / 8';
   }
 }
 

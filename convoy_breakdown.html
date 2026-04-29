@@ -3179,7 +3179,7 @@ async function uploadCloudinary(id) {
     });
     if(!res.ok) throw new Error('HTTP '+res.status);
     const data = await res.json();
-    imageData[id].cloudinaryUrl = data.secure_url;
+    imageData[id].cloudinaryUrl = data.secure_url + '?v=' + Date.now();
     saveLocal();
     setStatus(id, '✓ Cloudinary: '+data.secure_url.slice(0,40)+'...', 'ok');
     saveJSONBin();
@@ -4364,6 +4364,21 @@ const PANELS_BY_EP = {
 // ════════════════════════════════════════
 let selectedPanel = null;
 let panelImageData = {};
+const recentlyUpdatedPanel = new Map();
+const PANEL_PROTECT_MS = 30000;
+function markPanelRecentlyUpdated(id) {
+  recentlyUpdatedPanel.set(id, Date.now());
+  setTimeout(() => {
+    const t = recentlyUpdatedPanel.get(id);
+    if(t && Date.now() - t >= PANEL_PROTECT_MS) recentlyUpdatedPanel.delete(id);
+  }, PANEL_PROTECT_MS + 100);
+}
+function isPanelRecentlyUpdated(id) {
+  const t = recentlyUpdatedPanel.get(id);
+  if(!t) return false;
+  if(Date.now() - t >= PANEL_PROTECT_MS) { recentlyUpdatedPanel.delete(id); return false; }
+  return true;
+}
 
 function loadPanelImages() {
   try { const r = localStorage.getItem('convoy_panel_images'); if(r) panelImageData = JSON.parse(r); } catch(e) {}
@@ -4479,11 +4494,13 @@ async function uploadPanelLayout(panelId, input) {
   try {
     const fd = new FormData();
     fd.append('file', file); fd.append('upload_preset', pipeline.preset);
-    fd.append('folder', 'convoy_breakdown'); fd.append('public_id', panelId);
+    fd.append('folder', 'convoy_breakdown'); fd.append('public_id', panelId + '_' + Date.now());
     const res = await fetch(`https://api.cloudinary.com/v1_1/${pipeline.cloudName}/image/upload`, {method:'POST',body:fd});
     const data = await res.json();
     if(data.secure_url) {
-      panelImageData[panelId] = data.secure_url; savePanelImages();
+      panelImageData[panelId] = data.secure_url;
+      markPanelRecentlyUpdated(panelId);
+      savePanelImages();
       if(statusEl) { statusEl.textContent = '✓ Uploaded'; statusEl.className = 'pd-status ok'; }
       selectPanel(panelId); renderPanels(); syncPanelImagesToJSONBin();
       showToast('Layout uploaded to Cloudinary.');
@@ -4494,6 +4511,7 @@ async function uploadPanelLayout(panelId, input) {
 async function deletePanelLayout(panelId) {
   if(!confirm('Delete this layout image?')) return;
   delete panelImageData[panelId];
+  markPanelRecentlyUpdated(panelId);
   savePanelImages();
   selectPanel(panelId);
   renderPanels();
@@ -4559,7 +4577,17 @@ async function loadJSONBin() {
       });
     }
     if(record.panelImages !== undefined) {
-      panelImageData = record.panelImages || {};
+      const remotePanels = record.panelImages || {};
+      const mergedPanels = { ...remotePanels };
+      // Preserve panels updated locally in the last 30s — remote may be stale
+      Object.keys(panelImageData).forEach(id => {
+        if(isPanelRecentlyUpdated(id)) mergedPanels[id] = panelImageData[id];
+      });
+      // If a panel was recently deleted locally, remove it even if remote still has it
+      Object.keys(remotePanels).forEach(id => {
+        if(!(id in panelImageData) && isPanelRecentlyUpdated(id)) delete mergedPanels[id];
+      });
+      panelImageData = mergedPanels;
       savePanelImages();
     }
     if(record.wardrobeImages !== undefined) {

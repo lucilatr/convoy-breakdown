@@ -1516,7 +1516,66 @@
     flex-shrink: 0;
   }
   .bot-send:hover { opacity: .85; }
-  .bot-send:disabled { opacity: .4; cursor: default; }</style>
+  .bot-send:disabled { opacity: .4; cursor: default; }
+  /* ─── PROD BOARD ───────────────────────────────────────── */
+  #prod-board-view { display:none; position:fixed; inset:0; z-index:200; background:#111; overflow-y:auto; }
+  .prod-topbar { display:flex; align-items:center; justify-content:space-between; padding:12px 20px; background:#1a1a1a; border-bottom:1px solid #2a2a2a; position:sticky; top:0; z-index:10; }
+  .prod-topbar-title { font-size:15px; font-weight:700; color:#fff; letter-spacing:.5px; }
+  .prod-back-btn { background:none; border:1px solid #444; color:#aaa; padding:5px 14px; border-radius:6px; cursor:pointer; font-size:13px; }
+  .prod-back-btn:hover { border-color:#aaa; color:#fff; }
+  .prod-body { padding:20px; max-width:1300px; margin:0 auto; }
+  .prod-section-label { font-size:10px; font-weight:700; color:#666; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+  .prod-goal-box { background:#1c1c1c; border:1px solid #2a2a2a; border-radius:10px; padding:16px 20px; margin-bottom:24px; }
+  .prod-goal-text { color:#ccc; font-size:14px; line-height:1.6; white-space:pre-wrap; min-height:18px; }
+  .prod-goal-text.empty { color:#555; font-style:italic; }
+  .prod-goal-edit-btn { background:none; border:none; color:#555; cursor:pointer; font-size:11px; padding:2px 7px; border-radius:4px; margin-left:auto; }
+  .prod-goal-edit-btn:hover { color:#aaa; background:#2a2a2a; }
+  .prod-goal-textarea { width:100%; background:#111; border:1px solid #444; color:#ddd; border-radius:6px; padding:10px; font-size:14px; line-height:1.6; resize:vertical; min-height:60px; font-family:inherit; box-sizing:border-box; }
+  .prod-goal-save-btn { background:#27632a; border:none; color:#fff; padding:6px 16px; border-radius:6px; cursor:pointer; font-size:13px; margin-top:8px; }
+  .prod-goal-save-btn:hover { background:#2e7d32; }
+  .prod-goal-cancel-btn { background:none; border:1px solid #444; color:#888; padding:6px 14px; border-radius:6px; cursor:pointer; font-size:13px; margin-top:8px; margin-left:6px; }
+  .prod-cols { display:flex; gap:14px; align-items:flex-start; margin-bottom:14px; }
+  .prod-cols-top .prod-col { flex:1; }
+  .prod-cols-bottom { margin-bottom:0; }
+  .prod-col { flex:1; background:#1a1a1a; border:1px solid #2a2a2a; border-radius:10px; padding:14px; min-height:160px; transition:background .15s, border-color .15s; }
+  .prod-col.drag-over { background:#1a2a1c; border-color:#2e7d32; }
+  .prod-col-header { font-size:11px; font-weight:700; color:#888; letter-spacing:1px; text-transform:uppercase; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+  .prod-col-count { background:#252525; color:#666; border-radius:10px; padding:1px 7px; font-size:10px; }
+  .prod-task { background:#222; border:1px solid #2e2e2e; border-radius:8px; padding:10px 10px; margin-bottom:7px; cursor:grab; display:flex; align-items:flex-start; gap:9px; transition:border-color .1s; }
+  .prod-task:active { cursor:grabbing; }
+  .prod-task:hover { border-color:#3a3a3a; }
+  .prod-task.done { opacity:.4; }
+  .prod-task.done .prod-task-text { text-decoration:line-through; color:#666; }
+  .prod-task-check { width:17px; height:17px; border-radius:50%; border:2px solid #555; flex-shrink:0; cursor:pointer; margin-top:1px; display:flex; align-items:center; justify-content:center; font-size:10px; color:#fff; transition:background .15s, border-color .15s; }
+  .prod-task-check:hover { border-color:#2e7d32; }
+  .prod-task-check.checked { background:#2e7d32; border-color:#2e7d32; }
+  .prod-task-body { flex:1; min-width:0; }
+  .prod-task-text { font-size:13px; color:#ddd; line-height:1.45; word-break:break-word; }
+  .prod-task-meta { font-size:11px; color:#555; margin-top:3px; }
+  .prod-task-actions { display:flex; gap:3px; flex-shrink:0; opacity:0; transition:opacity .15s; }
+  .prod-task:hover .prod-task-actions { opacity:1; }
+  .prod-task-assign-btn { background:none; border:1px solid #333; color:#666; padding:2px 7px; border-radius:4px; cursor:pointer; font-size:11px; }
+  .prod-task-assign-btn:hover { color:#aaa; border-color:#666; }
+  .prod-task-del-btn { background:none; border:none; color:#555; cursor:pointer; font-size:12px; padding:2px 4px; }
+  .prod-task-del-btn:hover { color:#e53935; }
+  .prod-task-edit-btn { background:none; border:none; color:#555; cursor:pointer; font-size:12px; padding:2px 4px; }
+  .prod-task-edit-btn:hover { color:#aaa; }
+  .prod-task-edit-input { width:100%; background:#111; border:1px solid #2e7d32; color:#ddd; border-radius:5px; padding:5px 8px; font-size:13px; font-family:inherit; box-sizing:border-box; margin-bottom:5px; }
+  .prod-task-edit-input:focus { outline:none; }
+  .prod-add-form { margin-top:6px; }
+  .prod-add-input { width:100%; background:#111; border:1px solid #444; color:#ddd; border-radius:6px; padding:8px 10px; font-size:13px; font-family:inherit; box-sizing:border-box; }
+  .prod-add-input:focus { outline:none; border-color:#2e7d32; }
+  .prod-add-actions { display:flex; gap:6px; margin-top:6px; }
+  .prod-add-confirm { background:#27632a; border:none; color:#fff; padding:5px 12px; border-radius:5px; cursor:pointer; font-size:12px; }
+  .prod-add-confirm:hover { background:#2e7d32; }
+  .prod-add-cancel { background:none; border:1px solid #444; color:#777; padding:5px 10px; border-radius:5px; cursor:pointer; font-size:12px; }
+  .prod-add-btn { background:none; border:1px dashed #2e2e2e; color:#555; width:100%; padding:8px; border-radius:6px; cursor:pointer; font-size:12px; text-align:center; transition:border-color .15s, color .15s; margin-top:4px; box-sizing:border-box; }
+  .prod-add-btn:hover { border-color:#2e7d32; color:#4caf50; }
+  .prod-assign-popup { position:fixed; background:#222; border:1px solid #444; border-radius:8px; z-index:400; padding:5px; box-shadow:0 4px 20px rgba(0,0,0,.6); }
+  .prod-assign-option { padding:7px 14px; cursor:pointer; font-size:13px; color:#ccc; border-radius:5px; white-space:nowrap; }
+  .prod-assign-option:hover { background:#2e7d32; color:#fff; }
+  @media(max-width:640px){ .prod-cols { flex-direction:column; } .prod-cols-top .prod-col { width:100%; } }
+</style>
 </head>
 <body>
 
@@ -1548,6 +1607,7 @@
           <div class="menu-item" onclick="closeMainMenu(); toggleTracker();">▦ Tracker</div>
           <div class="menu-item" onclick="closeMainMenu(); openSchedule();">▤ Schedule</div>
           <div class="menu-item" onclick="closeMainMenu(); manualSyncFromBin();">↻ Sync</div>
+          <div class="menu-item" id="menu-prod" onclick="closeMainMenu(); openProdBoard();" style="display:none;">🎬 Prod Board</div>
           <div class="menu-item" id="menu-team" onclick="closeMainMenu(); openTeam();" style="display:none;">👥 Team</div>
           <div class="menu-item" onclick="closeMainMenu(); openPipeline();">⚙ Settings</div>
           <div class="menu-item" onclick="closeMainMenu(); exportZip();">↓ Export ZIP</div>
@@ -2194,7 +2254,7 @@ let pipeline = {
 const FALLBACK_PASS = 'Matchbox';
 
 let users = [
-  { id: 'admin-lu', username: 'Lu', password: 'Matchbox', role: 'admin', name: 'Lu Trobbiani' }
+  { id: 'admin-lu', username: 'Lu', password: 'Matchbox', role: 'admin', name: 'Lucila Trobbiani' }
 ];
 let currentUser = null;
 loadUsersLocal(); // cargar usuarios de localStorage como base
@@ -2286,6 +2346,8 @@ function updateUserBadge() {
   `;
   const menuTeam = document.getElementById('menu-team');
   if(menuTeam) menuTeam.style.display = isAdmin() ? '' : 'none';
+  const menuProd = document.getElementById('menu-prod');
+  if(menuProd) menuProd.style.display = isProdBoardUser() ? '' : 'none';
 }
 
 // ── Change Password ─────────────────────
@@ -2418,9 +2480,12 @@ function relativeDate(dateStr) {
 
 function renderMyTasks() {
   const tasks = getMyTasks();
+  const myProdTasks = (isProdBoardUser() && currentUser)
+    ? prodTasks.filter(t => t.assignedTo === currentUser.id && !t.done)
+    : [];
   const body = document.getElementById('my-tasks-body');
   if(!body) return;
-  if(!tasks.length) {
+  if(!tasks.length && !myProdTasks.length) {
     body.innerHTML = '<div class="my-tasks-empty">No tenés tareas asignadas.</div>';
     return;
   }
@@ -2477,7 +2542,32 @@ function renderMyTasks() {
     html += noDate.map(taskCardHtml).join('');
     html += '</div>';
   }
+  if(myProdTasks.length) {
+    html += '<div class="my-tasks-section"><div class="my-tasks-section-title" style="color:#81c784;">🎬 Producción · ' + myProdTasks.length + '</div>';
+    html += myProdTasks.map(t => {
+      return '<div class="task-card" style="border-left:3px solid #2e7d32;">'
+        + '<div class="task-card-left">'
+        + '<div class="task-card-meta">Prod Board</div>'
+        + '<div class="task-card-name">' + escHtml(t.text) + '</div>'
+        + '<div class="task-card-footer" style="display:flex;gap:8px;align-items:center;margin-top:6px;">'
+        + '<button style="font-size:11px;padding:2px 8px;background:#1b5e20;border:none;border-radius:4px;color:#aed6b0;cursor:pointer;" onclick="toggleProdDoneFromMyTasks(\'' + t.id + '\')">✓ Marcar done</button>'
+        + '</div>'
+        + '</div>'
+        + '</div>';
+    }).join('');
+    html += '</div>';
+  }
   body.innerHTML = html;
+}
+
+function toggleProdDoneFromMyTasks(taskId) {
+  const t = prodTasks.find(x => x.id === taskId);
+  if(!t) return;
+  t.done = true;
+  t.doneAt = new Date().toISOString();
+  t.doneBy = currentUser?.id || '';
+  saveProdData();
+  renderMyTasks();
 }
 
 // ── Team CRUD ──────────────────────────
@@ -3133,6 +3223,8 @@ async function saveJSONBin() {
     if(hasLocalData(boardmaticUrls)) record.boardmaticUrls = boardmaticUrls;
     if(hasLocalData(trackerData)) record.trackerData = trackerData;
     if(users && users.length > 0) record.users = users;
+    record.prodTasks = prodTasks;
+    record.prodWeeklyGoal = prodWeeklyGoal;
 
     await fetch('https://api.jsonbin.io/v3/b/' + pipeline.binId, {
       method:'PUT',
@@ -4490,6 +4582,8 @@ async function loadJSONBin() {
       saveUsersLocal();
       updateUserBadge();
     }
+    if(record.prodTasks !== undefined) prodTasks = record.prodTasks || [];
+    if(record.prodWeeklyGoal !== undefined) prodWeeklyGoal = record.prodWeeklyGoal || '';
     saveLocal();
     renderActive();
     updateStats();
@@ -6003,6 +6097,322 @@ async function syncWardrobeToJSONBin() {
     });
   } catch(e) { console.warn('Wardrobe JSONBin sync failed:', e); }
 }
+
+// ════════════════════════════════════════
+// PROD BOARD
+// ════════════════════════════════════════
+let prodTasks = [];
+let prodWeeklyGoal = '';
+let _prodDirty = false;
+let _prodSyncTimer = null;
+let _prodDragTaskId = null;
+
+const PROD_BOARD_USERS = ['Lucila Trobbiani', 'Santiago Tereso'];
+
+function isProdBoardUser() {
+  return currentUser && PROD_BOARD_USERS.includes(currentUser.name);
+}
+
+function openProdBoard() {
+  if(!isProdBoardUser()) return;
+  document.getElementById('prod-board-view').style.display = 'block';
+  renderProdBoard();
+}
+
+function closeProdBoard() {
+  document.getElementById('prod-board-view').style.display = 'none';
+}
+
+function renderProdBoard() {
+  renderProdGoal();
+  renderProdCols();
+}
+
+function renderProdGoal() {
+  const el = document.getElementById('prod-goal-section');
+  if(!el) return;
+  el.innerHTML = `
+    <div class="prod-section-label" style="margin-bottom:8px;">
+      Objetivo de la Semana
+      <button class="prod-goal-edit-btn" onclick="editProdGoal()" title="Editar">✎ Editar</button>
+    </div>
+    <div class="prod-goal-box">
+      <div class="prod-goal-text${prodWeeklyGoal ? '' : ' empty'}">${prodWeeklyGoal ? escHtml(prodWeeklyGoal) : 'Sin objetivo esta semana. Click en ✎ Editar para escribir uno.'}</div>
+    </div>`;
+}
+
+function editProdGoal() {
+  const el = document.getElementById('prod-goal-section');
+  if(!el) return;
+  el.innerHTML = `
+    <div class="prod-section-label" style="margin-bottom:8px;">Objetivo de la Semana</div>
+    <div class="prod-goal-box">
+      <textarea class="prod-goal-textarea" id="prod-goal-input" placeholder="¿Cuál es el foco de esta semana?">${escHtml(prodWeeklyGoal)}</textarea>
+      <div>
+        <button class="prod-goal-save-btn" onclick="saveProdGoal()">✓ Guardar</button>
+        <button class="prod-goal-cancel-btn" onclick="renderProdGoal()">Cancelar</button>
+      </div>
+    </div>`;
+  document.getElementById('prod-goal-input')?.focus();
+}
+
+function saveProdGoal() {
+  prodWeeklyGoal = (document.getElementById('prod-goal-input')?.value || '').trim();
+  renderProdGoal();
+  saveProdData();
+}
+
+function getProdLeads() {
+  return users.filter(u => PROD_BOARD_USERS.includes(u.name));
+}
+
+function getProdUserName(userId) {
+  if(!userId) return 'Sin asignar';
+  const u = users.find(x => x.id === userId);
+  return u ? (u.name || u.username) : '?';
+}
+
+function renderProdCols() {
+  const section = document.getElementById('prod-cols-section');
+  if(!section) return;
+  const leads = getProdLeads();
+  const cols = [{ assignedTo:'', label:'Sin Asignar', icon:'📥' }];
+  leads.forEach(u => cols.push({ assignedTo:u.id, label:u.name || u.username, icon:'👤' }));
+
+  function buildColHtml(col) {
+    const colKey = col.assignedTo || 'none';
+    const tasks = prodTasks.filter(t => t.assignedTo === col.assignedTo);
+    const active = tasks.filter(t => !t.done);
+    const done   = tasks.filter(t =>  t.done);
+    let h = `<div class="prod-col" id="prod-col-${colKey}"
+      ondragover="prodDragOver(event,this)"
+      ondragleave="prodDragLeave(this)"
+      ondrop="prodDrop(event,'${col.assignedTo}')">`;
+    h += `<div class="prod-col-header">${col.icon} ${escHtml(col.label)} <span class="prod-col-count">${active.length}</span></div>`;
+    [...active, ...done].forEach(task => {
+      const creatorName = getProdUserName(task.createdBy);
+      const doneByName  = task.done ? getProdUserName(task.doneBy || '') : '';
+      const meta = task.done
+        ? ('Hecho' + (doneByName ? ' · ' + doneByName : ''))
+        : (task.createdBy && task.createdBy !== col.assignedTo ? 'Por ' + creatorName : '');
+      const canDel = currentUser && (currentUser.id === task.createdBy || isAdmin());
+      h += `<div class="prod-task${task.done ? ' done' : ''}" draggable="true" ondragstart="prodDragStart(event,'${task.id}')">
+        <div class="prod-task-check${task.done ? ' checked' : ''}" onclick="toggleProdDone('${task.id}')">${task.done ? '✓' : ''}</div>
+        <div class="prod-task-body">
+          <div class="prod-task-text">${escHtml(task.text)}</div>
+          ${meta ? `<div class="prod-task-meta">${escHtml(meta)}</div>` : ''}
+        </div>
+        <div class="prod-task-actions">
+          <button class="prod-task-edit-btn" onclick="editProdTask('${task.id}')" title="Editar">✎</button>
+          <button class="prod-task-assign-btn" onclick="openProdAssignPopup(event,'${task.id}')" title="Reasignar">→</button>
+          ${canDel ? `<button class="prod-task-del-btn" onclick="deleteProdTask('${task.id}')" title="Eliminar">✕</button>` : ''}
+        </div>
+      </div>`;
+    });
+    h += `<div id="prod-add-${colKey}">
+      <button class="prod-add-btn" onclick="showProdAddForm('${col.assignedTo}')">+ Agregar tarea</button>
+    </div>`;
+    h += '</div>';
+    return h;
+  }
+
+  const unassignedCol = cols[0];
+  const userCols = cols.slice(1);
+
+  let html = '<div class="prod-section-label" style="margin-bottom:12px;">Tareas del Día</div>';
+  // Sin Asignar — full width
+  html += '<div class="prod-cols prod-cols-top">' + buildColHtml(unassignedCol) + '</div>';
+  // User columns — side by side below
+  if(userCols.length) {
+    html += '<div class="prod-cols prod-cols-bottom">' + userCols.map(buildColHtml).join('') + '</div>';
+  }
+  section.innerHTML = html;
+}
+
+function showProdAddForm(assignedTo) {
+  const colKey = assignedTo || 'none';
+  const el = document.getElementById('prod-add-' + colKey);
+  if(!el) return;
+  el.innerHTML = `<div class="prod-add-form">
+    <input class="prod-add-input" id="prod-add-input-${colKey}" type="text" placeholder="Nueva tarea..."
+      onkeydown="if(event.key==='Enter')confirmProdAdd('${assignedTo}');else if(event.key==='Escape')cancelProdAdd('${assignedTo}')">
+    <div class="prod-add-actions">
+      <button class="prod-add-confirm" onclick="confirmProdAdd('${assignedTo}')">✓ Agregar</button>
+      <button class="prod-add-cancel" onclick="cancelProdAdd('${assignedTo}')">Cancelar</button>
+    </div>
+  </div>`;
+  document.getElementById('prod-add-input-' + colKey)?.focus();
+}
+
+function cancelProdAdd(assignedTo) {
+  const colKey = assignedTo || 'none';
+  const el = document.getElementById('prod-add-' + colKey);
+  if(el) el.innerHTML = `<button class="prod-add-btn" onclick="showProdAddForm('${assignedTo}')">+ Agregar tarea</button>`;
+}
+
+function confirmProdAdd(assignedTo) {
+  const colKey = assignedTo || 'none';
+  const input = document.getElementById('prod-add-input-' + colKey);
+  const text = (input?.value || '').trim();
+  if(!text) return;
+  prodTasks.push({
+    id: 'pt-' + Date.now() + '-' + Math.floor(Math.random()*9999),
+    text,
+    assignedTo: assignedTo || '',
+    done: false,
+    doneAt: '',
+    doneBy: '',
+    createdBy: currentUser?.id || '',
+    createdAt: new Date().toISOString()
+  });
+  saveProdData();
+  renderProdCols();
+}
+
+function editProdTask(taskId) {
+  const task = prodTasks.find(t => t.id === taskId);
+  if(!task) return;
+  const colKey = task.assignedTo || 'none';
+  const taskEl = document.querySelector(`[ondragstart="prodDragStart(event,'${taskId}')"]`);
+  if(!taskEl) return;
+  const body = taskEl.querySelector('.prod-task-body');
+  if(!body) return;
+  const original = body.innerHTML;
+  body.innerHTML = `<input class="prod-task-edit-input" id="prod-edit-${taskId}" type="text" value="${escHtml(task.text)}"
+    onkeydown="if(event.key==='Enter')saveProdTaskEdit('${taskId}');else if(event.key==='Escape')renderProdCols()">
+    <div class="prod-add-actions">
+      <button class="prod-add-confirm" onclick="saveProdTaskEdit('${taskId}')">✓</button>
+      <button class="prod-add-cancel" onclick="renderProdCols()">Cancelar</button>
+    </div>`;
+  taskEl.setAttribute('draggable', 'false');
+  document.getElementById('prod-edit-' + taskId)?.focus();
+}
+
+function saveProdTaskEdit(taskId) {
+  const input = document.getElementById('prod-edit-' + taskId);
+  const text = (input?.value || '').trim();
+  if(!text) return;
+  const task = prodTasks.find(t => t.id === taskId);
+  if(!task) return;
+  task.text = text;
+  saveProdData();
+  renderProdCols();
+}
+
+function toggleProdDone(taskId) {
+  const task = prodTasks.find(t => t.id === taskId);
+  if(!task) return;
+  task.done = !task.done;
+  task.doneAt = task.done ? new Date().toISOString() : '';
+  task.doneBy = task.done ? (currentUser?.id || '') : '';
+  saveProdData();
+  renderProdCols();
+}
+
+function deleteProdTask(taskId) {
+  const task = prodTasks.find(t => t.id === taskId);
+  if(!task) return;
+  if(currentUser?.id !== task.createdBy && !isAdmin()) return;
+  prodTasks = prodTasks.filter(t => t.id !== taskId);
+  saveProdData();
+  renderProdCols();
+}
+
+function openProdAssignPopup(event, taskId) {
+  event.stopPropagation();
+  const popup = document.getElementById('prod-assign-popup');
+  if(!popup) return;
+  const leads = getProdLeads();
+  const options = [{ id:'', label:'📥 Sin asignar' }, ...leads.map(u => ({ id:u.id, label:'👤 ' + (u.name || u.username) }))];
+  popup.innerHTML = options.map(o =>
+    `<div class="prod-assign-option" onclick="assignProdTask('${taskId}','${o.id}');closeProdAssignPopup()">${escHtml(o.label)}</div>`
+  ).join('');
+  const rect = event.target.getBoundingClientRect();
+  popup.style.top  = (rect.bottom + 6) + 'px';
+  popup.style.left = Math.min(rect.left, window.innerWidth - 180) + 'px';
+  popup.style.display = 'block';
+  setTimeout(() => document.addEventListener('click', closeProdAssignPopup, { once:true }), 10);
+}
+
+function closeProdAssignPopup() {
+  const popup = document.getElementById('prod-assign-popup');
+  if(popup) popup.style.display = 'none';
+}
+
+function assignProdTask(taskId, userId) {
+  const task = prodTasks.find(t => t.id === taskId);
+  if(!task) return;
+  task.assignedTo = userId;
+  saveProdData();
+  renderProdCols();
+}
+
+function prodDragStart(event, taskId) {
+  _prodDragTaskId = taskId;
+  event.dataTransfer.effectAllowed = 'move';
+  event.dataTransfer.setData('text/plain', taskId);
+}
+
+function prodDragOver(event, colEl) {
+  event.preventDefault();
+  event.dataTransfer.dropEffect = 'move';
+  colEl.classList.add('drag-over');
+}
+
+function prodDragLeave(colEl) {
+  colEl.classList.remove('drag-over');
+}
+
+function prodDrop(event, assignedTo) {
+  event.preventDefault();
+  const colKey = assignedTo || 'none';
+  document.getElementById('prod-col-' + colKey)?.classList.remove('drag-over');
+  const taskId = _prodDragTaskId || event.dataTransfer.getData('text/plain');
+  _prodDragTaskId = null;
+  if(!taskId) return;
+  const task = prodTasks.find(t => t.id === taskId);
+  if(!task) return;
+  task.assignedTo = assignedTo;
+  saveProdData();
+  renderProdCols();
+}
+
+function saveProdData() {
+  _prodDirty = true;
+  if(_prodSyncTimer) clearTimeout(_prodSyncTimer);
+  _prodSyncTimer = setTimeout(syncProdToJSONBin, 3000);
+}
+
+async function syncProdToJSONBin() {
+  if(!pipeline.binId || !pipeline.binKey) return;
+  try {
+    const res = await fetch('https://api.jsonbin.io/v3/b/'+pipeline.binId+'/latest', {
+      headers:{'X-Master-Key':pipeline.binKey,'X-Bin-Meta':'false'}
+    });
+    const existing = await res.json();
+    const record = existing.record || existing;
+    record.prodTasks = prodTasks;
+    record.prodWeeklyGoal = prodWeeklyGoal;
+    await fetch('https://api.jsonbin.io/v3/b/'+pipeline.binId, {
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Master-Key':pipeline.binKey},
+      body: JSON.stringify(record)
+    });
+    _prodDirty = false;
+  } catch(e) { console.warn('Prod JSONBin sync failed:', e); }
+}
 </script>
+
+<div id="prod-board-view">
+  <div class="prod-topbar">
+    <span class="prod-topbar-title">🎬 Prod Board</span>
+    <button class="prod-back-btn" onclick="closeProdBoard()">← Volver</button>
+  </div>
+  <div class="prod-body">
+    <div id="prod-goal-section" style="margin-bottom:24px;"></div>
+    <div id="prod-cols-section"></div>
+  </div>
+</div>
+<div id="prod-assign-popup" class="prod-assign-popup" style="display:none;"></div>
 </body>
 </html>

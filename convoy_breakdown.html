@@ -303,11 +303,49 @@
     margin-top: 6px; letter-spacing: 1px;
   }
 
+  /* CHAR MAIN IMAGE */
+  .char-main-wrap { position: relative; background: var(--bg-card2); }
+  .char-main-empty {
+    width: 100%; height: 200px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+    border-bottom: 1px dashed var(--border); color: var(--text-muted);
+    font-family: var(--fontb); font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+    transition: all .2s;
+  }
+  .char-main-empty:hover { border-color: var(--pink); color: var(--pink); }
+  .char-main-has-img { position: relative; cursor: pointer; }
+  .char-main-has-img img { width:100%; display:block; object-fit:contain; max-height:240px; background:var(--bg-card2); }
+  .char-main-actions {
+    position: absolute; bottom:0; left:0; right:0; display:flex; gap:6px; padding:8px 10px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.75)); opacity:0; transition: opacity .2s;
+  }
+  .char-main-has-img:hover .char-main-actions { opacity:1; }
+  .char-main-actions button {
+    background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); color:#fff;
+    font-family:var(--fontb); font-size:10px; letter-spacing:1px; padding:4px 10px;
+    cursor:pointer; text-transform:uppercase; transition:background .15s;
+  }
+  .char-main-actions button:hover { background:var(--pink); border-color:var(--pink); }
+  /* EXPRESSIONS GRID */
+  .expr-grid { display:flex; flex-wrap:wrap; gap:6px; padding:10px 12px 12px; }
+  .expr-thumb { position:relative; width:76px; height:76px; cursor:pointer; }
+  .expr-thumb img { width:100%; height:100%; object-fit:contain; background:var(--bg-card2); border:1px solid var(--border); }
+  .expr-thumb:hover img { border-color:var(--pink); }
+  .expr-add {
+    width:76px; height:76px; display:flex; align-items:center; justify-content:center;
+    border:1px dashed var(--border); color:var(--text-muted); font-size:22px; cursor:pointer; transition:all .15s;
+  }
+  .expr-add:hover { border-color:var(--pink); color:var(--pink); }
+
   /* GRID LAYOUT */
   .cards-grid {
     display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 16px;
   }
+  #chars-grid { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 900px) { #chars-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 580px) { #chars-grid { grid-template-columns: 1fr; } }
+  .chars-tab-header { display:flex; justify-content:flex-end; padding: 0 0 12px; }
 
   /* CHARACTER / ASSET CARD */
   .item-card {
@@ -1707,6 +1745,9 @@
 
     <!-- CHARACTERS TAB -->
     <div id="tab-characters" class="tab-panel">
+      <div class="chars-tab-header">
+        <button class="synopsis-lang-btn" id="char-lang-btn" onclick="toggleCharLang()">ES</button>
+      </div>
       <div id="chars-grid" class="cards-grid"></div>
     </div>
 
@@ -2050,82 +2091,101 @@ const EP_SYNOPSES = {
 
 let synopsisLang = 'en';
 let panelLang = 'en';
+let charLang = 'en';
 
 const CHARACTERS = [
   {
     id:'sean', name:'Sean', role:'Lead — The Spy Kid',
+    roleEs:'Protagonista — El Niño Espía',
     vehicle:'Drives Rover 6x6',
+    vehicleEs:'Conduce el Rover 6x6',
     badge:'character',
     detail:'Protagonist. Recurring across all episodes.',
+    detailEs:'Protagonista. Aparece en todos los episodios.',
     episodes: ['ep101','ep102','ep103','ep104','ep105','ep106','ep107'],
     wardrobe: [
-      { id:'sean-base', name:'Base', desc:'Casual everyday outfit', episodes:['ep101','ep102','ep103','ep104','ep105','ep106','ep107'] },
-      { id:'sean-hardhat', name:'Construction Gear', desc:'Orange hard hat, seatbelt — construction scenes', episodes:['ep101','ep105'] },
+      { id:'sean-base', name:'Base', nameEs:'Base', desc:'Casual everyday outfit', descEs:'Atuendo casual del día a día', episodes:['ep101','ep102','ep103','ep104','ep105','ep106','ep107'] },
+      { id:'sean-hardhat', name:'Construction Gear', nameEs:'Equipo de Construcción', desc:'Orange hard hat, seatbelt — construction scenes', descEs:'Casco naranja, cinturón — escenas de construcción', episodes:['ep101','ep105'] },
     ],
     notes: ''
   },
   {
     id:'ted', name:'Ted', role:'Fire & Rescue Lead',
+    roleEs:'Líder de Bomberos y Rescate',
     vehicle:'Drives Blaze Blaster III & Triumph Scrambler',
+    vehicleEs:'Conduce el Blaze Blaster III y el Triumph Scrambler',
     badge:'character',
     detail:'Commands fire rescue ops. Wears full firefighter gear including helmet.',
+    detailEs:'Dirige las operaciones de rescate contra incendios. Usa equipo completo de bombero incluyendo casco.',
     episodes: ['ep101','ep102','ep103','ep104','ep105','ep106','ep107'],
     wardrobe: [
-      { id:'ted-base',        name:'Base',            desc:'Casual everyday outfit',                          episodes:['ep101','ep102','ep104','ep106','ep107'] },
-      { id:'ted-hardhat',     name:'Construction Gear', desc:'Orange hard hat over casual outfit',             episodes:['ep101','ep105'] },
-      { id:'ted-firefighter', name:'Firefighter',     desc:'Full gear — helmet, coat, breathing apparatus',   episodes:['ep103'] },
-      { id:'ted-race',        name:'Race Spectator',  desc:'Helmet on, visor up, race outfit',                episodes:['ep104','ep106'] },
+      { id:'ted-base',        name:'Base',            nameEs:'Base',                   desc:'Casual everyday outfit',                          descEs:'Atuendo casual del día a día',                     episodes:['ep101','ep102','ep104','ep106','ep107'] },
+      { id:'ted-hardhat',     name:'Construction Gear', nameEs:'Equipo de Construcción', desc:'Orange hard hat over casual outfit',             descEs:'Casco naranja sobre atuendo casual',               episodes:['ep101','ep105'] },
+      { id:'ted-firefighter', name:'Firefighter',     nameEs:'Bombero',                desc:'Full gear — helmet, coat, breathing apparatus',   descEs:'Equipo completo — casco, chaqueta, aparato respiratorio', episodes:['ep103'] },
+      { id:'ted-race',        name:'Race Spectator',  nameEs:'Espectador de Carrera',  desc:'Helmet on, visor up, race outfit',                descEs:'Casco puesto, visera arriba, atuendo de carrera',  episodes:['ep104','ep106'] },
     ],
     notes: ''
   },
   {
     id:'charmaine', name:'Charmaine', role:'Air Support',
+    roleEs:'Soporte Aéreo',
     vehicle:'Pilots Rescue Helicopter & Super Hercules',
+    vehicleEs:'Pilotea el Rescue Helicopter y el Super Hercules',
     badge:'character',
     detail:'Aerial recon, water bucket drops and cargo extractions. Uses headset.',
+    detailEs:'Reconocimiento aéreo, descargas de agua y extracciones de carga. Usa auricular.',
     episodes: ['ep101','ep102','ep103','ep104','ep105','ep106','ep107'],
     wardrobe: [
-      { id:'charmaine-base',    name:'Base',              desc:'Casual outfit with headset',              episodes:['ep101','ep103','ep104','ep105','ep106','ep107'] },
-      { id:'charmaine-hardhat', name:'Construction Gear', desc:'Orange hard hat over casual outfit',       episodes:['ep101','ep105'] },
-      { id:'charmaine-pilot',   name:'Pilot Gear',        desc:'Flight suit, cargo extraction gear',      episodes:['ep102','ep106','ep107'] },
+      { id:'charmaine-base',    name:'Base',              nameEs:'Base',                   desc:'Casual outfit with headset',              descEs:'Atuendo casual con auricular',                    episodes:['ep101','ep103','ep104','ep105','ep106','ep107'] },
+      { id:'charmaine-hardhat', name:'Construction Gear', nameEs:'Equipo de Construcción', desc:'Orange hard hat over casual outfit',       descEs:'Casco naranja sobre atuendo casual',              episodes:['ep101','ep105'] },
+      { id:'charmaine-pilot',   name:'Pilot Gear',        nameEs:'Equipo de Piloto',       desc:'Flight suit, cargo extraction gear',      descEs:'Traje de vuelo, equipo de extracción de carga',   episodes:['ep102','ep106','ep107'] },
     ],
     notes: ''
   },
   {
     id:'aimee', name:'Aimee', role:'Speed & Logistics',
+    roleEs:'Velocidad y Logística',
     vehicle:'Drives Ambulance, Toyota Tacoma & Chevy Stock Car',
+    vehicleEs:'Conduce la Ambulancia, Toyota Tacoma y Chevy Stock Car',
     badge:'character',
     detail:'Fast and resourceful. Handles crowd control, medical support and high-speed chases.',
+    detailEs:'Rápida y hábil. Maneja el control de multitudes, apoyo médico y persecuciones de alta velocidad.',
     episodes: ['ep101','ep102','ep103','ep104','ep105','ep106','ep107'],
     wardrobe: [
-      { id:'aimee-base',        name:'Base',              desc:'Casual everyday outfit',                   episodes:['ep101','ep102','ep103','ep105','ep106','ep107'] },
-      { id:'aimee-hardhat',     name:'Construction Gear', desc:'Orange hard hat over casual outfit',        episodes:['ep101','ep105'] },
-      { id:'aimee-firefighter', name:'Firefighter',       desc:'Fire gear — helmet, hose, assists Ted',    episodes:['ep103'] },
-      { id:'aimee-race',        name:'Race Driver',       desc:'Seatbelt on, focused race look',           episodes:['ep104','ep106'] },
+      { id:'aimee-base',        name:'Base',              nameEs:'Base',                   desc:'Casual everyday outfit',                   descEs:'Atuendo casual del día a día',                    episodes:['ep101','ep102','ep103','ep105','ep106','ep107'] },
+      { id:'aimee-hardhat',     name:'Construction Gear', nameEs:'Equipo de Construcción', desc:'Orange hard hat over casual outfit',        descEs:'Casco naranja sobre atuendo casual',             episodes:['ep101','ep105'] },
+      { id:'aimee-firefighter', name:'Firefighter',       nameEs:'Bombera',                desc:'Fire gear — helmet, hose, assists Ted',    descEs:'Equipo de bombero — casco, manguera, asiste a Ted', episodes:['ep103'] },
+      { id:'aimee-race',        name:'Race Driver',       nameEs:'Piloto de Carrera',      desc:'Seatbelt on, focused race look',           descEs:'Cinturón puesto, look concentrado de carrera',   episodes:['ep104','ep106'] },
     ],
     notes: ''
   },
   {
     id:'crosby', name:'Crosby', role:'Construction & Heavy',
+    roleEs:'Construcción y Maquinaria Pesada',
     vehicle:'Operates Excavator & Turf Hauler',
+    vehicleEs:'Opera la Excavadora y el Turf Hauler',
     badge:'character',
     detail:'Engineering mindset. Demolition and heavy construction rigs. Wears orange hard hat.',
+    detailEs:'Mentalidad de ingeniero. Demolición y equipos pesados de construcción. Usa casco naranja.',
     episodes: ['ep101','ep102','ep103','ep104','ep105','ep106','ep107'],
     wardrobe: [
-      { id:'crosby-base',        name:'Base',              desc:'Casual outfit with orange hard hat',          episodes:['ep101','ep102','ep103','ep105','ep106','ep107'] },
-      { id:'crosby-firefighter', name:'Firefighter',       desc:'Full gear — helmet, coat, fire hose',         episodes:['ep103'] },
-      { id:'crosby-race',        name:'Race Driver',       desc:'Race outfit, Nismo driver look',              episodes:['ep104','ep106'] },
+      { id:'crosby-base',        name:'Base',              nameEs:'Base',              desc:'Casual outfit with orange hard hat',          descEs:'Atuendo casual con casco naranja',     episodes:['ep101','ep102','ep103','ep105','ep106','ep107'] },
+      { id:'crosby-firefighter', name:'Firefighter',       nameEs:'Bombero',           desc:'Full gear — helmet, coat, fire hose',         descEs:'Equipo completo — casco, chaqueta, manguera', episodes:['ep103'] },
+      { id:'crosby-race',        name:'Race Driver',       nameEs:'Piloto de Carrera', desc:'Race outfit, Nismo driver look',              descEs:'Atuendo de carrera, look estilo Nismo', episodes:['ep104','ep106'] },
     ],
     notes: ''
   },
   {
     id:'von-steele', name:'Von Steele', role:'Villain — Super-Spy Criminal',
+    roleEs:'Villano — Criminal Superespía',
     vehicle:'Drives black Dodge Durango',
+    vehicleEs:'Conduce el Dodge Durango negro',
     badge:'villain',
     detail:'Recurring antagonist across all episodes.',
+    detailEs:'Antagonista recurrente en todos los episodios.',
     episodes: ['ep101','ep102','ep103','ep107'],
     wardrobe: [
-      { id:'von-steele-base', name:'Base', desc:'Eyepatch, dark villain look, spy aesthetic', episodes:['ep101','ep102','ep103','ep107'] },
+      { id:'von-steele-base', name:'Base', nameEs:'Base', desc:'Eyepatch, dark villain look, spy aesthetic', descEs:'Parche en el ojo, look oscuro de villano, estética de espía', episodes:['ep101','ep102','ep103','ep107'] },
     ],
     notes: ''
   }
@@ -2737,6 +2797,25 @@ function toggleSynopsisLang() {
   renderSynopsis(currentChapter);
 }
 
+function toggleCharLang() {
+  charLang = charLang === 'en' ? 'es' : 'en';
+  const btn = document.getElementById('char-lang-btn');
+  if(btn) {
+    btn.textContent = charLang === 'en' ? 'ES' : 'EN';
+    btn.classList.toggle('active', charLang === 'es');
+  }
+  renderCharacters();
+}
+
+function toggleWardrobeSection(sectionId, header) {
+  const body = document.getElementById(sectionId);
+  if(!body) return;
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : '';
+  const arrow = header.querySelector('.wardrobe-arrow');
+  if(arrow) arrow.textContent = isOpen ? '▶' : '▼';
+}
+
 function togglePanelLang() {
   panelLang = panelLang === 'en' ? 'es' : 'en';
   const btn = document.getElementById('panel-lang-btn');
@@ -2910,9 +2989,6 @@ function renderPlaysets() {
 }
 
 function buildItemCard(item) {
-  const imgUrl = imageData[item.id]?.url || '';
-  const hasImg = !!imgUrl;
-  const savedNotes = notesData[item.id] || '';
   const epTags = EPISODES.map(ep =>
     `<span class="ep-tag ${item.episodes.includes(ep) ? 'present' : ''}">${EP_LABELS[ep]}</span>`
   ).join('');
@@ -2921,13 +2997,47 @@ function buildItemCard(item) {
                      item.badge === 'vehicle' ? 'Vehicle' :
                      item.badge === 'playset' ? 'Playset' : 'Character';
 
+  // ── CHARACTER / VILLAIN: new layout ──
+  if(item.badge === 'character' || item.badge === 'villain') {
+    const isEs = charLang === 'es';
+    const role = (isEs && item.roleEs) ? item.roleEs : (item.role || '');
+    const detail = (isEs && item.detailEs) ? item.detailEs : item.detail;
+    const vehicle = (isEs && item.vehicleEs) ? item.vehicleEs : item.vehicle;
+    return `
+  <div class="item-card" id="card-${item.id}">
+    <div class="card-header">
+      <div>
+        <div class="card-name">${item.name}</div>
+        <div class="card-role">${role}</div>
+      </div>
+      <span class="card-badge ${badgeClass}">${badgeLabel}</span>
+    </div>
+    <div class="char-main-wrap" id="char-main-wrap-${item.id}"
+      ondragover="event.preventDefault(); this.classList.add('drag-over')"
+      ondragleave="this.classList.remove('drag-over')"
+      ondrop="this.classList.remove('drag-over'); handleDropMain(event, '${item.id}')"
+    >${buildMainImage(item.id)}</div>
+    <div class="upload-status" id="status-${item.id}"></div>
+    <input type="file" id="file-main-${item.id}" accept="image/*" onchange="handleFileMain(event, '${item.id}')">
+    <input type="file" id="file-${item.id}" accept="image/*" multiple onchange="handleFile(event, '${item.id}')">
+    <div class="card-body">
+      <div class="card-appearances">${epTags}</div>
+      <div class="card-detail">${detail}</div>
+      ${vehicle ? `<div class="card-vehicle" onclick="goToVehicle('${item.id}')" style="cursor:pointer;">🚗 ${vehicle}</div>` : ''}
+    </div>
+    ${item.wardrobe ? buildWardrobeSection(item) : ''}
+    <div id="expr-section-${item.id}">${buildExpressionsSection(item.id)}</div>
+  </div>`;
+  }
+
+  // ── VEHICLE / PLAYSET: original layout ──
+  const savedNotes = notesData[item.id] || '';
   return `
   <div class="item-card" id="card-${item.id}">
     <div class="card-header">
       <div>
         <div class="card-name">${item.name}</div>
         <div class="card-role">${item.role || item.sku || ''}</div>
-        ${item.vehicle ? `<div class="card-vehicle" onclick="goToVehicle('${item.id}')">${item.vehicle}</div>` : ''}
       </div>
       <span class="card-badge ${badgeClass}">${badgeLabel}</span>
     </div>
@@ -2945,7 +3055,6 @@ function buildItemCard(item) {
       <textarea class="notes-area" id="notes-${item.id}" placeholder="Production notes..."
         onblur="saveNotes('${item.id}')">${savedNotes}</textarea>
     </div>
-    ${item.wardrobe ? buildWardrobeSection(item) : ''}
   </div>`;
 }
 
@@ -3040,9 +3149,112 @@ function buildCarousel(id) {
     <button class="carousel-btn next hidden" id="next-${id}" onclick="slideCarousel('${id}', 1)">›</button>`;
 }
 
+function buildMainImage(id) {
+  const imgs = getImages(id);
+  const main = imgs[0];
+  if(!main) {
+    return `<div class="char-main-empty" onclick="triggerFileMain('${id}')">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="3" width="18" height="18" rx="2"/>
+        <path d="M3 16l5-5 4 4 4-5 5 6"/>
+        <circle cx="8.5" cy="8.5" r="1.5"/>
+      </svg>
+      <span>Drop main image or click</span>
+    </div>`;
+  }
+  return `<div class="char-main-has-img" onclick="openLightbox('${id}', 0)">
+    <img src="${main.cloudinaryUrl || main.url}" alt="">
+    <div class="char-main-actions">
+      <button onclick="event.stopPropagation(); triggerFileMain('${id}')">↑ Replace</button>
+      <button onclick="event.stopPropagation(); deleteImage('${id}', 0)">× Remove</button>
+    </div>
+  </div>`;
+}
+
+function buildExpressionsSection(id) {
+  const imgs = getImages(id);
+  const exprs = imgs.slice(1);
+  const isEs = charLang === 'es';
+  const label = isEs ? 'Expresiones y Acciones' : 'Expressions & Actions';
+  const sectionId = 'expr-body-' + id;
+  const thumbs = exprs.map((img, i) => `
+    <div class="expr-thumb" onclick="openLightbox('${id}', ${i+1})">
+      <img src="${img.cloudinaryUrl || img.url}" alt="">
+      <button class="thumb-del" onclick="event.stopPropagation(); deleteImage('${id}', ${i+1})">×</button>
+    </div>`).join('');
+  return `
+  <div class="wardrobe-section">
+    <div class="wardrobe-header" onclick="toggleWardrobeSection('${sectionId}', this)" style="cursor:pointer; user-select:none;">
+      <span class="wardrobe-label"><span class="wardrobe-arrow">▶</span> ${label}</span>
+      <span class="wardrobe-count">${exprs.length}</span>
+    </div>
+    <div id="${sectionId}" style="display:none;">
+      <div class="expr-grid">
+        ${thumbs}
+        <div class="expr-add" onclick="triggerFile('${id}')" title="${isEs ? 'Agregar expresión' : 'Add expression'}">+</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function triggerFileMain(id) {
+  document.getElementById('file-main-' + id)?.click();
+}
+
+function handleFileMain(event, id) {
+  const file = event.target.files[0];
+  event.target.value = '';
+  if(!file || !file.type.startsWith('image/')) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    if(!imageData[id]) imageData[id] = { images: [] };
+    if(!imageData[id].images) imageData[id].images = [];
+    if(imageData[id].images.length === 0) {
+      imageData[id].images.unshift({ url: e.target.result, cloudinaryUrl: '' });
+    } else {
+      imageData[id].images[0] = { url: e.target.result, cloudinaryUrl: '' };
+    }
+    saveLocal();
+    refreshCharCard(id);
+    showToast('Uploading to Cloudinary...');
+    uploadCloudinaryFile(id, file, 0);
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleDropMain(e, id) {
+  e.preventDefault();
+  e.stopPropagation();
+  const file = Array.from(e.dataTransfer.files).find(f => f.type.startsWith('image/'));
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    if(!imageData[id]) imageData[id] = { images: [] };
+    if(!imageData[id].images) imageData[id].images = [];
+    if(imageData[id].images.length === 0) {
+      imageData[id].images.unshift({ url: ev.target.result, cloudinaryUrl: '' });
+    } else {
+      imageData[id].images[0] = { url: ev.target.result, cloudinaryUrl: '' };
+    }
+    saveLocal();
+    refreshCharCard(id);
+    showToast('Uploading to Cloudinary...');
+    uploadCloudinaryFile(id, file, 0);
+  };
+  reader.readAsDataURL(file);
+}
+
+function refreshCharCard(id) {
+  const mainWrap = document.getElementById('char-main-wrap-' + id);
+  if(mainWrap) mainWrap.innerHTML = buildMainImage(id);
+  const exprSection = document.getElementById('expr-section-' + id);
+  if(exprSection) exprSection.innerHTML = buildExpressionsSection(id);
+}
+
 function refreshCarousel(id) {
   const wrap = document.getElementById('carousel-wrap-'+id);
   if(wrap) wrap.innerHTML = buildCarousel(id);
+  refreshCharCard(id);
   updateCarouselBtns(id);
 }
 
@@ -3117,6 +3329,7 @@ function deleteImage(id, idx) {
   saveLocal();
   saveJSONBin();
   refreshCarousel(id);
+  refreshCharCard(id);
   updateStats();
 }
 
@@ -4702,8 +4915,12 @@ function showToast(msg) {
 // VEHICLE LINK — click vehicle name to jump to its card
 // ════════════════════════════════════════
 const VEHICLE_LINKS = {
-  'sean':       ['rover-6x6'],
-  'von-steele': ['dodge-durango'],
+  'sean':      ['rover-6x6'],
+  'ted':       ['blaze-blaster', 'triumph-scrambler'],
+  'charmaine': ['rescue-heli', 'super-hercules'],
+  'aimee':     ['dodge-ambulance', 'toyota-tacoma', 'chevy-stock'],
+  'crosby':    ['excavator', 'turf-hauler'],
+  'von-steele':['dodge-durango'],
 };
 
 function goToVehicle(charId) {
@@ -5951,38 +6168,46 @@ function buildWardrobeSection(item) {
 
   const count = filtered.length;
   const totalCount = nonBase.length;
+  const isEs = charLang === 'es';
 
   const rows = filtered.map(v => {
     const img = wardrobeImageData[v.id] || '';
     const epBadges = v.episodes.map(ep => `<span class="wv-ep">${EP_LABELS[ep]}</span>`).join('');
+    const vName = (isEs && v.nameEs) ? v.nameEs : v.name;
+    const vDesc = (isEs && v.descEs) ? v.descEs : v.desc;
     return `
     <div class="wv-row">
       <div class="wv-thumb" onclick="document.getElementById('wv-file-${v.id}').click()" title="${img ? 'Click para reemplazar' : 'Click para agregar imagen'}">
         ${img
-          ? `<img src="${img}" alt="${v.name}"><button class="wv-thumb-del" onclick="event.stopPropagation(); deleteWardrobeImage('${v.id}')" title="Borrar imagen">×</button>`
+          ? `<img src="${img}" alt="${vName}"><button class="wv-thumb-del" onclick="event.stopPropagation(); deleteWardrobeImage('${v.id}')" title="Borrar imagen">×</button>`
           : `<span class="wv-thumb-add">+</span>`
         }
       </div>
       <input class="wv-file" type="file" id="wv-file-${v.id}" accept="image/*" onchange="uploadWardrobeImage('${v.id}', '${item.id}', this)">
       <div class="wv-info">
-        <div class="wv-name">${v.name}</div>
-        <div class="wv-desc">${v.desc}</div>
+        <div class="wv-name">${vName}</div>
+        <div class="wv-desc">${vDesc}</div>
         <div class="wv-eps">${epBadges}</div>
       </div>
     </div>`;
   }).join('');
 
-  const label = currentChapter === 'all'
-    ? `${totalCount} ${totalCount === 1 ? 'change' : 'changes'}`
-    : `${count} of ${totalCount} ${totalCount === 1 ? 'change' : 'changes'}`;
+  const sectionLabel = isEs ? 'Vestuario por episodio' : 'Wardrobe by episode';
+  const changeWord = isEs ? (totalCount === 1 ? 'cambio' : 'cambios') : (totalCount === 1 ? 'change' : 'changes');
+  const countLabel = currentChapter === 'all'
+    ? `${totalCount} ${changeWord}`
+    : `${count} ${isEs ? 'de' : 'of'} ${totalCount} ${changeWord}`;
+  const sectionId = 'wardrobe-body-' + item.id;
 
   return `
   <div class="wardrobe-section">
-    <div class="wardrobe-header">
-      <span class="wardrobe-label">Wardrobe changes</span>
-      <span class="wardrobe-count">${label}</span>
+    <div class="wardrobe-header" onclick="toggleWardrobeSection('${sectionId}', this)" style="cursor:pointer; user-select:none;">
+      <span class="wardrobe-label"><span class="wardrobe-arrow">▼</span> ${sectionLabel}</span>
+      <span class="wardrobe-count">${countLabel}</span>
     </div>
-    ${rows}
+    <div id="${sectionId}">
+      ${rows}
+    </div>
   </div>`;
 }
 

@@ -1398,6 +1398,7 @@
   }
   .menu-item:last-child { border-bottom: none; }
   .menu-item:hover { background: rgba(255,0,102,0.08); color: var(--text); }
+  .menu-separator { border-top: 1px solid #2a2a2a; margin: 10px 0 6px; }
 
   /* ─── BOARDMATIC ─── */
   .bm-container { padding: 16px 24px; max-width: 960px; }
@@ -1603,14 +1604,14 @@
       <div class="menu-wrap">
         <button class="menu-trigger" onclick="toggleMainMenu(event)">☰</button>
         <div class="menu-dropdown" id="main-menu">
-          <div class="menu-item" onclick="closeMainMenu(); openMyTasks();">My Tasks</div>
           <div class="menu-item" onclick="closeMainMenu(); toggleTracker();">▦ Tracker</div>
           <div class="menu-item" onclick="closeMainMenu(); openSchedule();">▤ Schedule</div>
-          <div class="menu-item" onclick="closeMainMenu(); manualSyncFromBin();">↻ Sync</div>
           <div class="menu-item" id="menu-prod" onclick="closeMainMenu(); openProdBoard();" style="display:none;">🎬 Prod Board</div>
+          <div class="menu-item" onclick="closeMainMenu(); openMyTasks();">My Tasks</div>
+          <div class="menu-separator"></div>
           <div class="menu-item" id="menu-team" onclick="closeMainMenu(); openTeam();" style="display:none;">👥 Team</div>
           <div class="menu-item" onclick="closeMainMenu(); openPipeline();">⚙ Settings</div>
-          <div class="menu-item" onclick="closeMainMenu(); exportZip();">↓ Export ZIP</div>
+          <div class="menu-item" onclick="closeMainMenu(); manualSyncFromBin();">↻ Sync</div>
         </div>
       </div>
       <div class="user-badge" id="user-badge"></div>

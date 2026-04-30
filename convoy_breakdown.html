@@ -6156,6 +6156,8 @@ function openProdBoard() {
   if(!isProdBoardUser()) return;
   document.getElementById('prod-board-view').style.display = 'block';
   renderProdBoard();
+  // Re-render after remote fetch in case prodTasks wasn't loaded yet
+  loadJSONBin().then(() => renderProdBoard()).catch(() => {});
 }
 
 function closeProdBoard() {

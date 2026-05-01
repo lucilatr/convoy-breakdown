@@ -741,6 +741,85 @@
   .stage-lock { background: #66BB6A; color: #111; }
   .stage-bs { background: #FFB74D; color: #111; }
 
+  /* ── This Week Recap: full-screen overlay modal ── */
+  .recap-panel {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.88);
+    z-index: 700;
+    display: none;
+    align-items: center; justify-content: center;
+  }
+  .recap-panel.open { display: flex; }
+  .recap-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    width: 740px; max-width: 92vw;
+    max-height: 82vh;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.7);
+  }
+  .recap-header {
+    padding: 20px 24px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .recap-header-title {
+    font-size: 11px; font-weight: 900; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--text);
+    font-family: var(--fontb);
+  }
+  .recap-close-btn {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text-dim); width: 28px; height: 28px;
+    font-size: 16px; cursor: pointer; line-height: 1;
+    transition: all .15s;
+  }
+  .recap-close-btn:hover { border-color: var(--pink); color: var(--pink); }
+  .recap-body { flex: 1; overflow-y: auto; padding: 0 0 24px; }
+  .recap-section {
+    padding: 18px 28px 10px;
+  }
+  .recap-section-label {
+    font-size: 9px; font-weight: 900; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--pink);
+    font-family: var(--fontb); margin-bottom: 4px;
+  }
+  .recap-week-label {
+    font-size: 15px; font-weight: 700; color: var(--text);
+    margin-bottom: 16px;
+  }
+  .recap-ep-row {
+    display: grid; grid-template-columns: 48px 1fr 1fr;
+    gap: 10px; align-items: start;
+    padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .recap-ep-row:last-child { border-bottom: none; }
+  .recap-ep-num {
+    font-size: 11px; font-weight: 900; letter-spacing: 1px;
+    color: var(--text-dim); font-family: var(--fontb);
+    padding-top: 4px;
+  }
+  .recap-col-head {
+    font-size: 8px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--text-dim); font-family: var(--fontb);
+    margin-bottom: 5px;
+  }
+  .recap-pill {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.5px; padding: 3px 9px;
+    border-radius: 3px; text-transform: uppercase;
+    font-family: var(--fontb); max-width: 100%;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    margin-bottom: 3px;
+  }
+  .recap-empty { font-size: 10px; color: var(--text-dim); font-style: italic; }
+  .recap-divider {
+    height: 1px; background: var(--border); margin: 4px 28px 0;
+  }
+
   .sched-scroll {
     flex: 1; overflow: auto; position: relative;
     background: var(--bg);
@@ -1918,6 +1997,7 @@
       <button class="sched-zoom-btn active" onclick="schedZoom('m')" id="sz-m">M</button>
       <button class="sched-zoom-btn" onclick="schedZoom('l')" id="sz-l">L</button>
       <button class="sched-zoom-btn" onclick="schedJumpToday()">→ Today</button>
+      <button class="sched-zoom-btn" onclick="toggleRecap()" id="recap-btn">This Week</button>
       <button class="sched-close" onclick="closeSchedule()">×</button>
     </div>
   </div>
@@ -1936,8 +2016,20 @@
     <div class="sched-legend-item"><div class="sched-legend-swatch" style="background:rgba(0,188,212,0.4);border-left:2px solid #00BCD4;border-right:2px solid #00BCD4;"></div>Today</div>
   </div>
 
-  <div class="sched-scroll" id="sched-scroll">
-    <div class="sched-grid" id="sched-grid"></div>
+  <div style="flex:1; display:flex; position:relative; overflow:hidden;">
+    <div class="sched-scroll" id="sched-scroll" style="flex:1;">
+      <div class="sched-grid" id="sched-grid"></div>
+    </div>
+  </div>
+</div>
+
+<div class="recap-panel" id="recap-panel" onclick="if(event.target===this)toggleRecap()">
+  <div class="recap-card">
+    <div class="recap-header">
+      <div class="recap-header-title">Weekly Recap</div>
+      <button class="recap-close-btn" onclick="toggleRecap()">×</button>
+    </div>
+    <div class="recap-body" id="recap-body"></div>
   </div>
 </div>
 
@@ -4105,6 +4197,99 @@ function openSchedule() {
 }
 function closeSchedule() {
   document.getElementById('schedule-modal').classList.remove('open');
+  document.getElementById('recap-panel').classList.remove('open');
+  document.getElementById('recap-btn').classList.remove('active');
+}
+
+// ── This Week Recap ──────────────────────────────────────────
+function toggleRecap() {
+  const panel = document.getElementById('recap-panel');
+  const btn   = document.getElementById('recap-btn');
+  const isOpen = panel.classList.contains('open');
+  if(isOpen) {
+    panel.classList.remove('open');
+    btn.classList.remove('active');
+  } else {
+    renderRecap();
+    panel.classList.add('open');
+    btn.classList.add('active');
+  }
+}
+
+function recapBarActiveInWeek(bar, wk) {
+  const barStart = (bar.wk - 19) * 4 + bar.fromQ;
+  const barEnd   = barStart + bar.len - 1;
+  const wkStart  = (wk - 19) * 4;
+  const wkEnd    = wkStart + 3;
+  return barStart <= wkEnd && barEnd >= wkStart;
+}
+
+function recapWkLabel(wk) {
+  const w = SCHED_WEEKS.find(w => w.n === wk);
+  return w ? `W${wk}  ·  ${w.from} – ${w.to}` : `W${wk}`;
+}
+
+function renderRecap() {
+  const curWk  = SCHED_TODAY.wk;
+  const nextWk = curWk + 1;
+  const SKIP   = new Set(['I','W','L','']);
+  const MICROS = new Set(['stage-internal micro','stage-wait micro','stage-lock micro']);
+  const EPS    = [101,102,103,104,105,106,107];
+
+  function activeBars(bars, wk) {
+    return bars.filter(b =>
+      !SKIP.has(b.label) && !MICROS.has(b.cls) && recapBarActiveInWeek(b, wk)
+    );
+  }
+
+  function pillHTML(bar) {
+    return `<span class="recap-pill ${bar.cls}">${bar.label}</span>`;
+  }
+
+  function buildSection(wk, heading, subheading, filterFn) {
+    const rows = EPS.map(ep => {
+      const d = SCHED_DATA[ep]; if(!d) return null;
+      const wBars = activeBars(d.top, wk).filter(filterFn || (()=>true));
+      const pBars = activeBars(d.bot, wk).filter(filterFn || (()=>true));
+      if(!wBars.length && !pBars.length) return null;
+      return { ep, w: wBars, p: pBars };
+    }).filter(Boolean);
+
+    if(!rows.length) return '';
+
+    const rowsHTML = rows.map(r => `
+      <div class="recap-ep-row">
+        <div class="recap-ep-num">EP${r.ep}</div>
+        <div>
+          <div class="recap-col-head">Writing</div>
+          ${r.w.length ? r.w.map(pillHTML).join(' ') : '<span class="recap-empty">—</span>'}
+        </div>
+        <div>
+          <div class="recap-col-head">Production</div>
+          ${r.p.length ? r.p.map(pillHTML).join(' ') : '<span class="recap-empty">—</span>'}
+        </div>
+      </div>`).join('');
+
+    return `
+      <div class="recap-section">
+        <div class="recap-section-label">${heading}</div>
+        <div class="recap-week-label">${recapWkLabel(wk)}</div>
+        ${rowsHTML}
+      </div>
+      <div class="recap-divider"></div>`;
+  }
+
+  // "Next Up" only shows bars that START next week
+  function startsNextWk(bar) {
+    return bar.wk === nextWk;
+  }
+
+  const html =
+    buildSection(curWk,  'This Week', '') +
+    buildSection(nextWk, 'Next Up', '', startsNextWk);
+
+  document.getElementById('recap-body').innerHTML =
+    html || '<div style="padding:24px 20px;color:var(--text-dim);font-size:12px;">No active phases this week.</div>';
 }
 function schedZoom(size) {
   schedCurrentZoom = size;

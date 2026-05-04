@@ -933,6 +933,22 @@
   /* HIDDEN */
   .hidden { display:none !important; }
 
+  /* ─── PANELS VIEW SUB-TABS ─── */
+  .panel-view-bar {
+    display: flex; gap: 0; padding: 0 0 0 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-card);
+  }
+  .pv-btn {
+    background: transparent; border: none; border-bottom: 2px solid transparent;
+    color: var(--text-muted); font-family: var(--font); font-size: 13px;
+    font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    padding: 10px 22px 11px; cursor: pointer; transition: all .15s;
+    position: relative; bottom: -1px;
+  }
+  .pv-btn:hover { color: var(--text); }
+  .pv-btn.active { color: var(--pink); border-bottom-color: var(--pink); }
+
   /* ─── PANELS TAB ─── */
   .panels-layout {
     display: grid; grid-template-columns: 1fr 220px;
@@ -1893,6 +1909,11 @@
 
     <!-- PANELS TAB -->
     <div id="tab-panels" class="tab-panel hidden">
+      <div class="panel-view-bar">
+        <button class="pv-btn active" id="pvbtn-rowlayout" onclick="switchPanelView('rowlayout')">Rough Layout</button>
+        <button class="pv-btn" id="pvbtn-lineart" onclick="switchPanelView('lineart')">Line Art</button>
+        <button class="pv-btn" id="pvbtn-color" onclick="switchPanelView('color')">Color</button>
+      </div>
       <div class="panels-layout">
         <div class="panels-list-col">
           <div class="panels-list-header">
@@ -4831,6 +4852,68 @@ const PANELS_BY_EP = {
 // ════════════════════════════════════════
 let selectedPanel = null;
 let panelImageData = {};
+let panelView = 'rowlayout'; // 'rowlayout' | 'lineart' | 'color'
+let lineArtsCache = null;
+let finalsCache = null;
+let lineArtsFetching = false;
+let finalsFetching = false;
+
+function switchPanelView(mode) {
+  panelView = mode;
+  document.querySelectorAll('.pv-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('pvbtn-' + mode);
+  if(btn) btn.classList.add('active');
+  if(mode === 'lineart' && !lineArtsCache && !lineArtsFetching) fetchLineArts();
+  else if(mode === 'color' && !finalsCache && !finalsFetching) fetchFinals();
+  renderPanels();
+  if(selectedPanel) selectPanel(selectedPanel);
+}
+
+async function fetchLineArts() {
+  lineArtsFetching = true;
+  try {
+    const res = await fetch('https://refineria.valen.net.ar/api/line-arts');
+    const data = await res.json();
+    lineArtsCache = data.lineArts || (Array.isArray(data) ? data : []);
+  } catch(e) { console.warn('Line arts fetch failed:', e); }
+  lineArtsFetching = false;
+  if(panelView === 'lineart') { renderPanels(); if(selectedPanel) selectPanel(selectedPanel); }
+}
+
+async function fetchFinals() {
+  finalsFetching = true;
+  try {
+    const res = await fetch('https://refineria.valen.net.ar/api/finals');
+    const data = await res.json();
+    finalsCache = data.lineArts || data.finals || (Array.isArray(data) ? data : []);
+  } catch(e) { console.warn('Finals fetch failed:', e); }
+  finalsFetching = false;
+  if(panelView === 'color') { renderPanels(); if(selectedPanel) selectPanel(selectedPanel); }
+}
+
+function filenameMatchesPanel(filename, epTag, panelCode) {
+  const base = filename.replace(/\.[^.]+$/, '');
+  const parts = base.split('_');
+  if(parts.length < 2) return false;
+  if(parts[0].toUpperCase() !== epTag.toUpperCase()) return false;
+  const filePanel = parts[parts.length - 1];
+  return filePanel.toLowerCase() === panelCode.toLowerCase() ||
+         parseInt(filePanel, 10) === parseInt(panelCode, 10);
+}
+
+function getApiImageForPanel(panelId, cache, field) {
+  // field: 'lineArt' for line art view, 'final' for color view
+  if(!cache || !cache.length) return null;
+  const m = panelId.match(/^ep(\d+)-p(\d+[a-z]*)/i);
+  if(!m) return null;
+  const epTag = 'EP' + m[1];
+  const panelCode = m[2];
+  const item = cache.find(x => x.board && filenameMatchesPanel(x.board.filename || '', epTag, panelCode));
+  if(!item) return null;
+  if(field && item[field]) return item[field].imageUrl || null;
+  // fallback: try lineArt then final
+  return (item.lineArt && item.lineArt.imageUrl) || (item.final && item.final.imageUrl) || null;
+}
 const recentlyUpdatedPanel = new Map();
 const PANEL_PROTECT_MS = 30000;
 function markPanelRecentlyUpdated(id) {
@@ -4887,12 +4970,23 @@ function renderPanels() {
   } else {
     titleEl.textContent = titleText;
   }
-  const imaged = panels.filter(p => panelImageData[p.id]).length;
-  countEl.textContent = panels.length + ' panels · ' + imaged + ' with layout';
   const plBtn = document.getElementById('panel-lang-btn');
   if(plBtn) { plBtn.textContent = panelLang === 'en' ? 'ES' : 'EN'; plBtn.classList.toggle('active', panelLang === 'es'); }
+  if(panelView === 'rowlayout') {
+    const imaged = panels.filter(p => panelImageData[p.id]).length;
+    countEl.textContent = panels.length + ' panels · ' + imaged + ' with layout';
+  } else {
+    const cache = panelView === 'lineart' ? lineArtsCache : finalsCache;
+    const fetching = panelView === 'lineart' ? lineArtsFetching : finalsFetching;
+    if(fetching) { countEl.textContent = panels.length + ' panels · loading…'; }
+    else if(!cache) { countEl.textContent = panels.length + ' panels'; }
+    else { const withArt = panels.filter(p => getApiImageForPanel(p.id, cache)).length; countEl.textContent = panels.length + ' panels · ' + withArt + ' with art'; }
+  }
   grid.innerHTML = panels.map(p => {
-    const img = panelImageData[p.id];
+    let img = null;
+    if(panelView === 'rowlayout') img = panelImageData[p.id];
+    else if(panelView === 'lineart') img = getApiImageForPanel(p.id, lineArtsCache, 'lineArt');
+    else if(panelView === 'color') img = getApiImageForPanel(p.id, finalsCache, 'final');
     const sel = selectedPanel === p.id;
     return `<div class="p-card${sel?' p-selected':''}" id="pcard-${p.id}" onclick="selectPanel('${p.id}')">
       <div class="p-thumb">
@@ -4921,18 +5015,22 @@ function selectPanel(id) {
   document.querySelectorAll('.p-card').forEach(c=>c.classList.remove('p-selected'));
   const card = document.getElementById('pcard-'+id);
   if(card) card.classList.add('p-selected');
-  const img = panelImageData[id];
+  let img = null;
+  if(panelView === 'rowlayout') img = panelImageData[id];
+  else if(panelView === 'lineart') img = getApiImageForPanel(id, lineArtsCache, 'lineArt');
+  else if(panelView === 'color') img = getApiImageForPanel(id, finalsCache, 'final');
   const actionText = panelLang==='es' && p.action_es ? p.action_es : (p.action || '');
   const descText = panelLang==='es' && p.desc_es ? p.desc_es : p.desc;
+  const isRowLayout = panelView === 'rowlayout';
   document.getElementById('panels-detail').innerHTML = `
     <div class="pd-num">Panel ${p.label}</div>
-    <div class="pd-img" onclick="document.getElementById('pd-file-${id}').click()">
-      ${img?`<img src="${img}" alt="Layout ${p.label}">`:`<div class="pd-img-ph"><svg width="36" height="26" viewBox="0 0 36 26" fill="none"><rect x="1" y="1" width="34" height="24" rx="2" stroke="currentColor" stroke-width="1.2"/><polyline points="1,18 10,10 17,15 25,7 35,14" stroke="currentColor" stroke-width="1.2" fill="none"/><circle cx="11" cy="8" r="2.5" fill="currentColor" opacity="0.4"/></svg></div>`}
+    <div class="pd-img"${isRowLayout ? ` onclick="document.getElementById('pd-file-${id}').click()"` : ''}>
+      ${img?`<img src="${img}" alt="Panel ${p.label}">`:`<div class="pd-img-ph"><svg width="36" height="26" viewBox="0 0 36 26" fill="none"><rect x="1" y="1" width="34" height="24" rx="2" stroke="currentColor" stroke-width="1.2"/><polyline points="1,18 10,10 17,15 25,7 35,14" stroke="currentColor" stroke-width="1.2" fill="none"/><circle cx="11" cy="8" r="2.5" fill="currentColor" opacity="0.4"/></svg></div>`}
     </div>
-    <input class="pd-file-input" type="file" id="pd-file-${id}" accept="image/*" onchange="uploadPanelLayout('${id}', this)">
+    ${isRowLayout ? `<input class="pd-file-input" type="file" id="pd-file-${id}" accept="image/*" onchange="uploadPanelLayout('${id}', this)">
     <button class="pd-upload-btn" onclick="document.getElementById('pd-file-${id}').click()">+ Upload layout</button>
     ${img ? `<button class="pd-delete-btn" onclick="deletePanelLayout('${id}')">✕ Delete layout</button>` : ''}
-    <div class="pd-status" id="pd-status-${id}"></div>
+    <div class="pd-status" id="pd-status-${id}"></div>` : ''}
     <div class="pd-divider"></div>
     <div class="pd-field"><div class="pd-label">Mundo</div><div class="pd-val" style="color:${p.world==='rw'?'#ffb400':'#00b4ff'}">${p.world==='rw'?'Real World':'Adventure World'}</div></div>
     ${p.env?`<div class="pd-field"><div class="pd-label">Environment</div><div class="pd-val">${getEnvName(p.env)}</div></div>`:''}
@@ -5517,7 +5615,7 @@ function renderTrackerGeneral(body) {
       html += '<td class="trk-type">Environment</td>';
       html += '<td class="trk-asset">'+e.name+'</td>';
       html += statusCell('general', e.id, 'concept');
-      html += naCell();
+      html += statusCell('general', e.id, 'views');
       html += naCell();
       html += naCell();
       html += notesCell('general', e.id);
@@ -5661,7 +5759,7 @@ function renderTrackerAll(body) {
       html += '<td class="trk-type">Environment</td>';
       html += '<td class="trk-asset">' + asset.name + '</td>';
       html += statusCell(scope, asset.id, 'concept');
-      html += naCell();
+      html += statusCell(scope, asset.id, 'views');
       html += naCell();
       html += naCell();
       html += notesCell(scope, asset.id);

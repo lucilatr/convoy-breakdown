@@ -5603,7 +5603,7 @@ function renderTrackerAll(body) {
       html += '<td class="trk-type">Wardrobe</td>';
       html += '<td class="trk-asset">' + asset.name + '</td>';
       html += statusCell(scope, asset.id, 'concept');
-      html += naCell();
+      html += statusCell(scope, asset.id, 'views');
       html += naCell();
       html += naCell();
       html += notesCell(scope, asset.id);
@@ -5735,7 +5735,7 @@ function renderTrackerEpisode(body, ep) {
         html += '<td class="trk-type">Environment</td>';
         html += '<td class="trk-asset">'+e.name+'</td>';
         html += statusCell(ep, e.id, 'concept');
-        html += naCell();
+        html += statusCell(ep, e.id, 'views');
         html += naCell();
         html += naCell();
         html += notesCell(ep, e.id);
@@ -6016,7 +6016,7 @@ function exportTrackerCSV() {
       rows.push([esc('Vehicle'),esc(v.name),esc(gs('general',v.id,'concept')),esc(gs('general',v.id,'views')),esc('N/A'),esc(hasAct?gs('general',v.id,'actions'):'N/A'),esc(gn('general',v.id)),esc(gu('general',v.id)),esc(gd('general',v.id))].join(','));
     });
     ENVIRONMENTS.filter(e=>isMultiEp(e)).forEach(e => {
-      rows.push([esc('Environment'),esc(e.name),esc(gs('general',e.id,'concept')),esc('N/A'),esc('N/A'),esc('N/A'),esc(gn('general',e.id)),esc(gu('general',e.id)),esc(gd('general',e.id))].join(','));
+      rows.push([esc('Environment'),esc(e.name),esc(gs('general',e.id,'concept')),esc(gs('general',e.id,'views')),esc('N/A'),esc('N/A'),esc(gn('general',e.id)),esc(gu('general',e.id)),esc(gd('general',e.id))].join(','));
     });
     PLAYSETS.filter(p=>isMultiEp(p)).forEach(p => {
       rows.push([esc('Playset'),esc(p.name),esc(gs('general',p.id,'concept')),esc('N/A'),esc('N/A'),esc('N/A'),esc(gn('general',p.id)),esc(gu('general',p.id)),esc(gd('general',p.id))].join(','));
@@ -6123,8 +6123,8 @@ function exportTrackerPDF() {
     }
     const me = ENVIRONMENTS.filter(e=>isMultiEp(e));
     if(me.length) {
-      html += '<h2>Environments</h2><table><thead><tr><th class="left">Type</th><th class="left">Asset</th><th>Concept</th><th class="left">Notes</th><th>Due</th></tr></thead><tbody>';
-      me.forEach(e => { html += '<tr><td class="type">Environment</td><td class="asset">'+e.name+'</td>'+sCell('general',e.id,'concept')+noteC('general',e.id)+dueC('general',e.id)+'</tr>'; });
+      html += '<h2>Environments</h2><table><thead><tr><th class="left">Type</th><th class="left">Asset</th><th>Concept</th><th>Views</th><th class="left">Notes</th><th>Due</th></tr></thead><tbody>';
+      me.forEach(e => { html += '<tr><td class="type">Environment</td><td class="asset">'+e.name+'</td>'+sCell('general',e.id,'concept')+sCell('general',e.id,'views')+noteC('general',e.id)+dueC('general',e.id)+'</tr>'; });
       html += '</tbody></table>';
     }
   } else {

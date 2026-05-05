@@ -3624,8 +3624,8 @@ async function saveJSONBin() {
     if(hasLocalData(boardmaticUrls)) record.boardmaticUrls = boardmaticUrls;
     if(hasLocalData(trackerData)) record.trackerData = trackerData;
     if(users && users.length > 0) record.users = users;
-    record.prodTasks = prodTasks;
-    record.prodWeeklyGoal = prodWeeklyGoal;
+    if(prodTasks && prodTasks.length > 0) record.prodTasks = prodTasks;
+    if(prodWeeklyGoal) record.prodWeeklyGoal = prodWeeklyGoal;
 
     await fetch('https://api.jsonbin.io/v3/b/' + pipeline.binId, {
       method:'PUT',

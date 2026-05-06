@@ -4,7 +4,8 @@
   "description": "CONVOY panels API for refineria.valen.net.ar",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "export": "node export.js"
   },
   "engines": {
     "node": ">=18"

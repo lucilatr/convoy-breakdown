@@ -6893,7 +6893,7 @@ function renderProdCols() {
       ondragleave="prodDragLeave(this)"
       ondrop="prodDrop(event,'${col.assignedTo}')">`;
     h += `<div class="prod-col-header">${col.icon} ${escHtml(col.label)} <span class="prod-col-count">${active.length}</span></div>`;
-    [...active, ...done].forEach(task => {
+    active.forEach(task => {
       const creatorName = getProdUserName(task.createdBy);
       const doneByName  = task.done ? getProdUserName(task.doneBy || '') : '';
       const meta = task.done

@@ -1742,6 +1742,12 @@
   .prod-task-edit-btn:hover { color:#aaa; }
   .prod-task-edit-input { width:100%; background:#111; border:1px solid #2e7d32; color:#ddd; border-radius:5px; padding:5px 8px; font-size:16px; font-family:inherit; box-sizing:border-box; margin-bottom:5px; }
   .prod-task-edit-input:focus { outline:none; }
+  .prod-task-prio-btn { background:none; border:none; color:#555; cursor:pointer; font-size:13px; padding:2px 4px; line-height:1; }
+  .prod-task-prio-btn:hover { color:#ddb020; }
+  .prod-prio-badge { font-size:13px; margin-right:5px; vertical-align:middle; }
+  .prod-prio-popup { position:fixed; background:#1e1e1e; border:1px solid #444; border-radius:8px; z-index:500; padding:4px; box-shadow:0 4px 20px rgba(0,0,0,.7); min-width:150px; }
+  .prod-prio-option { padding:7px 14px; cursor:pointer; border-radius:5px; font-size:14px; white-space:nowrap; color:#ccc; }
+  .prod-prio-option:hover { background:#333; color:#fff; }
   .prod-add-form { margin-top:6px; }
   .prod-add-input { width:100%; background:#111; border:1px solid #444; color:#ddd; border-radius:6px; padding:8px 10px; font-size:16px; font-family:inherit; box-sizing:border-box; }
   .prod-add-input:focus { outline:none; border-color:#2e7d32; }
@@ -6877,7 +6883,10 @@ function renderProdCols() {
   function buildColHtml(col) {
     const colKey = col.assignedTo || 'none';
     const tasks = prodTasks.filter(t => t.assignedTo === col.assignedTo);
-    const active = tasks.filter(t => !t.done);
+    const _prioOrder = { urgent:0, high:1, medium:2, low:3, '':4 };
+    const active = tasks.filter(t => !t.done).sort((a,b) =>
+      (_prioOrder[a.priority||''] ?? 4) - (_prioOrder[b.priority||''] ?? 4)
+    );
     const done   = tasks.filter(t =>  t.done);
     let h = `<div class="prod-col" id="prod-col-${colKey}"
       ondragover="prodDragOver(event,this)"
@@ -6891,13 +6900,16 @@ function renderProdCols() {
         ? ('Hecho' + (doneByName ? ' · ' + doneByName : ''))
         : (task.createdBy && task.createdBy !== col.assignedTo ? 'Por ' + creatorName : '');
       const canDel = currentUser && (currentUser.id === task.createdBy || isAdmin());
+      const _prioEmojis = { urgent:'🔥', high:'⚠️', medium:'✨', low:'🔵' };
+      const _prioHtml = !task.done && task.priority ? `<span class="prod-prio-badge">${_prioEmojis[task.priority]||''}</span>` : '';
       h += `<div class="prod-task${task.done ? ' done' : ''}" draggable="true" ondragstart="prodDragStart(event,'${task.id}')">
         <div class="prod-task-check${task.done ? ' checked' : ''}" onclick="toggleProdDone('${task.id}')">${task.done ? '✓' : ''}</div>
         <div class="prod-task-body">
-          <div class="prod-task-text">${escHtml(task.text)}</div>
+          <div class="prod-task-text">${_prioHtml}${escHtml(task.text)}</div>
           ${meta ? `<div class="prod-task-meta">${escHtml(meta)}</div>` : ''}
         </div>
         <div class="prod-task-actions">
+          ${!task.done ? `<button class="prod-task-prio-btn" onclick="openProdPrioPopup(event,'${task.id}')" title="Prioridad">⚑</button>` : ''}
           <button class="prod-task-edit-btn" onclick="editProdTask('${task.id}')" title="Editar">✎</button>
           <button class="prod-task-assign-btn" onclick="openProdAssignPopup(event,'${task.id}')" title="Reasignar">→</button>
           ${canDel ? `<button class="prod-task-del-btn" onclick="deleteProdTask('${task.id}')" title="Eliminar">✕</button>` : ''}
@@ -7034,6 +7046,38 @@ function closeProdAssignPopup() {
   if(popup) popup.style.display = 'none';
 }
 
+function openProdPrioPopup(event, taskId) {
+  event.stopPropagation();
+  const popup = document.getElementById('prod-prio-popup');
+  if(!popup) return;
+  const options = [
+    { val:'', label:'— Sin prioridad' },
+    { val:'urgent', label:'🔥 Urgent' },
+    { val:'high', label:'⚠️ High' },
+    { val:'medium', label:'✨ Medium' },
+    { val:'low', label:'🔵 Low' },
+  ];
+  popup.innerHTML = options.map(o =>
+    `<div class="prod-prio-option" onclick="setProdTaskPrioFromBoard('${taskId}','${o.val}');closeProdPrioPopup()">${escHtml(o.label)}</div>`
+  ).join('');
+  const rect = event.target.getBoundingClientRect();
+  popup.style.top  = (rect.bottom + 6) + 'px';
+  popup.style.left = Math.min(rect.left, window.innerWidth - 160) + 'px';
+  popup.style.display = 'block';
+  setTimeout(() => document.addEventListener('click', closeProdPrioPopup, { once:true }), 10);
+}
+function closeProdPrioPopup() {
+  const popup = document.getElementById('prod-prio-popup');
+  if(popup) popup.style.display = 'none';
+}
+function setProdTaskPrioFromBoard(taskId, priority) {
+  const t = prodTasks.find(x => x.id === taskId);
+  if(!t) return;
+  t.priority = priority;
+  saveProdData();
+  renderProdCols();
+}
+
 function assignProdTask(taskId, userId) {
   const task = prodTasks.find(t => t.id === taskId);
   if(!task) return;
@@ -7109,5 +7153,6 @@ async function syncProdToJSONBin() {
   </div>
 </div>
 <div id="prod-assign-popup" class="prod-assign-popup" style="display:none;"></div>
+<div id="prod-prio-popup" class="prod-prio-popup" style="display:none;"></div>
 </body>
 </html>

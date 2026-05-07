@@ -2661,6 +2661,7 @@ function getMyTasks() {
     if(data?.assignedTo !== currentUser.id) return;
     const parts = key.split('|');
     if(parts.length < 3) return;
+    if(STATUS_DONE.includes(data.status || 'none')) return;
     const [scope, assetId, stage] = parts;
     const found = allAssets.find(a => a.id === assetId);
     const assetName = found ? found.name : assetId;
@@ -2758,7 +2759,36 @@ function renderMyTasks() {
       + '</div>';
   }
 
+  const prioOrder = { urgent:0, high:1, medium:2, low:3, '':4 };
+  const sortedProdTasks = [...myProdTasks].sort((a, b) =>
+    (prioOrder[a.priority||''] ?? 4) - (prioOrder[b.priority||''] ?? 4)
+  );
+
+  function prodTaskCardHtml(t) {
+    const prioEmoji = PRIO_EMOJI[t.priority] || '';
+    const prioSel = '<select class="tc-status-sel" style="min-width:90px;" onchange="setProdTaskPriority(\'' + t.id + '\',this.value)">'
+      + '<option value=""' + (!t.priority ? ' selected' : '') + '>— Prio —</option>'
+      + [['urgent','🔥 Urgent'],['high','⚠️ High'],['medium','✨ Medium'],['low','🔵 Low']]
+          .map(([k,l]) => '<option value="' + k + '"' + (t.priority === k ? ' selected' : '') + '>' + l + '</option>').join('')
+      + '</select>';
+    return '<div class="task-card" style="border-left:3px solid #2e7d32;">'
+      + '<div class="task-card-left">'
+      + '<div class="task-card-meta">' + (prioEmoji ? prioEmoji + ' ' : '') + 'Prod Board</div>'
+      + '<div class="task-card-name">' + escHtml(t.text) + '</div>'
+      + '<div class="task-card-footer" style="display:flex;gap:8px;align-items:center;margin-top:6px;">'
+      + prioSel
+      + '<button style="font-size:11px;padding:2px 8px;background:#1b5e20;border:none;border-radius:4px;color:#aed6b0;cursor:pointer;" onclick="toggleProdDoneFromMyTasks(\'' + t.id + '\')">✓ Done</button>'
+      + '</div>'
+      + '</div>'
+      + '</div>';
+  }
+
   let html = '';
+  if(sortedProdTasks.length) {
+    html += '<div class="my-tasks-section"><div class="my-tasks-section-title" style="color:#81c784;">🎬 Producción · ' + sortedProdTasks.length + '</div>';
+    html += sortedProdTasks.map(prodTaskCardHtml).join('');
+    html += '</div>';
+  }
   if(overdue.length) {
     html += '<div class="my-tasks-section"><div class="my-tasks-section-title overdue">Overdue · ' + overdue.length + '</div>';
     html += overdue.map(taskCardHtml).join('');
@@ -2779,21 +2809,6 @@ function renderMyTasks() {
     html += noDate.map(taskCardHtml).join('');
     html += '</div>';
   }
-  if(myProdTasks.length) {
-    html += '<div class="my-tasks-section"><div class="my-tasks-section-title" style="color:#81c784;">🎬 Producción · ' + myProdTasks.length + '</div>';
-    html += myProdTasks.map(t => {
-      return '<div class="task-card" style="border-left:3px solid #2e7d32;">'
-        + '<div class="task-card-left">'
-        + '<div class="task-card-meta">Prod Board</div>'
-        + '<div class="task-card-name">' + escHtml(t.text) + '</div>'
-        + '<div class="task-card-footer" style="display:flex;gap:8px;align-items:center;margin-top:6px;">'
-        + '<button style="font-size:11px;padding:2px 8px;background:#1b5e20;border:none;border-radius:4px;color:#aed6b0;cursor:pointer;" onclick="toggleProdDoneFromMyTasks(\'' + t.id + '\')">✓ Marcar done</button>'
-        + '</div>'
-        + '</div>'
-        + '</div>';
-    }).join('');
-    html += '</div>';
-  }
   body.innerHTML = html;
 }
 
@@ -2803,6 +2818,14 @@ function toggleProdDoneFromMyTasks(taskId) {
   t.done = true;
   t.doneAt = new Date().toISOString();
   t.doneBy = currentUser?.id || '';
+  saveProdData();
+  renderMyTasks();
+}
+
+function setProdTaskPriority(taskId, priority) {
+  const t = prodTasks.find(x => x.id === taskId);
+  if(!t) return;
+  t.priority = priority;
   saveProdData();
   renderMyTasks();
 }

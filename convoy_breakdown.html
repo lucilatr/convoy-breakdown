@@ -2826,6 +2826,7 @@ function toggleProdDoneFromMyTasks(taskId) {
   t.doneBy = currentUser?.id || '';
   saveProdData();
   renderMyTasks();
+  renderProdCols();
 }
 
 function setProdTaskPriority(taskId, priority) {
@@ -6804,6 +6805,7 @@ let prodTasks = [];
 let prodWeeklyGoal = '';
 let _prodDirty = false;
 let _prodSyncTimer = null;
+let _prodPollInterval = null;
 let _prodDragTaskId = null;
 
 const PROD_BOARD_USERS = ['Lucila Trobbiani', 'Santiago Tereso'];
@@ -6818,10 +6820,14 @@ function openProdBoard() {
   renderProdBoard();
   // Re-render after remote fetch in case prodTasks wasn't loaded yet
   loadJSONBin().then(() => renderProdBoard()).catch(() => {});
+  // Poll for changes from other users every 15 seconds
+  if(_prodPollInterval) clearInterval(_prodPollInterval);
+  _prodPollInterval = setInterval(pollProdData, 15000);
 }
 
 function closeProdBoard() {
   document.getElementById('prod-board-view').style.display = 'none';
+  if(_prodPollInterval) { clearInterval(_prodPollInterval); _prodPollInterval = null; }
 }
 
 function renderProdBoard() {
@@ -7139,6 +7145,32 @@ async function syncProdToJSONBin() {
     });
     _prodDirty = false;
   } catch(e) { console.warn('Prod JSONBin sync failed:', e); }
+}
+
+async function pollProdData() {
+  // Don't overwrite local changes that haven't been saved yet
+  if(_prodDirty || !pipeline.binId || !pipeline.binKey) return;
+  try {
+    const res = await fetch('https://api.jsonbin.io/v3/b/'+pipeline.binId+'/latest', {
+      headers:{'X-Master-Key':pipeline.binKey,'X-Bin-Meta':'false'}
+    });
+    if(!res.ok) return;
+    const data = await res.json();
+    const record = data.record || data;
+    if(record.prodTasks !== undefined) {
+      const remoteJson = JSON.stringify(record.prodTasks);
+      const localJson  = JSON.stringify(prodTasks);
+      if(remoteJson !== localJson) {
+        prodTasks = record.prodTasks || [];
+        renderProdBoard();
+        renderMyTasks();
+      }
+    }
+    if(record.prodWeeklyGoal !== undefined && record.prodWeeklyGoal !== prodWeeklyGoal) {
+      prodWeeklyGoal = record.prodWeeklyGoal || '';
+      renderProdGoal();
+    }
+  } catch(e) { /* silent — poll failures are non-critical */ }
 }
 </script>
 

@@ -11,8 +11,8 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 // ─── CONFIG ──────────────────────────────────────────────────────────────────
 const R2_ACCOUNT_ID        = 'e9a69371242e95c66d7f35175c7ba99c';
 const R2_BUCKET            = 'breakdown';
-const R2_ACCESS_KEY_ID     = '5349f8795d411f2b4488b0d794cdb684';
-const R2_SECRET_ACCESS_KEY = '298cdb38bfa23cc790e9ae6cb159eab007a354f20f3877a643ba419fd9c00e1c';
+const R2_ACCESS_KEY_ID     = 'f407fe1eae254585ee223e2159f87070';
+const R2_SECRET_ACCESS_KEY = '89cca89ee15da8f0b9fb651f8316b40c9dc5114df8350d4c2ba269457835c58e';
 const R2_ENDPOINT          = `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`;
 const R2_PUBLIC_BASE       = 'https://pub-6e4fa026b36b41799b635aa2ac4b3739.r2.dev';
 

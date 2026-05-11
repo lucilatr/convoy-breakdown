@@ -2137,12 +2137,8 @@
         </div>
 
         <div class="modal-field">
-          <label>Cloudinary Cloud Name</label>
-          <input type="text" id="cf-cloud" placeholder="my-cloud-name">
-        </div>
-        <div class="modal-field">
-          <label>Cloudinary Upload Preset (unsigned)</label>
-          <input type="text" id="cf-preset" placeholder="breakdown_preset">
+          <label>R2 Worker URL</label>
+          <input type="text" id="r2-worker" placeholder="https://convoy-upload.your-subdomain.workers.dev">
         </div>
         <div class="modal-field">
           <label>JSONBin Bin ID</label>
@@ -2155,7 +2151,7 @@
 
         <div class="pipeline-status">
           <div class="pipe-dot" id="pipe-dot-cf"></div>
-          <div class="pipe-text" id="pipe-text-cf">Cloudinary: no configurado</div>
+          <div class="pipe-text" id="pipe-text-cf">R2 Worker: no configurado</div>
         </div>
         <div class="pipeline-status">
           <div class="pipe-dot" id="pipe-dot-jb"></div>
@@ -2167,9 +2163,9 @@
         <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border);">
           <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;">Recovery</div>
           <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.5;">
-            Si perdiste imágenes del mapping pero siguen en Cloudinary, este botón las busca y reconstruye el mapping.
+            Si perdiste imágenes del mapping pero siguen en R2, este botón las busca y reconstruye el mapping.
           </div>
-          <button class="modal-save" style="background: transparent; border: 1px solid var(--pink); color: var(--pink);" onclick="recoverFromCloudinary()">🔄 Recover from Cloudinary</button>
+          <button class="modal-save" style="background: transparent; border: 1px solid var(--pink); color: var(--pink);" onclick="recoverFromR2()">🔄 Recover from R2</button>
         </div>
       </div>
 
@@ -2482,11 +2478,10 @@ const ENVIRONMENTS = [
 // ════════════════════════════════════════
 let currentChapter = 'all';
 let currentTab = 'characters';
-let imageData = {}; // id -> { url, cloudinaryUrl }
+let imageData = {}; // id -> { images: [{url, r2Url}, ...] }
 let notesData = {}; // id -> string
 let pipeline = {
-  cloudName: 'duvgxho7s',
-  preset: 'convoy_preset',
+  workerUrl: '',
   binId: '69c55584b7ec241ddca7651b',
   binKey: '$2a$10$G/S5QC8pq2vpHyiOEdxjp.rmJOR4deLMjyDvs1.Zq7W9dMQt9uqQq'
 };
@@ -2933,7 +2928,7 @@ function loadLocal() {
       const parsed = JSON.parse(img);
       Object.entries(parsed).forEach(([k,v]) => {
         if(v.images) {
-          imageData[k] = { images: v.images.map(i => ({ cloudinaryUrl: i.cloudinaryUrl||'', url: i.cloudinaryUrl||'' })) };
+          imageData[k] = { images: v.images.map(i => ({ r2Url: i.r2Url||i.cloudinaryUrl||'', url: i.r2Url||i.cloudinaryUrl||'' })) };
         }
       });
     }
@@ -2949,11 +2944,11 @@ function loadLocal() {
 }
 
 function saveLocal() {
-  // Strip base64 — only keep cloudinary URLs
+  // Strip base64 — only keep R2 URLs
   const lightImages = {};
   Object.entries(imageData).forEach(([k,v]) => {
     if(v.images) {
-      lightImages[k] = { images: v.images.map(img => ({ cloudinaryUrl: img.cloudinaryUrl||'', url: img.cloudinaryUrl||'' })) };
+      lightImages[k] = { images: v.images.map(img => ({ r2Url: img.r2Url||img.cloudinaryUrl||'', url: img.r2Url||img.cloudinaryUrl||'' })) };
     }
   });
   localStorage.setItem('convoy_images', JSON.stringify(lightImages));
@@ -3318,7 +3313,7 @@ function buildEnvCard(item) {
 // MULTI-IMAGE CAROUSEL SYSTEM
 // ════════════════════════════════════════
 
-// imageData[id] = { images: [{url, cloudinaryUrl}, ...] }
+// imageData[id] = { images: [{url, r2Url}, ...] }
 function getImages(id) {
   return imageData[id]?.images || [];
 }
@@ -3341,7 +3336,7 @@ function buildCarousel(id) {
   }
   const thumbs = imgs.map((img, i) => `
     <div class="carousel-thumb" onclick="openLightbox('${id}', ${i})">
-      <img src="${img.cloudinaryUrl || img.url}" alt="">
+      <img src="${img.r2Url || img.cloudinaryUrl || img.url}" alt="">
       <button class="thumb-del" onclick="event.stopPropagation(); deleteImage('${id}', ${i})">×</button>
     </div>`).join('');
   return `
@@ -3369,7 +3364,7 @@ function buildMainImage(id) {
     </div>`;
   }
   return `<div class="char-main-has-img" onclick="openLightbox('${id}', 0)">
-    <img src="${main.cloudinaryUrl || main.url}" alt="">
+    <img src="${main.r2Url || main.cloudinaryUrl || main.url}" alt="">
     <div class="char-main-actions">
       <button onclick="event.stopPropagation(); triggerFileMain('${id}')">↑ Replace</button>
       <button onclick="event.stopPropagation(); deleteImage('${id}', 0)">× Remove</button>
@@ -3385,7 +3380,7 @@ function buildExpressionsSection(id) {
   const sectionId = 'expr-body-' + id;
   const thumbs = exprs.map((img, i) => `
     <div class="expr-thumb" onclick="openLightbox('${id}', ${i+1})">
-      <img src="${img.cloudinaryUrl || img.url}" alt="">
+      <img src="${img.r2Url || img.cloudinaryUrl || img.url}" alt="">
       <button class="thumb-del" onclick="event.stopPropagation(); deleteImage('${id}', ${i+1})">×</button>
     </div>`).join('');
   return `
@@ -3416,14 +3411,14 @@ function handleFileMain(event, id) {
     if(!imageData[id]) imageData[id] = { images: [] };
     if(!imageData[id].images) imageData[id].images = [];
     if(imageData[id].images.length === 0) {
-      imageData[id].images.unshift({ url: e.target.result, cloudinaryUrl: '' });
+      imageData[id].images.unshift({ url: e.target.result, r2Url: '' });
     } else {
-      imageData[id].images[0] = { url: e.target.result, cloudinaryUrl: '' };
+      imageData[id].images[0] = { url: e.target.result, r2Url: '' };
     }
     saveLocal();
     refreshCharCard(id);
-    showToast('Uploading to Cloudinary...');
-    uploadCloudinaryFile(id, file, 0);
+    showToast('Uploading to R2...');
+    uploadR2File(id, file, 0);
   };
   reader.readAsDataURL(file);
 }
@@ -3438,14 +3433,14 @@ function handleDropMain(e, id) {
     if(!imageData[id]) imageData[id] = { images: [] };
     if(!imageData[id].images) imageData[id].images = [];
     if(imageData[id].images.length === 0) {
-      imageData[id].images.unshift({ url: ev.target.result, cloudinaryUrl: '' });
+      imageData[id].images.unshift({ url: ev.target.result, r2Url: '' });
     } else {
-      imageData[id].images[0] = { url: ev.target.result, cloudinaryUrl: '' };
+      imageData[id].images[0] = { url: ev.target.result, r2Url: '' };
     }
     saveLocal();
     refreshCharCard(id);
-    showToast('Uploading to Cloudinary...');
-    uploadCloudinaryFile(id, file, 0);
+    showToast('Uploading to R2...');
+    uploadR2File(id, file, 0);
   };
   reader.readAsDataURL(file);
 }
@@ -3498,11 +3493,11 @@ function handleDrop(e, id) {
       if(!imageData[id]) imageData[id] = { images: [] };
       if(!imageData[id].images) imageData[id].images = [];
       const idx = imageData[id].images.length;
-      imageData[id].images.push({ url: ev.target.result, cloudinaryUrl: '' });
+      imageData[id].images.push({ url: ev.target.result, r2Url: '' });
       saveLocal();
       refreshCarousel(id);
-      showToast('Uploading to Cloudinary...');
-      uploadCloudinaryFile(id, file, idx);
+      showToast('Uploading to R2...');
+      uploadR2File(id, file, idx);
     };
     reader.readAsDataURL(file);
   });
@@ -3518,11 +3513,11 @@ function handleFile(event, id) {
       if(!imageData[id]) imageData[id] = { images: [] };
       if(!imageData[id].images) imageData[id].images = [];
       const idx = imageData[id].images.length;
-      imageData[id].images.push({ url: e.target.result, cloudinaryUrl: '' });
+      imageData[id].images.push({ url: e.target.result, r2Url: '' });
       saveLocal();
       refreshCarousel(id);
-      showToast('Uploading to Cloudinary...');
-      uploadCloudinaryFile(id, file, idx);
+      showToast('Uploading to R2...');
+      uploadR2File(id, file, idx);
     };
     reader.readAsDataURL(file);
   });
@@ -3552,66 +3547,36 @@ function saveNotes(id) {
 }
 
 // ════════════════════════════════════════
-// CLOUDINARY UPLOAD
+// R2 UPLOAD
 // ════════════════════════════════════════
-async function uploadCloudinaryFile(id, file, idx) {
+async function uploadR2File(id, file, idx) {
   setStatus(id, 'Uploading...', '');
+  if(!pipeline.workerUrl) {
+    setStatus(id, '✗ R2 Worker not configured', 'err');
+    showToast('Configure R2 Worker URL in Pipeline first.');
+    return;
+  }
   try {
+    const key = 'convoy/' + id + '_' + idx + '_' + Date.now() + '.' + (file.name.split('.').pop() || 'jpg');
     const fd = new FormData();
     fd.append('file', file);
-    fd.append('upload_preset', pipeline.preset);
-    fd.append('folder', 'convoy_breakdown');
-    fd.append('public_id', 'convoy_' + id + '_' + idx + '_' + Date.now());
-    const res = await fetch('https://api.cloudinary.com/v1_1/' + pipeline.cloudName + '/image/upload', {
-      method:'POST', body:fd
-    });
+    fd.append('key', key);
+    const res = await fetch(pipeline.workerUrl + '/upload', { method:'POST', body:fd });
     if(!res.ok) throw new Error('HTTP '+res.status);
     const data = await res.json();
+    if(data.error) throw new Error(data.error);
     if(imageData[id]?.images?.[idx]) {
-      imageData[id].images[idx].cloudinaryUrl = data.secure_url;
-      imageData[id].images[idx].url = data.secure_url;
+      imageData[id].images[idx].r2Url = data.url;
+      imageData[id].images[idx].url = data.url;
     }
     saveLocal();
-    setStatus(id, '✓ Cloudinary', 'ok');
+    setStatus(id, '✓ R2', 'ok');
     refreshCarousel(id);
     saveJSONBin();
     showToast('✓ Uploaded: ' + id);
   } catch(err) {
     setStatus(id, '✗ Error: '+err.message, 'err');
     showToast('Error: '+err.message);
-  }
-}
-
-async function uploadCloudinary(id) {
-  if(!pipeline.cloudName || !pipeline.preset) {
-    showToast('Configure Cloudinary in Pipeline first.');
-    return;
-  }
-  if(!imageData[id]?.url) {
-    showToast('No hay imagen para subir.');
-    return;
-  }
-  setStatus(id, 'Uploading...', '');
-  try {
-    const blob = await (await fetch(imageData[id].url)).blob();
-    const fd = new FormData();
-    fd.append('file', blob);
-    fd.append('upload_preset', pipeline.preset);
-    fd.append('folder', 'convoy_breakdown');
-    fd.append('public_id', `convoy_${id}`);
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${pipeline.cloudName}/image/upload`, {
-      method:'POST', body:fd
-    });
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const data = await res.json();
-    imageData[id].cloudinaryUrl = data.secure_url + '?v=' + Date.now();
-    saveLocal();
-    setStatus(id, '✓ Cloudinary: '+data.secure_url.slice(0,40)+'...', 'ok');
-    saveJSONBin();
-    showToast(`✓ Uploaded to Cloudinary: ${id}`);
-  } catch(err) {
-    setStatus(id, '✗ Error: '+err.message, 'err');
-    showToast('Error Cloudinary: '+err.message);
   }
 }
 
@@ -3638,7 +3603,7 @@ async function saveJSONBin() {
     // Build local images object
     const images = {};
     Object.entries(imageData).forEach(([k,v]) => {
-      if(v.images?.length) images[k] = v.images.map(i => i.cloudinaryUrl).filter(Boolean);
+      if(v.images?.length) images[k] = v.images.map(i => i.r2Url || i.cloudinaryUrl).filter(Boolean);
     });
 
     record.project = 'CONVOY';
@@ -3671,22 +3636,24 @@ async function saveJSONBin() {
 function loadPipelineConfig() {
   try {
     const p = localStorage.getItem('convoy_pipeline');
-    if(p) pipeline = JSON.parse(p);
+    if(p) {
+      const saved = JSON.parse(p);
+      // Merge saved config; migrate old cloudName/preset → drop them
+      pipeline.workerUrl = saved.workerUrl || '';
+      pipeline.binId = saved.binId || pipeline.binId;
+      pipeline.binKey = saved.binKey || pipeline.binKey;
+    }
   } catch(e){}
 }
 // ====================================================================
-// RECOVERY: Reconstruye los mappings de imágenes buscando en Cloudinary
+// RECOVERY: Reconstruye los mappings de imágenes buscando en R2
 // Usa los public_id conocidos (cada panel/card/wardrobe tiene un id único)
-// y verifica si existen en Cloudinary. Si existen, rearma el mapping.
+// y verifica si existen en R2. Si existen, rearma el mapping.
 // ====================================================================
-async function recoverFromCloudinary() {
-  if(!pipeline.cloudName) {
-    showToast('⚠ Configurá Cloudinary primero (⚙).');
-    return;
-  }
-  if(!confirm('Esto va a intentar recuperar imágenes huérfanas de Cloudinary. Puede tardar 1-2 minutos. ¿Continuar?')) return;
+async function recoverFromR2() {
+  if(!confirm('Esto va a intentar recuperar imágenes huérfanas de R2. Puede tardar 1-2 minutos. ¿Continuar?')) return;
 
-  const baseUrl = `https://res.cloudinary.com/${pipeline.cloudName}/image/upload/convoy_breakdown/`;
+  const baseUrl = 'https://pub-6e4fa026b36b41799b635aa2ac4b3739.r2.dev/convoy/';
 
   // Junto todos los IDs posibles
   const cardIds = [
@@ -3705,7 +3672,7 @@ async function recoverFromCloudinary() {
   });
 
   const totalIds = cardIds.length + wardrobeIds.length + panelIds.length;
-  console.log('🔍 Recovery iniciado. Verificando', totalIds, 'IDs en Cloudinary...');
+  console.log('🔍 Recovery iniciado. Verificando', totalIds, 'IDs en R2...');
   showToast('🔍 Recuperando... (ver consola)');
 
   const foundCards = {};
@@ -3761,7 +3728,7 @@ async function recoverFromCloudinary() {
   console.log('  TOTAL:', total);
 
   if(total === 0) {
-    showToast('❌ No se encontró nada en Cloudinary.');
+    showToast('❌ No se encontró nada en R2.');
     return;
   }
 
@@ -3778,11 +3745,11 @@ async function recoverFromCloudinary() {
   Object.entries(foundCards).forEach(([id, urls]) => {
     if(!imageData[id]) imageData[id] = { images: [] };
     // solo agregar URLs que no existan ya
-    const existing = new Set((imageData[id].images || []).map(i => i.cloudinaryUrl).filter(Boolean));
+    const existing = new Set((imageData[id].images || []).map(i => i.r2Url || i.cloudinaryUrl).filter(Boolean));
     urls.forEach(u => {
       if(!existing.has(u)) {
         imageData[id].images = imageData[id].images || [];
-        imageData[id].images.push({ cloudinaryUrl: u });
+        imageData[id].images.push({ r2Url: u, url: u });
       }
     });
   });
@@ -3822,8 +3789,7 @@ function openPipeline() {
   if(titleEl) titleEl.textContent = isAdmin() ? 'Settings' : 'My Account';
 
   if(isAdmin()) {
-    document.getElementById('cf-cloud').value = pipeline.cloudName||'';
-    document.getElementById('cf-preset').value = pipeline.preset||'';
+    document.getElementById('r2-worker').value = pipeline.workerUrl||'';
     document.getElementById('jb-bin').value = pipeline.binId||'';
     document.getElementById('jb-key').value = pipeline.binKey||'';
     updatePipeStatus();
@@ -3834,8 +3800,7 @@ function closePipeline() {
   document.getElementById('pipeline-modal').classList.remove('open');
 }
 function savePipeline() {
-  pipeline.cloudName = document.getElementById('cf-cloud').value.trim();
-  pipeline.preset = document.getElementById('cf-preset').value.trim();
+  pipeline.workerUrl = document.getElementById('r2-worker').value.trim().replace(/\/$/, '');
   pipeline.binId = document.getElementById('jb-bin').value.trim();
   pipeline.binKey = document.getElementById('jb-key').value.trim();
   localStorage.setItem('convoy_pipeline', JSON.stringify(pipeline));
@@ -3844,12 +3809,12 @@ function savePipeline() {
   setTimeout(()=>{ closePipeline(); renderActive(); }, 800);
 }
 function updatePipeStatus() {
-  const cfOk = pipeline.cloudName && pipeline.preset;
+  const r2Ok = !!pipeline.workerUrl;
   const jbOk = pipeline.binId && pipeline.binKey;
-  document.getElementById('pipe-dot-cf').className = 'pipe-dot '+(cfOk?'ok':'err');
-  document.getElementById('pipe-text-cf').textContent = cfOk
-    ? `Cloudinary: ${pipeline.cloudName} / ${pipeline.preset}`
-    : 'Cloudinary: no configurado';
+  document.getElementById('pipe-dot-cf').className = 'pipe-dot '+(r2Ok?'ok':'err');
+  document.getElementById('pipe-text-cf').textContent = r2Ok
+    ? `R2 Worker: ${pipeline.workerUrl.replace('https://', '').slice(0,40)}`
+    : 'R2 Worker: no configurado';
   document.getElementById('pipe-dot-jb').className = 'pipe-dot '+(jbOk?'ok':'err');
   document.getElementById('pipe-text-jb').textContent = jbOk
     ? `JSONBin: ${pipeline.binId.slice(0,12)}...`
@@ -5091,24 +5056,27 @@ async function uploadPanelLayout(panelId, input) {
   const file = input.files[0]; if(!file) return;
   const statusEl = document.getElementById('pd-status-'+panelId);
   if(statusEl) { statusEl.textContent = 'Uploading...'; statusEl.className = 'pd-status'; }
-  if(!pipeline.cloudName || !pipeline.preset) {
+  if(!pipeline.workerUrl) {
     const reader = new FileReader();
-    reader.onload = e => { panelImageData[panelId]=e.target.result; savePanelImages(); selectPanel(panelId); renderPanels(); showToast('Layout saved locally.'); };
+    reader.onload = e => { panelImageData[panelId]=e.target.result; savePanelImages(); selectPanel(panelId); renderPanels(); showToast('Layout saved locally (R2 Worker not configured).'); };
     reader.readAsDataURL(file); return;
   }
   try {
+    const key = 'convoy/panels/' + panelId + '_' + Date.now() + '.' + (file.name.split('.').pop() || 'jpg');
     const fd = new FormData();
-    fd.append('file', file); fd.append('upload_preset', pipeline.preset);
-    fd.append('folder', 'convoy_breakdown'); fd.append('public_id', panelId + '_' + Date.now());
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${pipeline.cloudName}/image/upload`, {method:'POST',body:fd});
+    fd.append('file', file);
+    fd.append('key', key);
+    const res = await fetch(pipeline.workerUrl + '/upload', { method:'POST', body:fd });
+    if(!res.ok) throw new Error('HTTP '+res.status);
     const data = await res.json();
-    if(data.secure_url) {
-      panelImageData[panelId] = data.secure_url;
+    if(data.error) throw new Error(data.error);
+    if(data.url) {
+      panelImageData[panelId] = data.url;
       markPanelRecentlyUpdated(panelId);
       savePanelImages();
       if(statusEl) { statusEl.textContent = '✓ Uploaded'; statusEl.className = 'pd-status ok'; }
       selectPanel(panelId); renderPanels(); syncPanelImagesToJSONBin();
-      showToast('Layout uploaded to Cloudinary.');
+      showToast('Layout uploaded to R2.');
     } else { throw new Error('No URL'); }
   } catch(e) { if(statusEl) { statusEl.textContent = 'Upload failed.'; statusEl.className = 'pd-status err'; } }
 }
@@ -5178,7 +5146,7 @@ async function loadJSONBin() {
       });
       Object.entries(remoteImages).forEach(([k,v]) => {
         const urls = Array.isArray(v) ? v : (typeof v === 'string' ? [v] : []);
-        imageData[k] = { images: urls.map(url => ({ cloudinaryUrl: url, url })) };
+        imageData[k] = { images: urls.map(url => ({ r2Url: url, url })) };
       });
     }
     if(record.panelImages !== undefined) {
@@ -5247,23 +5215,24 @@ function exportZip() {
       `"${item.episodes.join('|')}"`,
       item.sku||'',
       img?.url ? '1' : '0',
-      `"${img?.cloudinaryUrl||''}"`,
+      `"${img?.r2Url||img?.cloudinaryUrl||''}"`,
       `"${(notesData[item.id]||'').replace(/"/g,'""')}"`
     ].join(','));
   });
   const csv = rows.join('\n');
 
+  const getFirstUrl = id => imageData[id]?.images?.[0]?.r2Url || imageData[id]?.images?.[0]?.cloudinaryUrl || '';
   const manifest = {
     project: 'CONVOY — Matchbox Adventure Squad S01',
     exportDate: new Date().toISOString(),
     totalItems: allItems.length,
-    imagesUploaded: allItems.filter(i => imageData[i.id]?.cloudinaryUrl).length,
-    pipeline: { cloudName: pipeline.cloudName||'not set', binId: pipeline.binId||'not set' },
+    imagesUploaded: allItems.filter(i => imageData[i.id]?.images?.[0]?.r2Url || imageData[i.id]?.images?.[0]?.cloudinaryUrl).length,
+    pipeline: { workerUrl: pipeline.workerUrl||'not set', binId: pipeline.binId||'not set' },
     breakdown: {
-      characters: CHARACTERS.map(c => ({ id:c.id, name:c.name, role:c.role, episodes:c.episodes, notes:notesData[c.id]||'', image:imageData[c.id]?.cloudinaryUrl||'' })),
-      vehicles: VEHICLES.map(v => ({ id:v.id, name:v.name, sku:v.sku, episodes:v.episodes, notes:notesData[v.id]||'', image:imageData[v.id]?.cloudinaryUrl||'' })),
-      playsets: PLAYSETS.map(p => ({ id:p.id, name:p.name, sku:p.sku, episodes:p.episodes, notes:notesData[p.id]||'', image:imageData[p.id]?.cloudinaryUrl||'' })),
-      environments: ENVIRONMENTS.map(e => ({ id:e.id, name:e.name, episodes:e.episodes, notes:notesData[e.id]||'', image:imageData[e.id]?.cloudinaryUrl||'' }))
+      characters: CHARACTERS.map(c => ({ id:c.id, name:c.name, role:c.role, episodes:c.episodes, notes:notesData[c.id]||'', image:getFirstUrl(c.id) })),
+      vehicles: VEHICLES.map(v => ({ id:v.id, name:v.name, sku:v.sku, episodes:v.episodes, notes:notesData[v.id]||'', image:getFirstUrl(v.id) })),
+      playsets: PLAYSETS.map(p => ({ id:p.id, name:p.name, sku:p.sku, episodes:p.episodes, notes:notesData[p.id]||'', image:getFirstUrl(p.id) })),
+      environments: ENVIRONMENTS.map(e => ({ id:e.id, name:e.name, episodes:e.episodes, notes:notesData[e.id]||'', image:getFirstUrl(e.id) }))
     }
   };
 
@@ -5340,7 +5309,7 @@ let lbId = null, lbIdx = 0;
 function openLightbox(id, idx) {
   lbId = id; lbIdx = idx;
   const imgs = getImages(id);
-  document.getElementById('lightbox-img').src = imgs[idx]?.cloudinaryUrl || imgs[idx]?.url || '';
+  document.getElementById('lightbox-img').src = imgs[idx]?.r2Url || imgs[idx]?.cloudinaryUrl || imgs[idx]?.url || '';
   document.getElementById('lightbox-counter').textContent = (idx+1) + ' / ' + imgs.length;
   document.getElementById('lightbox').classList.add('open');
 }
@@ -5350,7 +5319,7 @@ function closeLightbox() {
 function lbNav(dir) {
   const imgs = getImages(lbId);
   lbIdx = (lbIdx + dir + imgs.length) % imgs.length;
-  document.getElementById('lightbox-img').src = imgs[lbIdx]?.cloudinaryUrl || imgs[lbIdx]?.url || '';
+  document.getElementById('lightbox-img').src = imgs[lbIdx]?.r2Url || imgs[lbIdx]?.cloudinaryUrl || imgs[lbIdx]?.url || '';
   document.getElementById('lightbox-counter').textContent = (lbIdx+1) + ' / ' + imgs.length;
 }
 document.addEventListener('keydown', e => {
@@ -6682,38 +6651,34 @@ async function uploadWardrobeImage(variationId, charId, input) {
     renderCharacters();
   }
 
-  // 2) Si no hay Cloudinary configurado, queda como local-only.
-  if(!pipeline.cloudName || !pipeline.preset) {
-    showToast('Wardrobe image saved locally.');
+  // 2) Si no hay R2 Worker configurado, queda como local-only.
+  if(!pipeline.workerUrl) {
+    showToast('Wardrobe image saved locally (R2 Worker not configured).');
     return;
   }
 
-  // 3) Subida a Cloudinary en background. Si falla, conservamos la local.
+  // 3) Subida a R2 en background. Si falla, conservamos la local.
   try {
+    const key = 'convoy/wardrobe/' + variationId + '_' + Date.now() + '.' + (file.name.split('.').pop() || 'jpg');
     const fd = new FormData();
     fd.append('file', file);
-    fd.append('upload_preset', pipeline.preset);
-    fd.append('folder', 'convoy_breakdown/wardrobe');
-    // Public_id ÚNICO por upload — si reutilizamos el mismo variationId como public_id,
-    // Cloudinary con preset unsigned (sin overwrite) devuelve la URL de la imagen existente,
-    // o el CDN sirve la versión vieja cacheada. Generar un ID único fuerza un asset nuevo.
-    fd.append('public_id', 'wardrobe_' + variationId + '_' + Date.now());
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${pipeline.cloudName}/image/upload`, { method:'POST', body:fd });
+    fd.append('key', key);
+    const res = await fetch(pipeline.workerUrl + '/upload', { method:'POST', body:fd });
     if(!res.ok) throw new Error('HTTP '+res.status);
     const data = await res.json();
-    console.log('[wardrobe upload] Cloudinary response for', variationId, ':', data.secure_url);
-    if(data.secure_url) {
+    console.log('[wardrobe upload] R2 response for', variationId, ':', data.url);
+    if(data.url) {
       // Re-mark para mantener la protección viva mientras actualizamos la URL final.
       markWardrobeRecentlyUpdated(variationId);
-      wardrobeImageData[variationId] = data.secure_url;
+      wardrobeImageData[variationId] = data.url;
       saveWardrobeImages();
       renderCharacters();
       syncWardrobeToJSONBin();
-      showToast('Wardrobe uploaded to Cloudinary.');
-    } else { throw new Error('No URL'); }
+      showToast('Wardrobe uploaded to R2.');
+    } else { throw new Error(data.error || 'No URL'); }
   } catch(e) {
-    console.warn('Cloudinary upload failed, keeping local copy:', e);
-    showToast('Upload to Cloudinary failed — saved locally.');
+    console.warn('R2 upload failed, keeping local copy:', e);
+    showToast('Upload to R2 failed — saved locally.');
   }
 }
 

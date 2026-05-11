@@ -4902,9 +4902,14 @@ function switchPanelView(mode) {
 async function fetchLineArts() {
   lineArtsFetching = true;
   try {
-    const res = await fetch('https://refineria.valen.net.ar/api/line-arts');
-    const data = await res.json();
-    lineArtsCache = data.lineArts || (Array.isArray(data) ? data : []);
+    const eps = ['ep101','ep102','ep103','ep104','ep105','ep106','ep107'];
+    const results = await Promise.all(eps.map(ep =>
+      fetch(`https://refineria.onrender.com/api/projects/convoy/episodes/${ep}/finals`)
+        .then(r => r.json())
+        .then(data => data.finals || data.lineArts || (Array.isArray(data) ? data : []))
+        .catch(() => [])
+    ));
+    lineArtsCache = results.flat();
   } catch(e) { console.warn('Line arts fetch failed:', e); }
   lineArtsFetching = false;
   if(panelView === 'lineart') { renderPanels(); if(selectedPanel) selectPanel(selectedPanel); }
@@ -4913,9 +4918,14 @@ async function fetchLineArts() {
 async function fetchFinals() {
   finalsFetching = true;
   try {
-    const res = await fetch('https://refineria.valen.net.ar/api/finals');
-    const data = await res.json();
-    finalsCache = data.lineArts || data.finals || (Array.isArray(data) ? data : []);
+    const eps = ['ep101','ep102','ep103','ep104','ep105','ep106','ep107'];
+    const results = await Promise.all(eps.map(ep =>
+      fetch(`https://refineria.onrender.com/api/projects/convoy/episodes/${ep}/finals`)
+        .then(r => r.json())
+        .then(data => data.finals || data.lineArts || (Array.isArray(data) ? data : []))
+        .catch(() => [])
+    ));
+    finalsCache = results.flat();
   } catch(e) { console.warn('Finals fetch failed:', e); }
   finalsFetching = false;
   if(panelView === 'color') { renderPanels(); if(selectedPanel) selectPanel(selectedPanel); }
@@ -4932,7 +4942,7 @@ function filenameMatchesPanel(filename, epTag, panelCode) {
 }
 
 function getApiImageForPanel(panelId, cache, field) {
-  // field: 'lineArt' for line art view, 'final' for color view
+  // field: 'curada' for line art view, 'final' for color view
   if(!cache || !cache.length) return null;
   const m = panelId.match(/^ep(\d+)-p(\d+[a-z]*)/i);
   if(!m) return null;
@@ -4941,8 +4951,8 @@ function getApiImageForPanel(panelId, cache, field) {
   const item = cache.find(x => x.board && filenameMatchesPanel(x.board.filename || '', epTag, panelCode));
   if(!item) return null;
   if(field && item[field]) return item[field].imageUrl || null;
-  // fallback: try lineArt then final
-  return (item.lineArt && item.lineArt.imageUrl) || (item.final && item.final.imageUrl) || null;
+  // fallback: try curada then final
+  return (item.curada && item.curada.imageUrl) || (item.final && item.final.imageUrl) || null;
 }
 const recentlyUpdatedPanel = new Map();
 const PANEL_PROTECT_MS = 30000;
@@ -5015,7 +5025,7 @@ function renderPanels() {
   grid.innerHTML = panels.map(p => {
     let img = null;
     if(panelView === 'rowlayout') img = panelImageData[p.id];
-    else if(panelView === 'lineart') img = getApiImageForPanel(p.id, lineArtsCache, 'lineArt');
+    else if(panelView === 'lineart') img = getApiImageForPanel(p.id, lineArtsCache, 'curada');
     else if(panelView === 'color') img = getApiImageForPanel(p.id, finalsCache, 'final');
     const sel = selectedPanel === p.id;
     return `<div class="p-card${sel?' p-selected':''}" id="pcard-${p.id}" onclick="selectPanel('${p.id}')">
@@ -5047,7 +5057,7 @@ function selectPanel(id) {
   if(card) card.classList.add('p-selected');
   let img = null;
   if(panelView === 'rowlayout') img = panelImageData[id];
-  else if(panelView === 'lineart') img = getApiImageForPanel(id, lineArtsCache, 'lineArt');
+  else if(panelView === 'lineart') img = getApiImageForPanel(id, lineArtsCache, 'curada');
   else if(panelView === 'color') img = getApiImageForPanel(id, finalsCache, 'final');
   const actionText = panelLang==='es' && p.action_es ? p.action_es : (p.action || '');
   const descText = panelLang==='es' && p.desc_es ? p.desc_es : p.desc;

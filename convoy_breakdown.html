@@ -3639,9 +3639,10 @@ function loadPipelineConfig() {
     if(p) {
       const saved = JSON.parse(p);
       // Merge saved config; migrate old cloudName/preset → drop them
-      pipeline.workerUrl = saved.workerUrl || '';
-      pipeline.binId = saved.binId || pipeline.binId;
-      pipeline.binKey = saved.binKey || pipeline.binKey;
+      // Only override workerUrl if it was explicitly saved (not empty)
+      if(saved.workerUrl) pipeline.workerUrl = saved.workerUrl;
+      if(saved.binId) pipeline.binId = saved.binId;
+      if(saved.binKey) pipeline.binKey = saved.binKey;
     }
   } catch(e){}
 }

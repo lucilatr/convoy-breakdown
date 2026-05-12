@@ -5504,16 +5504,11 @@ function renderTracker() {
 }
 
 function rowMatchesPerson(tr, userId) {
-  // Parse onclick attrs of clickable cells to find scope|assetId|stage, then check assignedTo
   let found = false;
   tr.querySelectorAll('.cell-click').forEach(cell => {
     if(found) return;
-    const onclick = cell.getAttribute('onclick') || '';
-    const m = onclick.match(/openTaskPopup\('([^']+)','([^']+)','([^']+)'\)/);
-    if(m) {
-      const key = trkKey(m[1], m[2], m[3]);
-      if(trackerData[key]?.assignedTo === userId) found = true;
-    }
+    const key = cell.getAttribute('data-key');
+    if(key && trackerData[key]?.assignedTo === userId) found = true;
   });
   return found;
 }

@@ -5394,6 +5394,8 @@ function setTrkVal(scope, assetId, stage, field, val) {
   if(!trackerData[k]) trackerData[k] = {};
   if(val === '' || val == null) delete trackerData[k][field];
   else trackerData[k][field] = val;
+  // Waiting Feedback → auto-unassign
+  if(field === 'status' && val === 'review') delete trackerData[k].assignedTo;
   trackerData[k].updatedBy = currentUser?.name || currentUser?.username || trackerUser || 'unknown';
   trackerData[k].updatedAt = new Date().toISOString();
   saveTrackerDataLocal();

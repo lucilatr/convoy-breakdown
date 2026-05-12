@@ -2073,6 +2073,7 @@
 <div id="cell-bulk-bar">
   <span id="cell-bulk-count">0 celdas</span>
   <select id="cell-bulk-status"></select>
+  <select id="cell-bulk-assignee"></select>
   <button id="cell-bulk-apply" onclick="applyCellBulk()">Apply</button>
   <button id="cell-bulk-clear" onclick="clearCellSelection()">Clear</button>
 </div>
@@ -6839,17 +6840,26 @@ function updateCellBulkBar() {
   document.getElementById('cell-bulk-count').textContent = count + ' cell' + (count > 1 ? 's' : '') + ' selected';
   const sel = document.getElementById('cell-bulk-status');
   if(!sel.children.length) {
-    sel.innerHTML = TRK_STATUSES.map(s => '<option value="'+s.id+'">'+s.label+'</option>').join('');
+    sel.innerHTML = '<option value="">— Status —</option>' + TRK_STATUSES.map(s => '<option value="'+s.id+'">'+s.label+'</option>').join('');
+  }
+  const asel = document.getElementById('cell-bulk-assignee');
+  if(!asel.children.length) {
+    asel.innerHTML = '<option value="">— Assignee —</option>'
+      + users.map(u => '<option value="'+u.id+'">'+escHtml(u.name||u.username)+'</option>').join('')
+      + '<option value="__clear__">✕ Clear assignee</option>';
   }
 }
 
 function applyCellBulk() {
   const status = document.getElementById('cell-bulk-status').value;
-  if(!status) return;
+  const assigneeRaw = document.getElementById('cell-bulk-assignee').value;
+  const assignee = assigneeRaw === '__clear__' ? '' : assigneeRaw;
+  if(!status && !assigneeRaw) return;
   const count = selectedCells.size;
   selectedCells.forEach(key => {
     const parts = key.split('|');
-    setTrkVal(parts[0], parts[1], parts[2], 'status', status);
+    if(status) setTrkVal(parts[0], parts[1], parts[2], 'status', status);
+    if(assigneeRaw) setTrkVal(parts[0], parts[1], parts[2], 'assignedTo', assignee);
   });
   clearCellSelection();
   renderTracker();
@@ -6860,6 +6870,8 @@ function clearCellSelection() {
   selectedCells.clear();
   const bar = document.getElementById('cell-bulk-bar');
   if(bar) bar.classList.remove('visible');
+  const asel = document.getElementById('cell-bulk-assignee');
+  if(asel) asel.innerHTML = '';
 }
 
 async function syncWardrobeToJSONBin() {

@@ -5574,7 +5574,21 @@ function applyTrackerRowFilter() {
   });
 
   const countEl = document.getElementById('tracker-person-count');
-  if(countEl) countEl.textContent = hasPersonFilter ? panelCount + ' panel' + (panelCount !== 1 ? 's' : '') : '';
+  if(countEl) {
+    if(hasPersonFilter) {
+      const totalPanels = Object.entries(trackerData).filter(([key, data]) => {
+        if(data?.assignedTo !== trackerPersonFilter) return false;
+        const parts = key.split('|');
+        if(parts.length < 3) return false;
+        const assetId = parts[1];
+        return !CHARACTERS?.find(c => c.id === assetId) && !VEHICLES?.find(v => v.id === assetId)
+            && !PLAYSETS?.find(p => p.id === assetId) && !ENVIRONMENTS?.find(e => e.id === assetId);
+      }).length;
+      countEl.textContent = totalPanels + ' panel' + (totalPanels !== 1 ? 's' : '');
+    } else {
+      countEl.textContent = '';
+    }
+  }
   // Ocultar section titles y tablas vacías si todas sus filas están ocultas
   body.querySelectorAll('.trk-section-title').forEach(title => {
     if(!hasStatusFilter && !hasPersonFilter) { title.style.display = ''; return; }

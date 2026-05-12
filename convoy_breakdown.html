@@ -1248,6 +1248,8 @@
   .trk-status-col { width: 140px; min-width: 140px; }
   .trk-notes-col { min-width: 130px; }
   .trk-due-col { width: 90px; min-width: 90px; }
+  .trk-thumb-cell { width: 80px; min-width: 80px; padding: 3px 4px; text-align: center; }
+  .trk-thumb { width: 72px; height: 48px; object-fit: cover; border-radius: 3px; display: block; border: 1px solid rgba(255,255,255,0.08); }
   .trk-panel-col { width: 60px; min-width: 60px; }
 
   .trk-sep td { height: 4px; border: none; background: var(--bg); }
@@ -5602,6 +5604,7 @@ function trkTableHeadPanels() {
   return '<div class="trk-wrap"><table class="trk-table"><thead><tr>'
     + '<th class="left" style="width:90px">Type</th>'
     + '<th style="width:70px">Panel</th>'
+    + '<th style="width:80px"></th>'
     + '<th class="trk-status-col">Layout</th>'
     + '<th class="trk-status-col">Line art</th>'
     + '<th class="trk-status-col">Color</th>'
@@ -5610,8 +5613,17 @@ function trkTableHeadPanels() {
     + '<th class="trk-due-col">Due date</th>'
     + '</tr></thead><tbody>';
 }
+
+function trkPanelThumbCell(panelId) {
+  const colorImg = finalsCache ? getApiImageForPanel(panelId, finalsCache, 'final') : null;
+  const roughImg = panelImageData[panelId] || null;
+  const src = colorImg || roughImg;
+  if(!src) return '<td></td>';
+  return '<td class="trk-thumb-cell"><img class="trk-thumb" src="' + src + '" loading="lazy" title="Panel preview"></td>';
+}
+
 function trkSectionRow(label) {
-  return '<tr class="trk-sep"><td colspan="8"></td></tr>';
+  return '<tr class="trk-sep"><td colspan="9"></td></tr>';
 }
 
 function renderTrackerGeneral(body) {
@@ -5911,11 +5923,13 @@ function renderTrackerEpisode(body, ep) {
   if(panels.length) {
     html += trkSectionTitle('Panels — '+EP_LABELS[ep], ep+'-panels', 'margin-top:24px');
     html += trkTableHeadPanels();
+    if(!finalsCache && !finalsFetching) fetchFinals().then(() => renderTracker());
 
     panels.forEach(p => {
       html += '<tr>';
       html += '<td class="trk-type">Panel</td>';
       html += '<td class="trk-asset center">'+p.label+'</td>';
+      html += trkPanelThumbCell(p.id);
       html += statusCell(ep, p.id, 'layout');
       html += statusCell(ep, p.id, 'lineart');
       html += statusCell(ep, p.id, 'color');

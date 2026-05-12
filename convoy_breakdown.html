@@ -4921,8 +4921,7 @@ function getApiImageForPanel(panelId, cache, field) {
   const item = cache.find(x => x.board && filenameMatchesPanel(x.board.filename || '', epTag, panelCode));
   if(!item) return null;
   if(field && item[field]) return item[field].imageUrl || null;
-  // fallback: try curada then final
-  return (item.curada && item.curada.imageUrl) || (item.final && item.final.imageUrl) || null;
+  return null;
 }
 const recentlyUpdatedPanel = new Map();
 const PANEL_PROTECT_MS = 30000;

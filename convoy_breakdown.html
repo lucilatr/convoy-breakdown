@@ -2045,6 +2045,7 @@
     <div class="tracker-title">Production Tracker</div>
     <div class="tracker-actions">
       <button class="tracker-action-btn" onclick="syncTrackerFromJSONBin()" title="Sync latest data">↻ Sync</button>
+      <button class="tracker-action-btn" onclick="exportAssignedTasksTXT()" title="Download assigned tasks per person">↓ Tasks</button>
       <button class="tracker-action-btn" onclick="exportTrackerCSV()" title="Download as CSV">↓ CSV</button>
       <button class="tracker-action-btn" onclick="exportTrackerPDF()" title="Download as PDF">↓ PDF</button>
     </div>
@@ -6073,7 +6074,15 @@ async function syncTrackerToJSONBin() {
       headers:{'X-Master-Key':pipeline.binKey,'X-Bin-Meta':'false'}
     });
     const existing = await res.json(); const record = existing.record || existing;
-    if(Object.keys(trackerData).length > 0) record.trackerData = trackerData;
+    if(Object.keys(trackerData).length > 0) {
+      // Merge: preserve remote keys not in local (e.g. tasks assigned by other users)
+      const remoteTracker = record.trackerData || {};
+      Object.entries(remoteTracker).forEach(([k, v]) => {
+        if(!trackerData[k]) trackerData[k] = v;
+      });
+      record.trackerData = trackerData;
+      saveTrackerDataLocal();
+    }
     await fetch('https://api.jsonbin.io/v3/b/'+pipeline.binId, {
       method:'PUT',
       headers:{'Content-Type':'application/json','X-Master-Key':pipeline.binKey},
@@ -6095,12 +6104,70 @@ async function syncTrackerFromJSONBin() {
       trackerData = record.trackerData;
       saveTrackerDataLocal();
       renderTracker();
+      if(document.getElementById('my-tasks-overlay').classList.contains('open')) renderMyTasks();
       showToast('Tracker synced.');
     } else { showToast('No tracker data found.'); }
   } catch(e) { showToast('Sync failed.'); console.warn(e); }
 }
 
 // Note: no auto-refresh to avoid race conditions — use ↻ Sync button instead
+
+// ─── Assigned Tasks TXT Export ───
+function exportAssignedTasksTXT() {
+  const allAssets = [...(CHARACTERS||[]), ...(VEHICLES||[]), ...(PLAYSETS||[]), ...(ENVIRONMENTS||[])];
+  const statusLabel = (id) => { const s = TRK_STATUSES.find(x => x.id === id); return s ? s.label : (id === 'none' || !id ? 'Not started' : id); };
+
+  // Group pending tasks by user
+  const byUser = {};
+  users.forEach(u => { byUser[u.id] = { user: u, tasks: [] }; });
+
+  Object.entries(trackerData).forEach(([key, data]) => {
+    if(!data?.assignedTo || !byUser[data.assignedTo]) return;
+    if(STATUS_DONE.includes(data.status || 'none')) return;
+    const parts = key.split('|');
+    if(parts.length < 3) return;
+    const [scope, assetId, stage] = parts;
+    const found = allAssets.find(a => a.id === assetId);
+    const assetName = found ? found.name : assetId;
+    const assetType = CHARACTERS?.find(c => c.id === assetId) ? 'Character'
+      : VEHICLES?.find(v => v.id === assetId) ? 'Vehicle'
+      : PLAYSETS?.find(p => p.id === assetId) ? 'Playset'
+      : ENVIRONMENTS?.find(e => e.id === assetId) ? 'Environment' : 'Panel';
+    const epLabel = scope !== 'general' ? (EP_LABELS[scope] || scope) : 'General';
+    byUser[data.assignedTo].tasks.push({ epLabel, assetType, assetName, stage, status: data.status || 'none', dueDate: data.dueDate || '', priority: data.priority || '' });
+  });
+
+  const today = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+  let lines = ['CONVOY — Assigned Tasks', 'Generated: ' + today, ''];
+
+  users.forEach(u => {
+    const entry = byUser[u.id];
+    if(!entry || !entry.tasks.length) return;
+    lines.push('══════════════════════════════════');
+    lines.push((u.name || u.username).toUpperCase() + ' · ' + u.role);
+    lines.push('══════════════════════════════════');
+    // Sort by episode, then asset type, then name
+    entry.tasks.sort((a, b) => a.epLabel.localeCompare(b.epLabel) || a.assetType.localeCompare(b.assetType) || a.assetName.localeCompare(b.assetName));
+    entry.tasks.forEach(t => {
+      const prio = t.priority ? (' [' + t.priority.toUpperCase() + ']') : '';
+      const due = t.dueDate ? (' — due ' + t.dueDate) : '';
+      lines.push('  • [' + t.epLabel + '] ' + t.assetType + ': ' + t.assetName + ' — ' + t.stage + prio + due);
+      lines.push('    Status: ' + statusLabel(t.status));
+    });
+    lines.push('  Total: ' + entry.tasks.length + ' task' + (entry.tasks.length !== 1 ? 's' : ''));
+    lines.push('');
+  });
+
+  const hasAny = users.some(u => byUser[u.id]?.tasks.length);
+  if(!hasAny) { showToast('No hay tareas asignadas.'); return; }
+
+  const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'CVY26_AssignedTasks_' + new Date().toISOString().slice(0,10) + '.txt';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
 
 // ─── CSV Export ───
 function exportTrackerCSV() {

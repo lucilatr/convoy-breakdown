@@ -2697,6 +2697,9 @@ function categorizeTasks(tasks) {
   });
   const prioOrder = { urgent:0, high:1, medium:2, low:3, '':4 };
   const sorter = (a, b) => {
+    const aPanel = a.assetType === 'Panel' ? 0 : 1;
+    const bPanel = b.assetType === 'Panel' ? 0 : 1;
+    if(aPanel !== bPanel) return aPanel - bPanel;
     const pa = prioOrder[a.priority] ?? 4, pb = prioOrder[b.priority] ?? 4;
     if(pa !== pb) return pa - pb;
     return (a.dueDate||'').localeCompare(b.dueDate||'');

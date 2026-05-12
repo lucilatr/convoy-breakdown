@@ -1399,8 +1399,8 @@
   /* Status pill & cell extras */
   .cell-click { cursor: pointer; transition: background .1s; }
   .cell-click:hover { background: rgba(255,0,102,0.05); }
-  .cell-wrap { display: flex; flex-direction: column; align-items: center; gap: 3px; }
-  .cell-meta { display: flex; align-items: center; gap: 3px; flex-wrap: wrap; justify-content: center; }
+  .cell-wrap { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 5px; }
+  .cell-meta { display: flex; align-items: center; gap: 3px; }
   .status-pill {
     display: inline-block; font-size: 9px; font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.8px; padding: 2px 6px;
@@ -1419,7 +1419,7 @@
   .status-pill.s-none { color: rgba(255,255,255,0.18); }
   .mini-avatar {
     width: 16px; height: 16px; border-radius: 50%;
-    background: var(--pink); color: #fff;
+    background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.6);
     font-family: var(--font); font-size: 8px; font-weight: 800;
     display: inline-flex; align-items: center; justify-content: center;
     flex-shrink: 0; letter-spacing: 0;

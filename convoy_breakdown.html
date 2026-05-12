@@ -1223,8 +1223,10 @@
     font-family: var(--font); font-weight: 800; font-size: 15px;
     text-transform: uppercase; letter-spacing: 3px; color: var(--pink);
     margin: 20px 0 6px; padding-bottom: 4px; border-bottom: 1px solid rgba(255,0,102,0.15);
+    cursor: pointer; user-select: none; display: flex; align-items: center; gap: 8px;
   }
   .trk-section-title:first-child { margin-top: 0; }
+  .trk-section-arrow { font-size: 10px; opacity: 0.7; flex-shrink: 0; }
   .trk-wrap { overflow-x: auto; margin-bottom: 4px; }
   .trk-table { border-collapse: collapse; font-size: 14px; width: 100%; }
   .trk-table th {
@@ -5438,6 +5440,41 @@ function initTrackerEpSelect() {
 let trackerEp = 'general';
 let trackerStatusFilter = new Set();
 let trackerPersonFilter = '';
+let trkCollapsed = {};
+
+function trkSectionTitle(label, sectionId, extraStyle) {
+  const arrow = trkCollapsed[sectionId] ? '▶' : '▼';
+  const style = extraStyle ? ' style="' + extraStyle + '"' : '';
+  return '<div class="trk-section-title" data-section="' + sectionId + '" onclick="toggleTrkSection(\'' + sectionId + '\')"' + style + '><span class="trk-section-arrow">' + arrow + '</span>' + label + '</div>';
+}
+
+function toggleTrkSection(sectionId) {
+  trkCollapsed[sectionId] = !trkCollapsed[sectionId];
+  const title = document.querySelector('[data-section="' + sectionId + '"]');
+  if(!title) return;
+  const arrow = title.querySelector('.trk-section-arrow');
+  const collapsed = trkCollapsed[sectionId];
+  let next = title.nextElementSibling;
+  while(next && !next.classList.contains('trk-section-title')) {
+    next.style.display = collapsed ? 'none' : '';
+    next = next.nextElementSibling;
+  }
+  if(arrow) arrow.textContent = collapsed ? '▶' : '▼';
+}
+
+function applyTrkCollapsed() {
+  Object.entries(trkCollapsed).forEach(([sectionId, collapsed]) => {
+    if(!collapsed) return;
+    const title = document.querySelector('[data-section="' + sectionId + '"]');
+    if(!title) return;
+    let next = title.nextElementSibling;
+    while(next && !next.classList.contains('trk-section-title')) {
+      next.style.display = 'none';
+      next = next.nextElementSibling;
+    }
+  });
+}
+
 function switchTrackerEp(ep) { trackerEp = ep; clearCellSelection(); renderTracker(); }
 function switchTrackerPerson(userId) { trackerPersonFilter = userId; clearCellSelection(); renderTracker(); }
 
@@ -5501,6 +5538,7 @@ function renderTracker() {
 
   // Post-proceso: ocultar filas sin celdas que matcheen los filtros activos
   applyTrackerRowFilter();
+  applyTrkCollapsed();
 }
 
 function rowMatchesPerson(tr, userId) {
@@ -5582,7 +5620,7 @@ function renderTrackerGeneral(body) {
   const multiEnvs = ENVIRONMENTS.filter(e => isMultiEp(e));
   const multiPlaysets = PLAYSETS.filter(p => isMultiEp(p));
 
-  let html = '<div class="trk-section-title">General assets</div>';
+  let html = trkSectionTitle('General assets', 'general-assets');
   html += trkTableHead();
 
   // Characters
@@ -5683,7 +5721,7 @@ function renderTrackerAll(body) {
 
   // ── CHARACTERS ──────────────────────────────────────────────────
   if(charsList.length) {
-    html += '<div class="trk-section-title">Characters</div>';
+    html += trkSectionTitle('Characters', 'all-characters');
     html += trkTableHead();
     charsList.forEach(({asset, scope}) => {
       html += '<tr>';
@@ -5702,7 +5740,7 @@ function renderTrackerAll(body) {
 
   // ── WARDROBE CHANGES ────────────────────────────────────────────
   if(wardrobeList.length) {
-    html += '<div class="trk-section-title">Wardrobe changes</div>';
+    html += trkSectionTitle('Wardrobe changes', 'all-wardrobe');
     html += trkTableHead();
     wardrobeList.forEach(({asset, scope}) => {
       html += '<tr>';
@@ -5721,7 +5759,7 @@ function renderTrackerAll(body) {
 
   // ── VEHICLES ────────────────────────────────────────────────────
   if(vehsList.length) {
-    html += '<div class="trk-section-title">Vehicles</div>';
+    html += trkSectionTitle('Vehicles', 'all-vehicles');
     html += trkTableHead();
     vehsList.forEach(({asset, scope}) => {
       const hasActions = VEHICLES_WITH_ACTIONS.includes(asset.id);
@@ -5741,7 +5779,7 @@ function renderTrackerAll(body) {
 
   // ── PLAYSETS ────────────────────────────────────────────────────
   if(playsetsList.length) {
-    html += '<div class="trk-section-title">Playsets</div>';
+    html += trkSectionTitle('Playsets', 'all-playsets');
     html += trkTableHead();
     playsetsList.forEach(({asset, scope}) => {
       html += '<tr>';
@@ -5760,7 +5798,7 @@ function renderTrackerAll(body) {
 
   // ── ENVIRONMENTS ────────────────────────────────────────────────
   if(envsList.length) {
-    html += '<div class="trk-section-title">Environments</div>';
+    html += trkSectionTitle('Environments', 'all-environments');
     html += trkTableHead();
     envsList.forEach(({asset, scope}) => {
       html += '<tr>';
@@ -5801,7 +5839,7 @@ function renderTrackerEpisode(body, ep) {
   const hasAssets = epWardrobes.length || allVehs.length || exclusiveEnvs.length || epPlaysets.length;
 
   if(hasAssets) {
-    html += '<div class="trk-section-title">Assets — '+EP_LABELS[ep]+'</div>';
+    html += trkSectionTitle('Assets — '+EP_LABELS[ep], ep+'-assets');
     html += trkTableHead();
 
     epWardrobes.forEach(w => {
@@ -5871,7 +5909,7 @@ function renderTrackerEpisode(body, ep) {
 
   const panels = (PANELS_BY_EP[ep] || []);
   if(panels.length) {
-    html += '<div class="trk-section-title" style="margin-top:24px">Panels — '+EP_LABELS[ep]+'</div>';
+    html += trkSectionTitle('Panels — '+EP_LABELS[ep], ep+'-panels', 'margin-top:24px');
     html += trkTableHeadPanels();
 
     panels.forEach(p => {

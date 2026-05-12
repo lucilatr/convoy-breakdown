@@ -2063,6 +2063,7 @@
     <select id="tracker-person-select" onchange="switchTrackerPerson(this.value)">
       <option value="">All</option>
     </select>
+    <span id="tracker-person-count" style="font-size:12px;color:var(--pink);font-weight:700;letter-spacing:1px;margin-left:6px;"></span>
     <div class="tracker-legend" id="tracker-legend"></div>
   </div>
   <div class="tracker-body" id="tracker-body">
@@ -5559,6 +5560,7 @@ function applyTrackerRowFilter() {
   if(!body) return;
   const hasStatusFilter = trackerStatusFilter.size > 0;
   const hasPersonFilter = !!trackerPersonFilter;
+  let panelCount = 0;
 
   body.querySelectorAll('tr').forEach(tr => {
     if(tr.querySelector('th') || tr.classList.contains('trk-sep')) return;
@@ -5568,7 +5570,11 @@ function applyTrackerRowFilter() {
     if(hasPersonFilter && !rowMatchesPerson(tr, trackerPersonFilter)) visible = false;
 
     tr.style.display = visible ? '' : 'none';
+    if(visible && hasPersonFilter && tr.querySelector('.trk-type')?.textContent === 'Panel') panelCount++;
   });
+
+  const countEl = document.getElementById('tracker-person-count');
+  if(countEl) countEl.textContent = hasPersonFilter ? panelCount + ' panel' + (panelCount !== 1 ? 's' : '') : '';
   // Ocultar section titles y tablas vacías si todas sus filas están ocultas
   body.querySelectorAll('.trk-section-title').forEach(title => {
     if(!hasStatusFilter && !hasPersonFilter) { title.style.display = ''; return; }

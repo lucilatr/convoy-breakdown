@@ -5942,7 +5942,15 @@ function renderTrackerEpisode(body, ep) {
 
   const panels = (PANELS_BY_EP[ep] || []);
   if(panels.length) {
-    html += trkSectionTitle('Panels — '+EP_LABELS[ep], ep+'-panels', 'margin-top:24px');
+    let panelSectionLabel = 'Panels — ' + EP_LABELS[ep];
+    if(trackerPersonFilter) {
+      const assignedCount = panels.filter(p => {
+        const stages = ['layout','lineart','color','animation'];
+        return stages.some(s => trackerData[ep+'|'+p.id+'|'+s]?.assignedTo === trackerPersonFilter);
+      }).length;
+      panelSectionLabel += ' <span style="font-size:11px;letter-spacing:1px;opacity:0.8;font-weight:700;">— ' + assignedCount + ' assigned</span>';
+    }
+    html += trkSectionTitle(panelSectionLabel, ep+'-panels', 'margin-top:24px');
     html += trkTableHeadPanels();
     if(!finalsCache && !finalsFetching) fetchFinals().then(() => renderTracker());
 

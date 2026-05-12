@@ -6190,11 +6190,12 @@ async function syncTrackerFromJSONBin() {
 // ─── Assigned Tasks TXT Export ───
 function exportAssignedTasksTXT() {
   const allAssets = [...(CHARACTERS||[]), ...(VEHICLES||[]), ...(PLAYSETS||[]), ...(ENVIRONMENTS||[])];
-  const statusLabel = (id) => { const s = TRK_STATUSES.find(x => x.id === id); return s ? s.label : (id === 'none' || !id ? 'Not started' : id); };
+  const STAGE_LABEL = { layout:'LAYOUT', lineart:'LINE ART', color:'COLOR', animation:'ANIMATION',
+    concept:'CONCEPT', views:'VIEWS', expressions:'EXPRESSIONS', actions:'ACTIONS', assignment:'ASSIGNMENT' };
 
-  // Group pending tasks by user
+  // Build per-user data: { userId: { user, byScope: { scope: { panels: { panelId: [stages] }, assets: [ {name, type, stages[]} ] } } } }
   const byUser = {};
-  users.forEach(u => { byUser[u.id] = { user: u, tasks: [] }; });
+  users.forEach(u => { byUser[u.id] = { user: u, byScope: {} }; });
 
   Object.entries(trackerData).forEach(([key, data]) => {
     if(!data?.assignedTo || !byUser[data.assignedTo]) return;
@@ -6202,39 +6203,74 @@ function exportAssignedTasksTXT() {
     const parts = key.split('|');
     if(parts.length < 3) return;
     const [scope, assetId, stage] = parts;
-    const found = allAssets.find(a => a.id === assetId);
-    const assetName = found ? found.name : assetId;
-    const assetType = CHARACTERS?.find(c => c.id === assetId) ? 'Character'
-      : VEHICLES?.find(v => v.id === assetId) ? 'Vehicle'
-      : PLAYSETS?.find(p => p.id === assetId) ? 'Playset'
-      : ENVIRONMENTS?.find(e => e.id === assetId) ? 'Environment' : 'Panel';
-    const epLabel = scope !== 'general' ? (EP_LABELS[scope] || scope) : 'General';
-    byUser[data.assignedTo].tasks.push({ epLabel, assetType, assetName, stage, status: data.status || 'none', dueDate: data.dueDate || '', priority: data.priority || '' });
+    const entry = byUser[data.assignedTo];
+    if(!entry.byScope[scope]) entry.byScope[scope] = { panels: {}, assets: {} };
+    const sc = entry.byScope[scope];
+
+    const isPanel = !allAssets.find(a => a.id === assetId);
+    if(isPanel) {
+      if(!sc.panels[assetId]) sc.panels[assetId] = [];
+      sc.panels[assetId].push(stage);
+    } else {
+      const assetName = allAssets.find(a => a.id === assetId)?.name || assetId;
+      const assetType = CHARACTERS?.find(c => c.id === assetId) ? 'CHARACTER'
+        : VEHICLES?.find(v => v.id === assetId) ? 'VEHICLE'
+        : PLAYSETS?.find(p => p.id === assetId) ? 'PLAYSET' : 'ENVIRONMENT';
+      const k = assetType + '|' + assetId;
+      if(!sc.assets[k]) sc.assets[k] = { name: assetName, type: assetType, stages: [] };
+      sc.assets[k].stages.push(stage);
+    }
   });
 
+  const hasAny = users.some(u => Object.keys(byUser[u.id]?.byScope || {}).length);
+  if(!hasAny) { showToast('No assigned tasks found.'); return; }
+
+  // Get panel label from PANELS_BY_EP
+  const panelLabel = (scope, panelId) => {
+    const panels = PANELS_BY_EP[scope] || [];
+    return panels.find(p => p.id === panelId)?.label || panelId;
+  };
+
+  const scopeOrder = ['general','ep101','ep102','ep103','ep104','ep105','ep106','ep107'];
   const today = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
-  let lines = ['CONVOY — Assigned Tasks', 'Generated: ' + today, ''];
+  let lines = ['CONVOY — ASSIGNED TASKS', today, ''];
 
   users.forEach(u => {
     const entry = byUser[u.id];
-    if(!entry || !entry.tasks.length) return;
-    lines.push('══════════════════════════════════');
-    lines.push((u.name || u.username).toUpperCase() + ' · ' + u.role);
-    lines.push('══════════════════════════════════');
-    // Sort by episode, then asset type, then name
-    entry.tasks.sort((a, b) => a.epLabel.localeCompare(b.epLabel) || a.assetType.localeCompare(b.assetType) || a.assetName.localeCompare(b.assetName));
-    entry.tasks.forEach(t => {
-      const prio = t.priority ? (' [' + t.priority.toUpperCase() + ']') : '';
-      const due = t.dueDate ? (' — due ' + t.dueDate) : '';
-      lines.push('  • [' + t.epLabel + '] ' + t.assetType + ': ' + t.assetName + ' — ' + t.stage + prio + due);
-      lines.push('    Status: ' + statusLabel(t.status));
+    if(!Object.keys(entry.byScope).length) return;
+    lines.push('');
+    lines.push((u.name || u.username).toUpperCase());
+    lines.push('─'.repeat(34));
+
+    const scopes = scopeOrder.filter(s => entry.byScope[s]);
+    scopes.forEach(scope => {
+      const sc = entry.byScope[scope];
+      const epTitle = scope === 'general' ? 'GENERAL' : (EP_LABELS[scope] || scope).toUpperCase();
+      lines.push('');
+      lines.push(epTitle);
+
+      // Assets
+      Object.values(sc.assets).sort((a,b) => a.name.localeCompare(b.name)).forEach(a => {
+        const stagesStr = a.stages.map(s => STAGE_LABEL[s] || s.toUpperCase()).join(' & ');
+        lines.push('  ' + a.type + ': ' + a.name.toUpperCase() + ' — ' + stagesStr);
+      });
+
+      // Panels — sort by label number, group stages
+      const panelStages = ['layout','lineart','color','animation'];
+      const sortedPanels = Object.entries(sc.panels).sort(([idA],[idB]) => {
+        const numA = parseInt((idA.match(/p(\d+)/)||[])[1]||0);
+        const numB = parseInt((idB.match(/p(\d+)/)||[])[1]||0);
+        return numA - numB;
+      });
+      sortedPanels.forEach(([panelId, stages]) => {
+        const ordered = panelStages.filter(s => stages.includes(s));
+        const stagesStr = ordered.map(s => STAGE_LABEL[s]).join(' & ');
+        lines.push('  PANEL ' + panelLabel(scope, panelId) + ' — ' + stagesStr);
+      });
     });
-    lines.push('  Total: ' + entry.tasks.length + ' task' + (entry.tasks.length !== 1 ? 's' : ''));
+
     lines.push('');
   });
-
-  const hasAny = users.some(u => byUser[u.id]?.tasks.length);
-  if(!hasAny) { showToast('No hay tareas asignadas.'); return; }
 
   const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
   const a = document.createElement('a');

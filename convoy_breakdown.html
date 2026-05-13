@@ -4880,9 +4880,9 @@ async function fetchLineArts() {
   try {
     const eps = ['ep101','ep102','ep103','ep104','ep105','ep106','ep107'];
     const results = await Promise.all(eps.map(ep =>
-      fetch(`https://refineria.onrender.com/api/projects/convoy/episodes/${ep}/finals`)
+      fetch(`https://refineria.onrender.com/api/projects/convoy/episodes/${ep}/line-arts`)
         .then(r => r.json())
-        .then(data => data.finals || data.lineArts || (Array.isArray(data) ? data : []))
+        .then(data => data.lineArts || (Array.isArray(data) ? data : []))
         .catch(() => [])
     ));
     lineArtsCache = results.flat();
@@ -4898,7 +4898,7 @@ async function fetchFinals() {
     const results = await Promise.all(eps.map(ep =>
       fetch(`https://refineria.onrender.com/api/projects/convoy/episodes/${ep}/finals`)
         .then(r => r.json())
-        .then(data => data.finals || data.lineArts || (Array.isArray(data) ? data : []))
+        .then(data => data.finals || (Array.isArray(data) ? data : []))
         .catch(() => [])
     ));
     finalsCache = results.flat();
@@ -4918,7 +4918,7 @@ function filenameMatchesPanel(filename, epTag, panelCode) {
 }
 
 function getApiImageForPanel(panelId, cache, field) {
-  // field: 'curada' for line art view, 'final' for color view
+  // field: 'lineArt' for line art view (from /line-arts), 'final' for color view (from /finals)
   if(!cache || !cache.length) return null;
   const m = panelId.match(/^ep(\d+)-p(\d+[a-z]*)/i);
   if(!m) return null;
@@ -5000,7 +5000,7 @@ function renderPanels() {
   grid.innerHTML = panels.map(p => {
     let img = null;
     if(panelView === 'rowlayout') img = panelImageData[p.id];
-    else if(panelView === 'lineart') img = getApiImageForPanel(p.id, lineArtsCache, 'curada');
+    else if(panelView === 'lineart') img = getApiImageForPanel(p.id, lineArtsCache, 'lineArt');
     else if(panelView === 'color') img = getApiImageForPanel(p.id, finalsCache, 'final');
     const sel = selectedPanel === p.id;
     return `<div class="p-card${sel?' p-selected':''}" id="pcard-${p.id}" onclick="selectPanel('${p.id}')">
@@ -5032,7 +5032,7 @@ function selectPanel(id) {
   if(card) card.classList.add('p-selected');
   let img = null;
   if(panelView === 'rowlayout') img = panelImageData[id];
-  else if(panelView === 'lineart') img = getApiImageForPanel(id, lineArtsCache, 'curada');
+  else if(panelView === 'lineart') img = getApiImageForPanel(id, lineArtsCache, 'lineArt');
   else if(panelView === 'color') img = getApiImageForPanel(id, finalsCache, 'final');
   const actionText = panelLang==='es' && p.action_es ? p.action_es : (p.action || '');
   const descText = panelLang==='es' && p.desc_es ? p.desc_es : p.desc;

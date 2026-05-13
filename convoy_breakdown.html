@@ -5652,7 +5652,7 @@ function trkPanelThumbCell(panelId) {
   const roughImg = panelImageData[panelId] || null;
   const src = colorImg || roughImg;
   if(!src) return '<td></td>';
-  return '<td class="trk-thumb-cell"><img class="trk-thumb" src="' + src + '" loading="lazy" title="Panel preview"></td>';
+  return '<td class="trk-thumb-cell"><img class="trk-thumb" src="' + src + '" loading="lazy" title="Click para ver imagen completa" style="cursor:zoom-in" onclick="window.open(\'' + src + '\',\'_blank\')"></td>';
 }
 
 function trkSectionRow(label) {

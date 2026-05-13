@@ -4926,7 +4926,11 @@ function getApiImageForPanel(panelId, cache, field) {
   const panelCode = m[2];
   const item = cache.find(x => x.board && filenameMatchesPanel(x.board.filename || '', epTag, panelCode));
   if(!item) return null;
-  if(field && item[field]) return item[field].imageUrl || null;
+  if(field && item[field]) {
+    const val = item[field];
+    // field value can be a URL string or an object with imageUrl
+    return typeof val === 'string' ? val : (val.imageUrl || null);
+  }
   return null;
 }
 const recentlyUpdatedPanel = new Map();
@@ -5191,16 +5195,25 @@ async function loadJSONBin() {
       saveBoardmaticUrlsLocal();
     }
     if(record.trackerData !== undefined) {
+      // Smart merge by updatedAt: whichever version of a key is more recent wins.
+      // This ensures local changes survive a page reload even if the sync hadn't fired yet.
+      const remoteTracker = record.trackerData || {};
+      const merged = { ...remoteTracker };
+      Object.entries(trackerData).forEach(([k, local]) => {
+        const remote = remoteTracker[k];
+        if(!remote) {
+          merged[k] = local; // remote doesn't have it — keep local
+        } else {
+          const localTime  = local.updatedAt  ? new Date(local.updatedAt).getTime()  : 0;
+          const remoteTime = remote.updatedAt ? new Date(remote.updatedAt).getTime() : 0;
+          merged[k] = localTime >= remoteTime ? local : remote;
+        }
+      });
+      trackerData = merged;
+      // If local had newer entries, push them to remote now
       if(_trackerDirty) {
-        // Pending local changes — merge instead of replacing, so we don't clobber unsaved edits.
-        // Local keys win; remote-only keys are added. The queued syncTrackerToJSONBin will
-        // write everything back within 600ms.
-        const remoteTracker = record.trackerData || {};
-        Object.entries(remoteTracker).forEach(([k, v]) => {
-          if(!trackerData[k]) trackerData[k] = v;
-        });
-      } else {
-        trackerData = record.trackerData || {};
+        clearTimeout(_trkSyncTimer);
+        _trkSyncTimer = setTimeout(() => syncTrackerToJSONBin(), 300);
       }
       saveTrackerDataLocal();
     }

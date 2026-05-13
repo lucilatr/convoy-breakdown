@@ -5191,7 +5191,17 @@ async function loadJSONBin() {
       saveBoardmaticUrlsLocal();
     }
     if(record.trackerData !== undefined) {
-      trackerData = record.trackerData || {};
+      if(_trackerDirty) {
+        // Pending local changes — merge instead of replacing, so we don't clobber unsaved edits.
+        // Local keys win; remote-only keys are added. The queued syncTrackerToJSONBin will
+        // write everything back within 600ms.
+        const remoteTracker = record.trackerData || {};
+        Object.entries(remoteTracker).forEach(([k, v]) => {
+          if(!trackerData[k]) trackerData[k] = v;
+        });
+      } else {
+        trackerData = record.trackerData || {};
+      }
       saveTrackerDataLocal();
     }
     if(record.users && record.users.length > 0) {

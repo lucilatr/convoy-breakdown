@@ -4878,6 +4878,26 @@ function switchPanelView(mode) {
   if(selectedPanel) selectPanel(selectedPanel);
 }
 
+function _fetchBlobCors(url) {
+  // Try fetch with CORS, fallback to Image+canvas (for servers that send CORS headers)
+  return fetch(url, { mode: 'cors', credentials: 'omit' })
+    .then(r => { if(!r.ok) throw new Error('HTTP ' + r.status); return r.blob(); })
+    .catch(() => new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        try {
+          const c = document.createElement('canvas');
+          c.width = img.naturalWidth; c.height = img.naturalHeight;
+          c.getContext('2d').drawImage(img, 0, 0);
+          c.toBlob(b => b ? resolve(b) : reject(new Error('toBlob failed')), 'image/jpeg', 0.95);
+        } catch(e) { reject(e); }
+      };
+      img.onerror = () => reject(new Error('Image load failed'));
+      img.src = url + (url.includes('?') ? '&' : '?') + '_cb=' + Date.now();
+    }));
+}
+
 async function downloadPanelImages() {
   if(!currentChapter || currentChapter === 'all') {
     showToast('Seleccioná un episodio primero.'); return;
@@ -4886,9 +4906,8 @@ async function downloadPanelImages() {
   if(!panels.length) { showToast('No hay paneles.'); return; }
 
   const suffix = panelView === 'rowlayout' ? 'RL' : panelView === 'lineart' ? 'LA' : 'COLOR';
-  const epLabel = currentChapter.toUpperCase(); // EP101
+  const epLabel = currentChapter.toUpperCase();
 
-  // Ensure caches are loaded
   if(panelView === 'lineart' && !lineArtsCache && !lineArtsFetching) { showToast('Cargando line arts…'); await fetchLineArts(); }
   if(panelView === 'color'   && !finalsCache   && !finalsFetching)   { showToast('Cargando color…');    await fetchFinals();   }
 
@@ -4896,7 +4915,7 @@ async function downloadPanelImages() {
     let src = null;
     if(panelView === 'rowlayout') src = panelImageData[p.id] || null;
     else if(panelView === 'lineart') src = getApiImageForPanel(p.id, lineArtsCache, 'lineArt');
-    else if(panelView === 'color')   src = getApiImageForPanel(p.id, finalsCache,   'final');
+    else if(panelView === 'color')   src = getApiImageForPanel(p.id, finalsCache, 'final');
     if(!src) return null;
     const match = p.label.match(/^(\d+)/);
     const num = match ? match[1].padStart(2, '0') : p.label;
@@ -4910,19 +4929,27 @@ async function downloadPanelImages() {
   showToast(`Empaquetando ${items.length} imágenes…`);
 
   const zip = new JSZip();
-  let count = 0;
+  let count = 0, failed = 0;
   await Promise.all(items.map(async ({ src, filename }) => {
     try {
-      const res = await fetch(src);
-      const blob = await res.blob();
+      const blob = await _fetchBlobCors(src);
       const ext = blob.type.includes('png') ? 'png' : 'jpg';
       zip.file(`${filename}.${ext}`, blob);
       count++;
-    } catch(e) { console.warn('Download failed:', src, e); }
+    } catch(e) {
+      console.warn('Download failed:', filename, src, e);
+      failed++;
+    }
   }));
 
   if(btn) btn.textContent = '↓ Download';
-  if(!count) { showToast('No se pudieron descargar las imágenes.'); return; }
+
+  if(!count) {
+    // CORS bloqueado — abrir imágenes en nuevas pestañas como fallback
+    showToast('CORS bloqueado. Abriendo imágenes individualmente…');
+    items.forEach(({ src }) => window.open(src, '_blank'));
+    return;
+  }
 
   const zipBlob = await zip.generateAsync({ type: 'blob' });
   const a = document.createElement('a');
@@ -4930,7 +4957,7 @@ async function downloadPanelImages() {
   a.download = `${epLabel}_${suffix}.zip`;
   a.click();
   URL.revokeObjectURL(a.href);
-  showToast(`✓ ${count} imágenes descargadas.`);
+  showToast(`✓ ${count} imágenes descargadas${failed ? ' · ' + failed + ' fallaron' : ''}.`);
 }
 
 async function fetchLineArts() {

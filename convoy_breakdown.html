@@ -4878,24 +4878,16 @@ function switchPanelView(mode) {
   if(selectedPanel) selectPanel(selectedPanel);
 }
 
-function _fetchBlobCors(url) {
-  // Try fetch with CORS, fallback to Image+canvas (for servers that send CORS headers)
-  return fetch(url, { mode: 'cors', credentials: 'omit' })
-    .then(r => { if(!r.ok) throw new Error('HTTP ' + r.status); return r.blob(); })
-    .catch(() => new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        try {
-          const c = document.createElement('canvas');
-          c.width = img.naturalWidth; c.height = img.naturalHeight;
-          c.getContext('2d').drawImage(img, 0, 0);
-          c.toBlob(b => b ? resolve(b) : reject(new Error('toBlob failed')), 'image/jpeg', 0.95);
-        } catch(e) { reject(e); }
-      };
-      img.onerror = () => reject(new Error('Image load failed'));
-      img.src = url + (url.includes('?') ? '&' : '?') + '_cb=' + Date.now();
-    }));
+async function _fetchBlobCors(url) {
+  // 1) Try direct fetch
+  try {
+    const r = await fetch(url, { mode: 'cors', credentials: 'omit' });
+    if(r.ok) return await r.blob();
+  } catch(e) {}
+  // 2) Fallback: route through CORS proxy
+  const r = await fetch('https://corsproxy.io/?' + encodeURIComponent(url));
+  if(!r.ok) throw new Error('HTTP ' + r.status);
+  return r.blob();
 }
 
 async function downloadPanelImages() {
@@ -4944,12 +4936,7 @@ async function downloadPanelImages() {
 
   if(btn) btn.textContent = '↓ Download';
 
-  if(!count) {
-    // CORS bloqueado — abrir imágenes en nuevas pestañas como fallback
-    showToast('CORS bloqueado. Abriendo imágenes individualmente…');
-    items.forEach(({ src }) => window.open(src, '_blank'));
-    return;
-  }
+  if(!count) { showToast('No se pudieron descargar las imágenes. Revisá la consola.'); return; }
 
   const zipBlob = await zip.generateAsync({ type: 'blob' });
   const a = document.createElement('a');

@@ -4879,15 +4879,27 @@ function switchPanelView(mode) {
 }
 
 async function _fetchBlobCors(url) {
+  // Handle data URIs directly (no fetch needed)
+  if(url.startsWith('data:')) {
+    const [header, data] = url.split(',');
+    const mime = header.match(/:(.*?);/)[1];
+    const binary = atob(data);
+    const arr = new Uint8Array(binary.length);
+    for(let i = 0; i < binary.length; i++) arr[i] = binary.charCodeAt(i);
+    return new Blob([arr], { type: mime });
+  }
   // 1) Try direct fetch
   try {
     const r = await fetch(url, { mode: 'cors', credentials: 'omit' });
-    if(r.ok) return await r.blob();
-  } catch(e) {}
-  // 2) Fallback: route through CORS proxy
-  const r = await fetch('https://corsproxy.io/?' + encodeURIComponent(url));
-  if(!r.ok) throw new Error('HTTP ' + r.status);
-  return r.blob();
+    if(r.ok) { console.log('[DL] direct OK:', url); return await r.blob(); }
+  } catch(e) { console.warn('[DL] direct failed:', url, e.message); }
+  // 2) allorigins proxy
+  try {
+    const r = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(url));
+    if(r.ok) { console.log('[DL] proxy OK:', url); return await r.blob(); }
+    console.warn('[DL] proxy status:', r.status, url);
+  } catch(e) { console.warn('[DL] proxy failed:', url, e.message); }
+  throw new Error('all methods failed for ' + url);
 }
 
 async function downloadPanelImages() {

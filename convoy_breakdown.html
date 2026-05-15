@@ -2670,6 +2670,7 @@ function getMyTasks() {
     const parts = key.split('|');
     if(parts.length < 3) return;
     if(STATUS_DONE.includes(data.status || 'none')) return;
+    if(data.status === 'review') return; // Waiting Feedback: visible in tracker but not in My Tasks
     const [scope, assetId, stage] = parts;
     const found = allAssets.find(a => a.id === assetId);
     const assetName = found ? found.name : assetId;
@@ -5417,8 +5418,8 @@ function setTrkVal(scope, assetId, stage, field, val) {
   if(!trackerData[k]) trackerData[k] = {};
   if(val === '' || val == null) delete trackerData[k][field];
   else trackerData[k][field] = val;
-  // Waiting Feedback → auto-unassign
-  if(field === 'status' && val === 'review') delete trackerData[k].assignedTo;
+  // Waiting Feedback: keep assignedTo so person filter in tracker still shows it,
+  // but getMyTasks excludes 'review' so it won't appear in My Tasks.
   trackerData[k].updatedBy = currentUser?.name || currentUser?.username || trackerUser || 'unknown';
   trackerData[k].updatedAt = new Date().toISOString();
   saveTrackerDataLocal();

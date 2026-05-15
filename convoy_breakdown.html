@@ -4878,30 +4878,6 @@ function switchPanelView(mode) {
   if(selectedPanel) selectPanel(selectedPanel);
 }
 
-async function _fetchBlobCors(url) {
-  // Handle data URIs directly (no fetch needed)
-  if(url.startsWith('data:')) {
-    const [header, data] = url.split(',');
-    const mime = header.match(/:(.*?);/)[1];
-    const binary = atob(data);
-    const arr = new Uint8Array(binary.length);
-    for(let i = 0; i < binary.length; i++) arr[i] = binary.charCodeAt(i);
-    return new Blob([arr], { type: mime });
-  }
-  // 1) Try direct fetch
-  try {
-    const r = await fetch(url, { mode: 'cors', credentials: 'omit' });
-    if(r.ok) { console.log('[DL] direct OK:', url); return await r.blob(); }
-  } catch(e) { console.warn('[DL] direct failed:', url, e.message); }
-  // 2) allorigins proxy
-  try {
-    const r = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(url));
-    if(r.ok) { console.log('[DL] proxy OK:', url); return await r.blob(); }
-    console.warn('[DL] proxy status:', r.status, url);
-  } catch(e) { console.warn('[DL] proxy failed:', url, e.message); }
-  throw new Error('all methods failed for ' + url);
-}
-
 async function downloadPanelImages() {
   if(!currentChapter || currentChapter === 'all') {
     showToast('Seleccioná un episodio primero.'); return;
@@ -4923,40 +4899,78 @@ async function downloadPanelImages() {
     if(!src) return null;
     const match = p.label.match(/^(\d+)/);
     const num = match ? match[1].padStart(2, '0') : p.label;
-    return { src, filename: `${epLabel}_P${num}_${suffix}` };
+    const ext = src.includes('.png') || src.startsWith('data:image/png') ? 'png' : 'jpg';
+    return { src, filename: `${epLabel}_P${num}_${suffix}.${ext}` };
   }).filter(Boolean);
 
   if(!items.length) { showToast('No hay imágenes disponibles para esta vista.'); return; }
 
+  // Try direct fetch first (works if server has CORS headers)
   const btn = document.getElementById('pvbtn-download');
-  if(btn) btn.textContent = '↓ Descargando…';
-  showToast(`Empaquetando ${items.length} imágenes…`);
+  if(btn) btn.textContent = '↓ Probando…';
 
-  const zip = new JSZip();
-  let count = 0, failed = 0;
-  await Promise.all(items.map(async ({ src, filename }) => {
+  const testUrl = items[0].src;
+  let corsOk = false;
+  if(testUrl.startsWith('data:')) {
+    corsOk = true;
+  } else {
     try {
-      const blob = await _fetchBlobCors(src);
-      const ext = blob.type.includes('png') ? 'png' : 'jpg';
-      zip.file(`${filename}.${ext}`, blob);
-      count++;
-    } catch(e) {
-      console.warn('Download failed:', filename, src, e);
-      failed++;
-    }
-  }));
+      const r = await fetch(testUrl, { mode: 'cors', credentials: 'omit' });
+      if(r.ok) corsOk = true;
+    } catch(e) {}
+  }
 
-  if(btn) btn.textContent = '↓ Download';
-
-  if(!count) { showToast('No se pudieron descargar las imágenes. Revisá la consola.'); return; }
-
-  const zipBlob = await zip.generateAsync({ type: 'blob' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(zipBlob);
-  a.download = `${epLabel}_${suffix}.zip`;
-  a.click();
-  URL.revokeObjectURL(a.href);
-  showToast(`✓ ${count} imágenes descargadas${failed ? ' · ' + failed + ' fallaron' : ''}.`);
+  if(corsOk) {
+    // Download as ZIP
+    if(btn) btn.textContent = '↓ Descargando…';
+    showToast(`Empaquetando ${items.length} imágenes…`);
+    const zip = new JSZip();
+    let count = 0;
+    await Promise.all(items.map(async ({ src, filename }) => {
+      try {
+        let blob;
+        if(src.startsWith('data:')) {
+          const [header, data] = src.split(',');
+          const mime = header.match(/:(.*?);/)[1];
+          const binary = atob(data);
+          const arr = new Uint8Array(binary.length);
+          for(let i = 0; i < binary.length; i++) arr[i] = binary.charCodeAt(i);
+          blob = new Blob([arr], { type: mime });
+        } else {
+          const r = await fetch(src, { mode: 'cors', credentials: 'omit' });
+          blob = await r.blob();
+        }
+        zip.file(filename, blob);
+        count++;
+      } catch(e) { console.warn('Failed:', filename, e); }
+    }));
+    if(btn) btn.textContent = '↓ Download';
+    if(!count) { showToast('No se pudieron descargar las imágenes.'); return; }
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(zipBlob);
+    a.download = `${epLabel}_${suffix}.zip`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    showToast(`✓ ${count} imágenes descargadas.`);
+  } else {
+    // CORS bloqueado — generar script de terminal
+    if(btn) btn.textContent = '↓ Download';
+    const folder = `${epLabel}_${suffix}`;
+    const lines = [
+      '#!/bin/bash',
+      `mkdir -p "${folder}"`,
+      ...items.map(({ src, filename }) => `curl -L -o "${folder}/${filename}" "${src}"`)
+    ];
+    const script = lines.join('\n') + '\n';
+    const blob = new Blob([script], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `download_${folder}.sh`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    showToast('⬇ Script generado. Abrí la terminal, dale permisos (chmod +x) y ejecutalo.');
+  }
 }
 
 async function fetchLineArts() {

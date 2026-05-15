@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CONVOY — Production Breakdown</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -1923,6 +1924,7 @@
         <button class="pv-btn active" id="pvbtn-rowlayout" onclick="switchPanelView('rowlayout')">Rough Layout</button>
         <button class="pv-btn" id="pvbtn-lineart" onclick="switchPanelView('lineart')">Line Art</button>
         <button class="pv-btn" id="pvbtn-color" onclick="switchPanelView('color')">Color</button>
+        <button class="pv-btn" id="pvbtn-download" onclick="downloadPanelImages()" style="margin-left:auto;color:rgba(255,255,255,0.35);font-size:11px;" title="Descargar imágenes de esta vista">↓ Download</button>
       </div>
       <div class="panels-layout">
         <div class="panels-list-col">
@@ -4874,6 +4876,61 @@ function switchPanelView(mode) {
   else if(mode === 'color' && !finalsCache && !finalsFetching) fetchFinals();
   renderPanels();
   if(selectedPanel) selectPanel(selectedPanel);
+}
+
+async function downloadPanelImages() {
+  if(!currentChapter || currentChapter === 'all') {
+    showToast('Seleccioná un episodio primero.'); return;
+  }
+  const panels = PANELS_BY_EP[currentChapter] || [];
+  if(!panels.length) { showToast('No hay paneles.'); return; }
+
+  const suffix = panelView === 'rowlayout' ? 'RL' : panelView === 'lineart' ? 'LA' : 'COLOR';
+  const epLabel = currentChapter.toUpperCase(); // EP101
+
+  // Ensure caches are loaded
+  if(panelView === 'lineart' && !lineArtsCache && !lineArtsFetching) { showToast('Cargando line arts…'); await fetchLineArts(); }
+  if(panelView === 'color'   && !finalsCache   && !finalsFetching)   { showToast('Cargando color…');    await fetchFinals();   }
+
+  const items = panels.map(p => {
+    let src = null;
+    if(panelView === 'rowlayout') src = panelImageData[p.id] || null;
+    else if(panelView === 'lineart') src = getApiImageForPanel(p.id, lineArtsCache, 'lineArt');
+    else if(panelView === 'color')   src = getApiImageForPanel(p.id, finalsCache,   'final');
+    if(!src) return null;
+    const match = p.label.match(/^(\d+)/);
+    const num = match ? match[1].padStart(2, '0') : p.label;
+    return { src, filename: `${epLabel}_P${num}_${suffix}` };
+  }).filter(Boolean);
+
+  if(!items.length) { showToast('No hay imágenes disponibles para esta vista.'); return; }
+
+  const btn = document.getElementById('pvbtn-download');
+  if(btn) btn.textContent = '↓ Descargando…';
+  showToast(`Empaquetando ${items.length} imágenes…`);
+
+  const zip = new JSZip();
+  let count = 0;
+  await Promise.all(items.map(async ({ src, filename }) => {
+    try {
+      const res = await fetch(src);
+      const blob = await res.blob();
+      const ext = blob.type.includes('png') ? 'png' : 'jpg';
+      zip.file(`${filename}.${ext}`, blob);
+      count++;
+    } catch(e) { console.warn('Download failed:', src, e); }
+  }));
+
+  if(btn) btn.textContent = '↓ Download';
+  if(!count) { showToast('No se pudieron descargar las imágenes.'); return; }
+
+  const zipBlob = await zip.generateAsync({ type: 'blob' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(zipBlob);
+  a.download = `${epLabel}_${suffix}.zip`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast(`✓ ${count} imágenes descargadas.`);
 }
 
 async function fetchLineArts() {

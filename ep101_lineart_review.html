@@ -734,6 +734,38 @@
     .panel-img-col { aspect-ratio: 16/9; }
     .panel-page-header { background: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
+    /* Spacer: forzar visibilidad en print */
+    .panel-spacer {
+      height: 14mm !important;
+      min-height: 14mm !important;
+      display: block !important;
+      flex-shrink: 0 !important;
+    }
+
+    /* Lineup: exactamente una página A4, sin overflow */
+    .lineup-page {
+      height: 297mm;
+      overflow: hidden;
+    }
+    .lineup-grid {
+      overflow: hidden;
+    }
+    .char-card {
+      overflow: hidden;
+      min-height: 0;
+    }
+    .char-img-wrap {
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .char-img-wrap > img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: top;
+    }
+
     .editable:empty::before { color: #ddd; }
 
     @page {

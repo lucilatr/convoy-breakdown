@@ -4905,72 +4905,51 @@ async function downloadPanelImages() {
 
   if(!items.length) { showToast('No hay imágenes disponibles para esta vista.'); return; }
 
-  // Try direct fetch first (works if server has CORS headers)
   const btn = document.getElementById('pvbtn-download');
-  if(btn) btn.textContent = '↓ Probando…';
+  if(btn) btn.textContent = '↓ Descargando…';
+  showToast(`Empaquetando ${items.length} imágenes…`);
 
-  const testUrl = items[0].src;
-  let corsOk = false;
-  if(testUrl.startsWith('data:')) {
-    corsOk = true;
-  } else {
+  async function fetchBlob(src) {
+    // 1. data URI — convert directly
+    if(src.startsWith('data:')) {
+      const [header, data] = src.split(',');
+      const mime = header.match(/:(.*?);/)[1];
+      const binary = atob(data);
+      const arr = new Uint8Array(binary.length);
+      for(let i = 0; i < binary.length; i++) arr[i] = binary.charCodeAt(i);
+      return new Blob([arr], { type: mime });
+    }
+    // 2. Direct fetch (works if server has CORS headers)
     try {
-      const r = await fetch(testUrl, { mode: 'cors', credentials: 'omit' });
-      if(r.ok) corsOk = true;
+      const r = await fetch(src, { mode: 'cors', credentials: 'omit' });
+      if(r.ok) return await r.blob();
     } catch(e) {}
+    // 3. Proxy fallback (bypass CORS)
+    const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(src)}`;
+    const r2 = await fetch(proxy);
+    if(r2.ok) return await r2.blob();
+    throw new Error('fetch failed: ' + src);
   }
 
-  if(corsOk) {
-    // Download as ZIP
-    if(btn) btn.textContent = '↓ Descargando…';
-    showToast(`Empaquetando ${items.length} imágenes…`);
-    const zip = new JSZip();
-    let count = 0;
-    await Promise.all(items.map(async ({ src, filename }) => {
-      try {
-        let blob;
-        if(src.startsWith('data:')) {
-          const [header, data] = src.split(',');
-          const mime = header.match(/:(.*?);/)[1];
-          const binary = atob(data);
-          const arr = new Uint8Array(binary.length);
-          for(let i = 0; i < binary.length; i++) arr[i] = binary.charCodeAt(i);
-          blob = new Blob([arr], { type: mime });
-        } else {
-          const r = await fetch(src, { mode: 'cors', credentials: 'omit' });
-          blob = await r.blob();
-        }
-        zip.file(filename, blob);
-        count++;
-      } catch(e) { console.warn('Failed:', filename, e); }
-    }));
-    if(btn) btn.textContent = '↓ Download';
-    if(!count) { showToast('No se pudieron descargar las imágenes.'); return; }
-    const zipBlob = await zip.generateAsync({ type: 'blob' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(zipBlob);
-    a.download = `${epLabel}_${suffix}.zip`;
-    a.click();
-    URL.revokeObjectURL(a.href);
-    showToast(`✓ ${count} imágenes descargadas.`);
-  } else {
-    // CORS bloqueado — generar script de terminal
-    if(btn) btn.textContent = '↓ Download';
-    const folder = `${epLabel}_${suffix}`;
-    const lines = [
-      '#!/bin/bash',
-      `mkdir -p "${folder}"`,
-      ...items.map(({ src, filename }) => `curl -L -o "${folder}/${filename}" "${src}"`)
-    ];
-    const script = lines.join('\n') + '\n';
-    const blob = new Blob([script], { type: 'text/plain' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `download_${folder}.sh`;
-    a.click();
-    URL.revokeObjectURL(a.href);
-    showToast('⬇ Script generado. Abrí la terminal, dale permisos (chmod +x) y ejecutalo.');
-  }
+  const zip = new JSZip();
+  let count = 0;
+  await Promise.all(items.map(async ({ src, filename }) => {
+    try {
+      const blob = await fetchBlob(src);
+      zip.file(filename, blob);
+      count++;
+    } catch(e) { console.warn('Skipped:', filename, e); }
+  }));
+
+  if(btn) btn.textContent = '↓ Download';
+  if(!count) { showToast('No se pudieron descargar las imágenes.'); return; }
+  const zipBlob = await zip.generateAsync({ type: 'blob' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(zipBlob);
+  a.download = `${epLabel}_${suffix}.zip`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast(`✓ ${count} imágenes descargadas como ZIP.`);
 }
 
 async function fetchLineArts() {

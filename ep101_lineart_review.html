@@ -375,11 +375,12 @@
     background: var(--white);
   }
 
-  /* IMAGE: full width, 16:9 */
+  /* IMAGE: full width with 1cm side margins + border frame */
   .panel-img-col {
-    width: 100%;
+    width: calc(100% - 2cm);
+    margin: 0 1cm;
     background: var(--black);
-    border-bottom: 1px solid #222;
+    border: 1px solid #555;
     display: flex;
     align-items: center;
     justify-content: center;

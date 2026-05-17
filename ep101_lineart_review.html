@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CVY26_001_101 — Line Art Review</title>
+<style>
+  /* ── VARIABLES ──────────────────────────────────────────────── */
+  :root {
+    --black: #0a0a0a;
+    --white: #ffffff;
+    --off-white: #f5f5f0;
+    --grey-light: #e8e8e4;
+    --grey-mid: #999;
+    --grey-dark: #333;
+    --accent: #e8002d;
+    --accent-dark: #b5001e;
+    --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --font-mono: 'Courier New', monospace;
+  }
+
+  /* ── RESET ──────────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    background: #e8e8e4;
+    color: var(--black);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ── SCREEN NAV BAR ─────────────────────────────────────────── */
+  #topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: var(--black);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 24px;
+    gap: 16px;
+    border-bottom: 2px solid var(--accent);
+  }
+  #topbar .tb-title {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--white);
+  }
+  #topbar .tb-title span { color: var(--accent); }
+  #topbar .tb-controls { display: flex; gap: 10px; }
+  .tb-btn {
+    background: var(--accent);
+    color: var(--white);
+    border: none;
+    padding: 7px 16px;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .tb-btn:hover { background: var(--accent-dark); }
+  .tb-btn.secondary {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.25);
+    color: rgba(255,255,255,0.7);
+  }
+  .tb-btn.secondary:hover { border-color: var(--white); color: var(--white); background: transparent; }
+
+  /* ── PAGE WRAPPER ───────────────────────────────────────────── */
+  #doc-wrapper {
+    padding-top: 60px;
+  }
+
+  /* ── SHARED PAGE STYLES ─────────────────────────────────────── */
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    background: var(--white);
+    margin: 24px auto;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ── COVER PAGE ─────────────────────────────────────────────── */
+  .cover {
+    background: var(--white);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0;
+  }
+  .cover-stripe {
+    background: var(--accent);
+    height: 10px;
+    width: 100%;
+  }
+  .cover-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 48px 56px;
+    gap: 24px;
+    border-bottom: 1px solid var(--grey-light);
+  }
+  .cover-eyebrow {
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .cover-title {
+    font-size: 42px;
+    font-weight: 900;
+    color: var(--black);
+    line-height: 1.05;
+    letter-spacing: -1px;
+    text-transform: uppercase;
+  }
+  .cover-title span { color: var(--accent); }
+  .cover-subtitle {
+    font-size: 18px;
+    font-weight: 300;
+    color: var(--grey-mid);
+    letter-spacing: 1px;
+  }
+  .cover-divider {
+    width: 48px;
+    height: 2px;
+    background: var(--accent);
+  }
+  .cover-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 32px;
+    padding: 32px 56px 48px;
+  }
+  .cover-meta-item { display: flex; flex-direction: column; gap: 2px; }
+  .cover-meta-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--grey-mid);
+    font-weight: 600;
+  }
+  .cover-meta-value {
+    font-size: 12px;
+    color: var(--grey-dark);
+    font-weight: 500;
+  }
+  .cover-meta-value[contenteditable="true"] {
+    outline: none;
+    border-bottom: 1px dashed var(--grey-light);
+    min-width: 80px;
+    display: inline-block;
+  }
+  .cover-logo-area {
+    position: absolute;
+    bottom: 56px;
+    right: 56px;
+    text-align: right;
+  }
+  .cover-logo {
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 6px;
+    color: var(--grey-light);
+    text-transform: uppercase;
+  }
+  .cover-confidential {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--grey-mid);
+    margin-top: 4px;
+  }
+
+  /* ── SECTION HEADER PAGE ────────────────────────────────────── */
+  .section-page {
+    background: var(--off-white);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 64px 56px;
+    min-height: 160px;
+  }
+  .section-page.compact { min-height: unset; padding: 28px 40px 0; }
+  .section-eyebrow {
+    font-size: 9px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .section-title {
+    font-size: 28px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+    color: var(--black);
+  }
+  .section-rule {
+    width: 100%;
+    height: 1px;
+    background: var(--grey-light);
+    margin: 0 40px;
+  }
+
+  /* ── CHARACTER LINEUP PAGE ──────────────────────────────────── */
+  .lineup-page {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .lineup-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    background: var(--black);
+    border-bottom: 2px solid var(--accent);
+    padding: 14px 28px;
+    flex-shrink: 0;
+  }
+  .lineup-header-title {
+    font-size: 14px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--white);
+  }
+  .lineup-header-ep {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+  }
+  .lineup-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--grey-light);
+  }
+  .char-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    padding: 16px 20px 14px;
+    gap: 10px;
+  }
+
+  .char-img-wrap {
+    width: 100%;
+    background: var(--off-white);
+    overflow: visible;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .char-img-wrap > img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .char-img-placeholder {
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--grey-mid);
+    text-transform: uppercase;
+    text-align: center;
+    padding: 32px;
+  }
+  /* Franja inferior: texto izquierda + pin derecha */
+  .char-bottom {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    border-top: 1px solid var(--grey-light);
+    padding-top: 10px;
+    margin-top: 8px;
+  }
+  .char-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .char-name {
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--black);
+  }
+  .char-role {
+    font-size: 9.5px;
+    color: var(--grey-mid);
+    letter-spacing: 0.3px;
+  }
+  .char-vehicle {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  /* Wardrobe pin — polaroid a la derecha */
+  .char-wardrobe-pin {
+    width: 32%;
+    flex-shrink: 0;
+    background: var(--white);
+    padding: 5px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    transform: rotate(3deg);
+  }
+  .char-wardrobe-pin img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* ── PANEL PAGE ─────────────────────────────────────────────── */
+  .panel-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 297mm;
+  }
+  .panel-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 20px;
+    background: var(--black);
+    border-bottom: 2px solid var(--accent);
+    flex-shrink: 0;
+  }
+  .panel-page-header .ph-ep {
+    font-size: 8px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+  }
+  .panel-page-header .ph-title {
+    font-size: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+  }
+  .panel-page-header .ph-num {
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: var(--accent);
+  }
+
+  /* SPACER between header and image */
+  .panel-spacer {
+    height: 14mm;
+    flex-shrink: 0;
+    background: var(--white);
+  }
+
+  /* IMAGE: full width, 16:9 */
+  .panel-img-col {
+    width: 100%;
+    background: var(--black);
+    border-bottom: 1px solid #222;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    aspect-ratio: 16 / 9;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .panel-img-col img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+  .panel-img-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 24px;
+    color: #555;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+  }
+  .panel-img-placeholder .pip-icon {
+    width: 64px;
+    height: 48px;
+    border: 2px dashed currentColor;
+    border-radius: 2px;
+    position: relative;
+  }
+  .panel-img-placeholder .pip-icon::after {
+    content: '';
+    position: absolute;
+    bottom: 8px; left: 8px; right: 8px;
+    height: 2px;
+    background: currentColor;
+    box-shadow: 0 -6px 0 currentColor;
+  }
+  .panel-img-placeholder .pip-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: var(--font-mono);
+    color: #555;
+  }
+
+  /* INFO SECTION: below image */
+  .panel-info-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* top info row: 2 columns */
+  .panel-info-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    flex: 1;
+  }
+
+  /* left col: panel num + scene + visual */
+  .panel-info-main {
+    padding: 14px 20px 14px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-right: 1px solid var(--grey-light);
+  }
+
+  /* right col: dialogue + chars */
+  .panel-info-side {
+    padding: 14px 22px 14px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .panel-num-badge {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .panel-num {
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--black);
+    letter-spacing: -1px;
+  }
+  .panel-num-sub {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--grey-mid);
+    letter-spacing: 1px;
+  }
+
+  .info-block { display: flex; flex-direction: column; gap: 4px; }
+  .info-label {
+    font-size: 7.5px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--grey-mid);
+  }
+  .info-value {
+    font-size: 10.5px;
+    line-height: 1.55;
+    color: var(--grey-dark);
+  }
+
+  /* editable fields */
+  .editable {
+    outline: none;
+    border-bottom: 1px dashed var(--grey-light);
+    min-height: 18px;
+    padding: 2px 0;
+    color: var(--grey-dark);
+    font-size: 10.5px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+  }
+  .editable:empty::before {
+    content: attr(data-placeholder);
+    color: #ccc;
+    font-style: italic;
+    pointer-events: none;
+  }
+  .editable:focus {
+    border-bottom-color: var(--accent);
+    border-bottom-style: solid;
+  }
+
+  /* dialogue block */
+  .dialogue-block {
+    background: var(--off-white);
+    border-left: 3px solid var(--accent);
+    padding: 10px 12px;
+    border-radius: 0 2px 2px 0;
+  }
+  .dialogue-block .info-label { color: var(--accent); }
+  .dialogue-block .editable {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    line-height: 1.6;
+    border-bottom-color: transparent;
+  }
+  .dialogue-block .editable:focus { border-bottom-color: var(--accent); }
+
+  /* chars in scene */
+  .chars-in-scene {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 2px;
+  }
+  .char-tag {
+    font-size: 7.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: var(--grey-light);
+    padding: 2px 7px;
+    border-radius: 2px;
+    color: var(--grey-dark);
+  }
+  .char-tag.villain { background: #fdecea; color: var(--accent); }
+
+  /* notes row: bottom strip */
+  .panel-notes-row {
+    border-top: 1px solid var(--grey-light);
+    padding: 8px 22px 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+  .panel-notes-row .info-label { margin-bottom: 2px; }
+  .panel-notes-row .editable {
+    font-size: 10px;
+    border-bottom-color: transparent;
+  }
+  .panel-notes-row .editable:focus { border-bottom-color: var(--accent); }
+  .notes-col { flex: 1; }
+
+  /* ── WARDROBE PAGE ──────────────────────────────────────────── */
+  .wardrobe-page {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+  }
+  .wardrobe-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    background: var(--grey-light);
+    padding: 0;
+  }
+  .wardrobe-card {
+    background: var(--white);
+    display: flex;
+    flex-direction: column;
+    padding: 16px 12px 14px;
+    gap: 10px;
+  }
+  .wardrobe-img-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--off-white);
+    overflow: hidden;
+  }
+  .wardrobe-img-wrap img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .wardrobe-info {
+    border-top: 1px solid var(--grey-light);
+    padding-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .wardrobe-name {
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--black);
+  }
+  .wardrobe-label {
+    font-size: 8px;
+    color: var(--grey-mid);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  /* ── STORYBOARD PAGE ────────────────────────────────────────── */
+  .storyboard-page {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+  }
+  .sb-header {
+    background: var(--black);
+    border-bottom: 2px solid var(--accent);
+    padding: 18px 24px 14px;
+    flex-shrink: 0;
+  }
+  .sb-eyebrow {
+    font-size: 8px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 4px;
+  }
+  .sb-title {
+    font-size: 22px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+    color: var(--white);
+    line-height: 1;
+  }
+  .sb-title span { color: var(--accent); }
+  .sb-subtitle {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.35);
+    margin-top: 5px;
+    text-transform: uppercase;
+  }
+  .sb-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+    padding: 14px;
+    align-content: start;
+  }
+  .sb-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .sb-img-wrap {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: var(--grey-light);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .sb-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .sb-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    font-family: var(--font-mono);
+    color: #bbb;
+    letter-spacing: 1px;
+  }
+  .sb-label {
+    font-size: 6.5px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--grey-mid);
+    text-align: center;
+    line-height: 1;
+  }
+
+  /* ── PRINT STYLES ───────────────────────────────────────────── */
+  @media print {
+    body { background: white; font-size: 11px; }
+    #topbar { display: none !important; }
+    #doc-wrapper { padding-top: 0; }
+
+    .page {
+      width: 100%;
+      min-height: 100vh;
+      margin: 0;
+      box-shadow: none;
+      page-break-after: always;
+      break-after: page;
+    }
+    .page:last-child { page-break-after: avoid; break-after: avoid; }
+
+    .cover { min-height: 100vh; }
+    .lineup-page { min-height: 100vh; }
+
+    .panel-page {
+      min-height: 100vh;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .panel-img-col { aspect-ratio: 16/9; }
+    .panel-page-header { background: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+    .editable:empty::before { color: #ddd; }
+
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── TOP BAR (screen only) ───────────────────────────────────────── -->
+<div id="topbar">
+  <div class="tb-title">CVY26_001 <span>·</span> EP101 <span>·</span> Line Art Review</div>
+  <div class="tb-controls">
+    <button class="tb-btn secondary" onclick="toggleEditing()">Toggle Editing</button>
+    <button class="tb-btn" onclick="window.print()">Export PDF</button>
+  </div>
+</div>
+
+<div id="doc-wrapper">
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     COVER PAGE
+═══════════════════════════════════════════════════════════════════ -->
+<div class="page cover">
+  <div class="cover-stripe"></div>
+  <div class="cover-body">
+    <div class="cover-eyebrow">Matchbox Adventure Squad · Production Review</div>
+    <div class="cover-title">Line Art<br><span>Review</span></div>
+    <div class="cover-subtitle">Episode 101 — Dangerous Bridge High-Speed Chase!</div>
+    <div class="cover-divider"></div>
+    <div style="font-size:11px;color:var(--grey-mid);line-height:1.6;max-width:340px;">
+      This document is submitted for Mattel Brand review.<br>
+      It includes line art panels alongside script context to facilitate character and scene accuracy review.
+    </div>
+  </div>
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Project Code</div>
+      <div class="cover-meta-value">CVY26_001</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Episode</div>
+      <div class="cover-meta-value">101 — Bridge of Super Spies!</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Document Type</div>
+      <div class="cover-meta-value">Line Art Review Package</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Date</div>
+      <div class="cover-meta-value" contenteditable="true" data-placeholder="Date">—</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Total Panels</div>
+      <div class="cover-meta-value">45</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Version</div>
+      <div class="cover-meta-value" contenteditable="true" data-placeholder="V1">V1</div>
+    </div>
+  </div>
+  <div class="cover-logo-area">
+    <div class="cover-logo">Convoy</div>
+    <div class="cover-confidential">Confidential — For Review Only</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     CHARACTER LINEUP PAGE
+═══════════════════════════════════════════════════════════════════ -->
+<div class="page lineup-page">
+  <div class="lineup-header">
+    <div class="lineup-header-title">Character Lineup</div>
+    <div class="lineup-header-ep">Episode 101 · Cast</div>
+  </div>
+
+  <div class="lineup-grid">
+
+    <!-- SEAN -->
+    <div class="char-card">
+      <div class="char-img-wrap">
+        <img src="./MATCHBOX-SEAN-turn1.jpg" alt="Sean" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="char-img-placeholder" style="display:none">Sean — Turn 1</div>
+      </div>
+      <div class="char-bottom">
+        <div class="char-info">
+          <div class="char-name">Sean</div>
+          <div class="char-role">Lead — The Spy Kid</div>
+          <div class="char-vehicle">Rover 6x6</div>
+        </div>
+        <div class="char-wardrobe-pin">
+          <img src="./wardrobe/sean_construction_wardrobe.png" alt="Sean wardrobe">
+        </div>
+      </div>
+    </div>
+
+    <!-- TED -->
+    <div class="char-card">
+      <div class="char-img-wrap">
+        <img src="./MATCHBOX-TED-turn1.jpg" alt="Ted" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="char-img-placeholder" style="display:none">Ted — Turn 1</div>
+      </div>
+      <div class="char-bottom">
+        <div class="char-info">
+          <div class="char-name">Ted</div>
+          <div class="char-role">Fire &amp; Rescue Lead</div>
+          <div class="char-vehicle">Triumph Scrambler / Ford F-150</div>
+        </div>
+        <div class="char-wardrobe-pin">
+          <img src="./wardrobe/ted_construction_wardrobe.png" alt="Ted wardrobe">
+        </div>
+      </div>
+    </div>
+
+    <!-- CHARMAINE -->
+    <div class="char-card">
+      <div class="char-img-wrap">
+        <img src="./MATCHBOX-CHARMAINErevisedHAIR.jpg" alt="Charmaine" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="char-img-placeholder" style="display:none">Charmaine — Turn 1</div>
+      </div>
+      <div class="char-bottom">
+        <div class="char-info">
+          <div class="char-name">Charmaine</div>
+          <div class="char-role">Tech &amp; Air Support</div>
+          <div class="char-vehicle">Rescue Helicopter / Porsche 911</div>
+        </div>
+        <div class="char-wardrobe-pin">
+          <img src="./wardrobe/charmine_construction_wardrobe.png" alt="Charmaine wardrobe">
+        </div>
+      </div>
+    </div>
+
+    <!-- AIMEE -->
+    <div class="char-card">
+      <div class="char-img-wrap">
+        <img src="./MATCHBOX-AIMEE-turn1.jpg" alt="Aimee" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="char-img-placeholder" style="display:none">Aimee — Turn 1</div>
+      </div>
+      <div class="char-bottom">
+        <div class="char-info">
+          <div class="char-name">Aimee</div>
+          <div class="char-role">Speed &amp; Driving Expert</div>
+          <div class="char-vehicle">Mustang Fastback / Skidster</div>
+        </div>
+        <div class="char-wardrobe-pin">
+          <img src="./wardrobe/aimee_construction_wardrobe.png" alt="Aimee wardrobe">
+        </div>
+      </div>
+    </div>
+
+    <!-- CROSBY -->
+    <div class="char-card">
+      <div class="char-img-wrap">
+        <img src="./MATCHBOX-CROSBY-turn1.jpg" alt="Crosby" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="char-img-placeholder" style="display:none">Crosby — Turn 1</div>
+      </div>
+      <div class="char-bottom">
+        <div class="char-info">
+          <div class="char-name">Crosby</div>
+          <div class="char-role">Engineering &amp; Heavy Machinery</div>
+          <div class="char-vehicle">Excavator / Ford F-150 / Turf Hauler</div>
+        </div>
+        <div class="char-wardrobe-pin">
+          <img src="./wardrobe/crosby_construction_wardrobe.png" alt="Crosby wardrobe">
+        </div>
+      </div>
+    </div>
+
+    <!-- VON STEELE -->
+    <div class="char-card">
+      <div class="char-img-wrap">
+        <img src="./MATCHBOX-VONSTEELE-turn1.jpg" alt="Von Steele" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="char-img-placeholder" style="display:none">Von Steele — Turn 1</div>
+      </div>
+      <div class="char-bottom">
+        <div class="char-info">
+          <div class="char-name">Von Steele</div>
+          <div class="char-role">Villain — Super Criminal</div>
+          <div class="char-vehicle">Dodge Durango / F-650 Rollback</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /lineup-grid -->
+</div><!-- /lineup-page -->
+
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     PANELS
+     Image path: LINEART_FOLDER variable below. Change it to your folder.
+═══════════════════════════════════════════════════════════════════ -->
+
+<script>
+// ── CONFIGURATION ──────────────────────────────────────────────
+// Change this to the folder where line art images are stored.
+// Files should be named: p01.jpg, p02.jpg ... p45.jpg
+// Sub-panels (02AB, 04AF etc.) use the same base number file.
+const LINEART_FOLDER = './EP101_LA/';
+const LINEART_EXT   = '.jpg';
+
+// ── PANEL DATA ─────────────────────────────────────────────────
+const PANELS = [
+  {
+    num: '01', label: '01',
+    scene: 'COLD OPEN',
+    desc: 'EXT. FOUR-LANE HIGHWAY — DAY. MS on the front of two fast-moving cars side by side: a Rover 6x6 and a Dodge Durango, both catching a little air coming over a small rise in the highway. The drivers look nearly identical, except the driver of the Durango is wearing an eyepatch. Zoom in as the cars land and side-bump each other. Sparks fly and fill the frame.',
+    dialogue: 'SEAN (V.O.): Sean in his Rover 6x6 is in hot pursuit!',
+    chars: ['Sean', 'Von Steele']
+  },
+  {
+    num: '02', label: '02A–B',
+    scene: 'COLD OPEN',
+    desc: 'EXT. FOUR-LANE HIGHWAY. WS 45-degree high-angle partial side view. The Rover 6x6 and Dodge Durango race toward an expansive bridge over a river, where the highway narrows into two lanes. Beyond the bridge, the bustling, clean metropolis of Matchbox City. INSET: A yellow Narrow Bridge sign. The vibrating cars slide into frame neck and neck. Tire smoke trails them. The yellow "narrow bridge" sign moves off screen, revealing the narrow bridge. Push in on the Rover 6x6.',
+    dialogue: 'SEAN (V.O.): We can\'t let Von Steele escape to the city!',
+    chars: ['Sean', 'Von Steele']
+  },
+  {
+    num: '03', label: '03',
+    scene: 'COLD OPEN — TITLE CARD',
+    desc: 'Matchbox Crew logo with the episode title. The title zips into position as Sean says the title.',
+    dialogue: 'SEAN (V.O.): Dangerous Bridge High-Speed Chase!',
+    chars: []
+  },
+  {
+    num: '04', label: '04A–F',
+    scene: 'SCENE 1 — REAL WORLD / SMALLEY\'S GARAGE',
+    desc: 'INT. SMALLEY\'S GARAGE — DAY. MS, table-level. Sean, Aimee, Ted, Crosby and Charmaine are bent down and at play. Five singles stack vertically to form a split-screen of the whole team. After a beat, the stack is squeezed tighter as Sean with an eyepatch (Von Steele) is added to the frame. The name of each character splashes over the correlating character image.',
+    dialogue: '',
+    chars: ['Sean', 'Ted', 'Charmaine', 'Aimee', 'Crosby', 'Von Steele']
+  },
+  {
+    num: '05', label: '05',
+    scene: 'SCENE 1 — REAL WORLD / SMALLEY\'S GARAGE',
+    desc: 'INT. SMALLEY\'S GARAGE — DAY. WS of the professional mechanic\'s garage converted into the ultimate Matchbox play space, complete with a large table-sized diorama of a City. Sean pushes the miniature toy version of the Rover and black Durango over a DIY bridge. Aimee, Ted, Crosby and Charmaine lean in, inspecting the action. The pieces of the room build one piece at a time from all directions — walls, shelves, decoration, dioramas, kids!',
+    dialogue: 'SEAN (V.O.): (vroom!)\nAIMEE (V.O.): Whoa, Sean, who\'s that in the black car?\nSEAN (V.O.): It\'s super-spy criminal Von Steele!',
+    chars: ['Sean', 'Ted', 'Charmaine', 'Aimee', 'Crosby']
+  },
+  {
+    num: '06', label: '06',
+    scene: 'SCENE 1 — REAL WORLD / SMALLEY\'S GARAGE',
+    desc: 'INT. SMALLEY\'S GARAGE. CU, table level. Sean now wearing an eyepatch has the Dodge Durango in his left hand stretched out in front of the Rover 6x6 in his right hand. Sean\'s arm with the Durango stretches out into the foreground, foreshortened to take up half of the screen.',
+    dialogue: 'SEAN (as Von Steele) (V.O.): Your Matchbox Crew is way too slow to ever catch Von Steele! (over-the-top villain laugh)',
+    chars: ['Sean']
+  },
+  {
+    num: '07', label: '07',
+    scene: 'SCENE 1 — REAL WORLD / SMALLEY\'S GARAGE',
+    desc: 'INT. SMALLEY\'S GARAGE. MS table-level view of the bridge play area. Aimee, Ted, Crosby and Charmaine with their hands respectively on Mustang Fastback, Triumph Scrambler, Ford F-150 and Porsche 911 are lined up on the bridge driving towards Sean holding the Rover 6x6 and Dodge Durango. Push in on the cars, controlled by the kids. Sean moves the Rover in the left lane and the Durango in the right lane, towards the others moving towards him.',
+    dialogue: 'SEAN (V.O.): Aimee, Ted, Crosby, Charmaine, we have to make him--\nAIMEE, TED, CHARMAINE & CROSBY (V.O.): (honk honk, beep beep, watch out!)',
+    chars: ['Sean', 'Ted', 'Charmaine', 'Aimee', 'Crosby']
+  },
+  {
+    num: '08', label: '08',
+    scene: 'SCENE 2 — ADVENTURE WORLD',
+    desc: 'EXT. BIG RIVER BRIDGE. MS car-level, 45-degree angle of the bridge road on the horizontal axis, "over the shoulder" of the Rover 6x6. The Rover 6x6 narrowly missing the oncoming Mustang Fastback, Triumph Scrambler, Ford F-150 and Porsche 911. Starting close to the Rover 6x6, track with the Rover as it moves towards camera into the right lane behind the Dodge Durango, just as the other cars race by in the left lane. Motion blur and sun flares of light off the vehicles as they pass.',
+    dialogue: 'SEAN (V.O.): Sean swerves into the right lane just barely dodging the cars coming at him.',
+    chars: ['Sean']
+  },
+  {
+    num: '09', label: '09',
+    scene: 'SCENE 2 — ADVENTURE WORLD',
+    desc: 'EXT. BIG RIVER BRIDGE. MS behind the Dodge Durango. It is slightly off the ground with the lip of the bridge entrance in the foreground. The back of the Dodge Durango fills the panel and moves forward to reveal the bridge background and the passing cars. The Durango lands in the middle of the frame on the bridge, shocks bouncing, the frame shaking.',
+    dialogue: 'SEAN (as Von Steele) (V.O.): So long slowpoke!',
+    chars: ['Von Steele']
+  },
+  {
+    num: '10', label: '10',
+    scene: 'SCENE 2 — ADVENTURE WORLD',
+    desc: 'EXT. BIG RIVER BRIDGE — CONTINUOUS. MS straight forward front of the Rover 6x6. We see Sean both hands on the wheel, seatbelt on, wide-eyed face filled with exhilaration and determination. The reflection of the back of the Durango is seen over the passenger side of the Rover. The Rover 6x6 shifts from side to side in the frame as Sean\'s hands and body lean left and right. Image slowly moves closer to the camera. The reflection of the Durango slides in and out as the Rover changes lanes.',
+    dialogue: 'SEAN (V.O.): Sean stays right on Von Steele\'s tail! Dodging cars. Looking for an opening.',
+    chars: ['Sean']
+  },
+  {
+    num: '11', label: '11',
+    scene: 'SCENE 2 — ADVENTURE WORLD',
+    desc: 'EXT. BIG RIVER BRIDGE — CONTINUOUS. WS high, side angle on the bridge. The Dodge Durango has a significant lead on the Rover 6x6. There are some cars on the bridge but it is not heavy traffic. In background we see the skyline of Matchbox City at the end of the bridge. Pull out as the frame rotates 180 degrees clockwise on the y-axis. The silhouette of the Matchbox City moves towards the viewer and changes from silhouette to detailed drawing.',
+    dialogue: 'SEAN (V.O.): If Von Steele reaches the city, he\'ll slip away to his secret hideout and we\'ll lose him!',
+    chars: ['Von Steele']
+  },
+  {
+    num: '12', label: '12A–B',
+    scene: 'SCENE 2 — ADVENTURE WORLD',
+    desc: 'INT. SEAN\'S CAR / INT. VON STEELE\'S CAR. ECU split-screen side-by-side faces of Sean with gritted teeth and determined eyes and eye-patched Von Steele with head back in wicked laughter. The faces are 3/4 angled at each other, but each character is in their own vehicle. Von Steele\'s 3/4 has his eyepatch toward camera. Sweat flies from their foreheads as the faces move towards the center panel divider. Images shake with the vibrations of moving cars.',
+    dialogue: 'SEAN (V.O.): I\'ll get you, Von Steele!\nSEAN (as Von Steele) (V.O.): Never! Haha!',
+    chars: ['Sean', 'Von Steele']
+  },
+  {
+    num: '13', label: '13',
+    scene: 'SCENE 2 — ADVENTURE WORLD',
+    desc: 'EXT. BIG RIVER BRIDGE. MS, Excavator height angled down towards the bridge. In the left foreground Crosby sits in the cab of the Excavator, hard hat on. He is looking forward with a surprised face. To his right, in the background the Durango and Rover are racing side by side. Start on a CU of the Durango and the Rover side by side. As we pull back the Excavator slides in from the left to reveal Crosby. Crosby\'s eyebrows raise.',
+    dialogue: 'CROSBY (V.O.): Sean! You have to slow down!\nCHARMAINE/AIMEE/TED (V.O.): (walla: what? Why? Did he say "slow" down, What\'s this about?, Crosby must have a screw loose.)',
+    chars: ['Crosby']
+  },
+  {
+    num: '14', label: '14',
+    scene: 'SCENE 2 — ADVENTURE WORLD',
+    desc: 'EXT. BIG RIVER BRIDGE. EWS aerial, near birds-eye angle on the bridge. The vehicles are near the 1/3 mark toward the city. Pan along the bridge as the cars move. Lens flares off the shiny, pristine arches and support columns.',
+    dialogue: 'SEAN (V.O.): No way, Crosby! I\'ve almost got \'em!',
+    chars: []
+  },
+  {
+    num: '15', label: '15',
+    scene: 'SCENE 3 — ADVENTURE WORLD',
+    desc: 'EXT. BIG RIVER BRIDGE — CONTINUOUS. EWS aerial, near birds-eye angle on the bridge. The same as the last image but the bridge is only partially-built, with construction materials, vehicles, missing sections and exposed sides. Transition from Panel 14 match dissolve, same vehicle action.',
+    dialogue: 'CROSBY (V.O.): Okayyy, big guy. I was just gonna let you know that the entire bridge is under construction!',
+    chars: []
+  },
+  {
+    num: '16', label: '16',
+    scene: 'SCENE 3 — ADVENTURE WORLD',
+    desc: 'EXT. BIG RIVER BRIDGE — CONTINUOUS. MS at 30 feet up, 45-degree side angle. The Excavator is dumping concrete rubble into the Turf Hauler. In the background, the Rover and Durango approach. The bucket of the Excavator opens as huge chunks of concrete rubble rain down into the Turf Hauler. Through the rock in the foreground we see the Rover chasing the Durango.',
+    dialogue: 'CROSBY (V.O.): Might be tough to catch that spy guy with big chunks of the bridge missing.',
+    chars: ['Crosby']
+  },
+  {
+    num: '17', label: '17',
+    scene: 'SCENE 3 — ADVENTURE WORLD',
+    desc: 'EXT. BIG RIVER BRIDGE — CONTINUOUS. MS at bridge level. The Skidster with its bucket filled with rebar. In the background the Rover and Durango race towards the Skidster. They\'re close! The Skidster rolls through the panel horizontally while its bucket lift arm moves up.',
+    dialogue: 'SEAN (shouting over noise) (V.O.): No no no no. Stop.\nCROSBY (V.O.): Can\'t hear ya! There\'s too much construction noise!',
+    chars: ['Aimee']
+  },
+  {
+    num: '18', label: '18',
+    scene: 'SCENE 4 — REAL WORLD / SMALLEY\'S GARAGE',
+    desc: 'INT. SMALLEY\'S GARAGE. MS. Crosby smiles as he manipulates the Excavator and Turf Hauler. Aimee\'s face is at diorama level rolling the Skidster. Sean has his hands out, fingers spread, his face pleading. We pull out from Sean\'s waving foreshortened hands to see the construction play happening on the table, lowering to Crosby and Aimee moving their vehicles taking up full frame.',
+    dialogue: 'SEAN (V.O.): Crosby, the bridge can\'t be under construction.',
+    chars: ['Sean', 'Aimee', 'Crosby']
+  },
+  {
+    num: '19', label: '19',
+    scene: 'SCENE 4 — REAL WORLD / SMALLEY\'S GARAGE',
+    desc: 'INT. SMALLEY\'S GARAGE. MS, 20-degree high angle. Crosby is holding a cardboard tube that used to be part of the DIY bridge. Sean looks shocked. Crosby looks innocent. On the table, the Mountain Escape Getaway playset, Smalley\'s Garage Crusher playset, and several small boxes are playing as the city\'s skyline. Sean\'s hand reaches to stop Crosby\'s hand which is moving away from the bridge with the cardboard tube.',
+    dialogue: 'CROSBY (V.O.): Sure it can. Look!\nSEAN (V.O.): We can\'t chase Von Steele if the bridge is broken.',
+    chars: ['Sean', 'Crosby']
+  },
+  {
+    num: '20', label: '20',
+    scene: 'SCENE 4 — REAL WORLD / SMALLEY\'S GARAGE',
+    desc: 'INT. SMALLEY\'S GARAGE. MS, kid level, 20-degrees off side view. Crosby is smiling at Sean holding TWO Excavators, one in either hand. Crosby\'s hands with the vehicles shake with enticement. The one in his left hand moves towards Sean.',
+    dialogue: 'CROSBY (V.O.): We can if we use the right kind of vehicles.',
+    chars: ['Crosby']
+  },
+  {
+    num: '21', label: '21',
+    scene: 'SCENE 4 — REAL WORLD / SMALLEY\'S GARAGE',
+    desc: 'INT. SMALLEY\'S GARAGE. ECU, profile. Crosby is holding the Excavator inches from Sean\'s skeptical face. The Excavator moves at Sean. We move in on the Excavator. Match-cut.',
+    dialogue: '',
+    chars: ['Sean', 'Crosby']
+  },
+  {
+    num: '22', label: '22',
+    scene: 'SCENE 5 — ADVENTURE WORLD',
+    desc: 'EXT. BIG RIVER BRIDGE — CONTINUOUS. WS, side angle. Sean, driving an Excavator filled with concrete rubble, drives along the bridge. The Dodge Durango is a bit ahead of it. Sean\'s face is stressed and he\'s struggling to steer the vehicle. CU on the surprised and confused face of Sean slightly angled towards camera, body moving with the rumble of the vehicle. Pop to full-frame on the Excavator and pull out as it rumbles along the bridge with the Dodge Durango "getting away."',
+    dialogue: 'SEAN (V.O.): I\'m in a car chase driving a giant Excavator. I can\'t believe it.',
+    chars: ['Sean']
+  },
+  {
+    num: '23', label: '23',
+    scene: 'SCENE 5 — ADVENTURE WORLD',
+    desc: 'EXT. BIG RIVER BRIDGE. MS, 3/4 side view of the back of the Dodge Durango steering around the Skidster and a spool of bridge cabling. The Dodge Durango slides left as the Skidster and spool of bridge cabling slides right. The spool fills the frame as the Durango disappears into the background.',
+    dialogue: 'SEAN (as Von Steele) (V.O.): Thanks. I actually love a good obstacle course.\nSEAN (V.O.): Von Steele increases his lead as Sean falls behind.',
+    chars: ['Von Steele']
+  },
+  {
+    num: '24', label: '24',
+    scene: 'SCENE 5 — ADVENTURE WORLD',
+    desc: 'EXT. BIG RIVER BRIDGE. WS, high-angle 45-degree aerial view of the Rescue Helicopter (playing as a cargo helicopter) carrying a pallet of i-beams. The industrial carabiner holding the pallet releases. The pallet descends toward the bridge.',
+    dialogue: 'CHARMAINE (V.O.): Let\'s see how he likes this obstacle!',
+    chars: ['Charmaine']
+  },
+  {
+    num: '25', label: '25',
+    scene: 'SCENE 5 — ADVENTURE WORLD',
+    desc: 'EXT. BIG RIVER BRIDGE. MS, ground level view of the pallet of i-beams covering the full width of the bridge. The pallet drops into frame and lands, shaking the bridge, sending out a plume of construction dust in all directions.',
+    dialogue: 'CROSBY (V.O.): Nice aim, Charmaine. Von Steele is boxed in.',
+    chars: []
+  },
+  {
+    num: '26', label: '26',
+    scene: 'SCENE 5 — ADVENTURE WORLD',
+    desc: 'EXT. BIG RIVER BRIDGE. MWS, 45-degree angle on the bridge. A foreshortened chaotic array of i-beams flying in all directions (but not at the viewer directly). Behind the i-beams the front of the F-650 Rollback powers forward, its front bumper and grille blasting the i-beams aside. The i-beams shoot out in all directions. The F-650 moves forward behind them. Dust and debris fill the air.',
+    dialogue: 'SEAN (V.O.): Von Steele quickly used his master spy key to steal a heavy duty truck.\nSEAN (as Von Steele) (V.O.): A little construction is no problem for the great Von Steele!',
+    chars: ['Von Steele']
+  },
+  {
+    num: '27', label: '27',
+    scene: 'SCENE 6 — REAL WORLD / SMALLEY\'S GARAGE',
+    desc: 'INT. SMALLEY\'S GARAGE. MWS, slightly high-angle on the bridge play area. All the kids are now wearing orange hard hats. Sean is pushing the F-650 through a wall of toothpick i-beams. Crosby and Charmaine look on surprised. To the right side, Ted snaps in frustration. Aimee in the foreground to the left shakes her head looking at Sean. We pull out from the F-650 and flying toothpicks. Charmaine with her helicopter and Crosby with his Excavator leaning back with hands raising. Ted\'s arm swings across his body as he snaps.',
+    dialogue: 'SEAN (smashing SFX) (V.O.): Booosh!\nAIMEE (V.O.): Ugh! This construction is no problem for Von Steele!',
+    chars: ['Sean', 'Ted', 'Charmaine', 'Aimee', 'Crosby']
+  },
+  {
+    num: '28', label: '28',
+    scene: 'SCENE 6 — REAL WORLD / SMALLEY\'S GARAGE',
+    desc: 'INT. SMALLEY\'S GARAGE. CU, bridge play area level. Crosby\'s contemplative face, chin resting on one fist. The F-650 and two Excavators are in front of him. He is pushing one of the Excavators. Crosby moves laterally pushing the Excavator, tracking past the other vehicles to a part of the bridge that is empty.',
+    dialogue: 'CROSBY (V.O.): (narration) The foreman carefully inspects the construction project.',
+    chars: ['Crosby']
+  },
+  {
+    num: '29', label: '29',
+    scene: 'SCENE 6 — REAL WORLD / SMALLEY\'S GARAGE',
+    desc: 'INT. SMALLEY\'S GARAGE. MS, eye-level with the kids. Crosby is in the middle facing directly forward, with Aimee and Ted on one side and Charmaine and Sean on the other. Crosby is holding the Turf Hauler in one hand and an Excavator in the other in front of him with straight arms. Crosby\'s face gains excitement as his extended arms holding the two construction vehicles move from the sides towards each other.',
+    dialogue: 'CROSBY (V.O.): I forgot the first step of building. Demolition!',
+    chars: ['Sean', 'Ted', 'Charmaine', 'Aimee', 'Crosby']
+  },
+  {
+    num: '30', label: '30',
+    scene: 'SCENE 7 — ADVENTURE WORLD',
+    desc: 'EXT. BIG RIVER BRIDGE. MS, low angle from the bridge up at the Excavator. The bucket of the Excavator is smashing a hole through the bridge road surface. The bucket of the Excavator drops through frame as huge chunks of the road (concrete) fly through the air.',
+    dialogue: 'CROSBY (V.O.): Sean! Keep Von Steele busy. If we want to stop him, we\'ve got a mess to make.',
+    chars: []
+  },
+  {
+    num: '31', label: '31',
+    scene: 'SCENE 7 — ADVENTURE WORLD',
+    desc: 'EXT. BIG RIVER BRIDGE. WS, 45-degree angle view on the bridge. Sean\'s Excavator is cutting off the F-650, both vehicles at an angle. The Excavator turns counterclockwise in front of the F-650 and its big bucket arm blocks its path. The F-650 turns counterclockwise and stops short to avoid a collision.',
+    dialogue: 'SEAN (V.O.): Sean uses the bucket of the Excavator to hold off Von Steele.\nSEAN (as Von Steele) (V.O.): Whoa! Watch it with that thing! Are you crazy?\nSEAN (V.O.): Yep!',
+    chars: ['Sean']
+  },
+  {
+    num: '32', label: '32',
+    scene: 'SCENE 7 — ADVENTURE WORLD',
+    desc: 'EXT. BIG RIVER BRIDGE. WS, 20-degree angle above bridge level. The Ford F-150 with Ted and Skidster with Aimee pull together on a piece of chain tearing away a section of the rebar and concrete bridge road from the hole that was started by the Excavator in Panel 31. The Ford F-150 and Skidster move right to left in the frame. As they pull on a rod of rebar, chunks of the bridge fall out of frame, creating an "F-650-sized" gap in the bridge road.',
+    dialogue: 'CROSBY (laughing) (V.O.): Yes! Way to wreck Aimee and Ted! (then) Sean, how ya doing?',
+    chars: ['Ted', 'Aimee']
+  },
+  {
+    num: '33', label: '33',
+    scene: 'SCENE 7 — ADVENTURE WORLD',
+    desc: 'EXT. BIG RIVER BRIDGE. MS, side view on the bridge. Sean\'s Excavator bucket is hooked to the tow hook of the F-650 Rollback. Tire smoke billows from the tires of the F-650. We pull out from a CU of the Excavator bucket hooked to the F-650 tail hitch. Tire smoke spreads as the F-650\'s wheels spin and it slowly pulls the Excavator forward.',
+    dialogue: 'SEAN (V.O.): Sean has the bucket of the Excavator hooked to the Rollback\'s tow hook, barely holding on.\nSEAN (as Von Steele) (V.O.): Let go of me!',
+    chars: ['Sean', 'Von Steele']
+  },
+  {
+    num: '34', label: '34A–B',
+    scene: 'SCENE 7 — ADVENTURE WORLD',
+    desc: 'EXT. BIG RIVER BRIDGE. WS, 45-degree angle aerial side-view of the bridge. To the left we see the Excavator hanging on to the F-650, to the right a portion of the city skyline. In the center, the missing chunk of bridge, the Skidster and the Ford F-150 on the left side, the Excavator on the right side blocking Von Steele\'s view of the hole. In the air, the Rescue Helicopter hovers above the bridge gap with a thin, giant panel of drywall. Wind lines around the drywall. INSET: CU on Crosby in his Excavator looking up with concern. Starting wide, we zoom in on the Rescue Helicopter being blown right, left, forward and back by huge gusts of cross-wind blasting the drywall panel like a sail.',
+    dialogue: 'CROSBY (V.O.): Charmaine, we need to lay that flimsy drywall over the hole. When Von Steele drives over it, he\'ll fall right through it!\nCHARMAINE (V.O.): WhoooA! WhoooA! I\'m caught in a cross-wind. This might not work!',
+    chars: ['Charmaine', 'Crosby']
+  },
+  {
+    num: '35', label: '35',
+    scene: 'SCENE 8 — REAL WORLD / SMALLEY\'S GARAGE',
+    desc: 'INT. SMALLEY\'S GARAGE. MS, kid level. Charmaine is holding the Rescue Helicopter in front of her with her right hand above a piece of paper with hastily drawn road markings, her left hand below. To her left, Ted\'s cheeks are puffed as he blows as hard as he can on the sheet of paper. To the right in the background, Sean and Aimee are doubled over with laughter. Charmaine\'s arms, the helicopter and the paper swing back and forth. Ted\'s head and shoulders match that rhythm coming in and out of frame. His cheeks puff-out and relax as his face gets redder. Sean and Aimee rock forward and back.',
+    dialogue: 'TED (V.O.): (wind noises)\nSEAN/AIMEE (V.O.): (laughter)\nCHARMAINE (V.O.): Whoooa! Whoooa!',
+    chars: ['Sean', 'Ted', 'Charmaine', 'Aimee']
+  },
+  {
+    num: '36', label: '36',
+    scene: 'SCENE 8 — REAL WORLD / SMALLEY\'S GARAGE',
+    desc: 'INT. SMALLEY\'S GARAGE. CU, bridge play area, eye level, side view. Crosby and Charmaine lean in, close to the play area, each holding one side of the piece of paper above the gap in the bridge. Crosby and Charmaine\'s arms lower evenly until the paper lays on the bridge. The paper bows in the middle a bit.',
+    dialogue: 'CROSBY (V.O.): Lower it in very carefully. It looks just like a road, but that drywall is paper thin.',
+    chars: ['Crosby', 'Charmaine']
+  },
+  {
+    num: '37', label: '37',
+    scene: 'SCENE 9 — ADVENTURE WORLD',
+    desc: 'EXT. BIG RIVER BRIDGE. WS, 20 degrees above bridge level, 3/4 angle off horizontal. The front of the F-650 dominates the right foreground. To the left the Excavator bucket is just lifted from the tow hook of the F-650. In the Excavator cab, in a hard hat and seatbelt, Sean\'s eyes are wide. The Excavator arm pops up a bit and the F-650 zooms out the right side of the frame. Tire smoke plumes.',
+    dialogue: 'SEAN (V.O.): Von Steele\'s truck pops free. Now Sean just has to make sure he\'s going fast enough that he can\'t stop before the hole.',
+    chars: ['Sean']
+  },
+  {
+    num: '38', label: '38',
+    scene: 'SCENE 9 — ADVENTURE WORLD',
+    desc: 'EXT. BIG RIVER BRIDGE. MS, bridge level, side view. The F-650 speeds forward with the Excavator right behind it. They\'re going as fast as these big trucks can go. The bridge moves right to left in the background. The F-650 and the Excavator trade the lead back and forth several times. The background blurs a little as they speed up.',
+    dialogue: 'SEAN (as Von Steele) (V.O.): How are you going so fast in that thing?\nSEAN (V.O.): Are you running out of gas Von Steele?\nSEAN (as Von Steele) (V.O.): Never! You want to see fast? I\'ll show you fast!',
+    chars: ['Sean', 'Von Steele']
+  },
+  {
+    num: '39', label: '39',
+    scene: 'SCENE 9 — ADVENTURE WORLD',
+    desc: 'EXT. BIG RIVER BRIDGE. Aerial view of the bridge: the F-650 just ahead of Sean\'s Excavator in the right lane, both advancing toward the drywall. The Skidster and F-150 move to the left lane clearing the way. The Rescue Helicopter above to the left. Crosby\'s Excavator is beyond the drywall.',
+    dialogue: '',
+    chars: ['Sean', 'Ted', 'Charmaine', 'Aimee', 'Crosby', 'Von Steele']
+  },
+  {
+    num: '40', label: '40A–B',
+    scene: 'SCENE 9 — ADVENTURE WORLD',
+    desc: 'EXT. BIG RIVER BRIDGE. The F-650 skids onto the false drywall road. Sean\'s Excavator brakes screeching to a halt inches from the edge. Tire smoke. Pause. The drywall splits in two. The F-650 falls out of frame. INSET: ECU of Von Steele, eyes wide, mouth open, sweat and saliva flying.',
+    dialogue: '',
+    chars: ['Sean', 'Von Steele']
+  },
+  {
+    num: '41', label: '41',
+    scene: 'SCENE 9 — ADVENTURE WORLD',
+    desc: 'EXT. BIG RIVER BRIDGE. Crosby\'s Excavator arm fully extended down through the gap in the bridge. The bucket catches the hook of the falling F-650 (tires first) and stops it dead in its tracks.',
+    dialogue: '',
+    chars: ['Crosby']
+  },
+  {
+    num: '42', label: '42',
+    scene: 'SCENE 9 — ADVENTURE WORLD',
+    desc: 'EXT. BIG RIVER BRIDGE. Sean leaning against the Rover 6x6, handcuffs dangling from two fingers like a pendulum. In the background, the F-650 hangs from Crosby\'s Excavator bucket like a Christmas ornament. Focus shift from Sean to the arm lifting the F-650.',
+    dialogue: '',
+    chars: ['Sean', 'Crosby']
+  },
+  {
+    num: '43', label: '43A–B',
+    scene: 'SCENE 9 — ADVENTURE WORLD',
+    desc: 'EXT. BIG RIVER BRIDGE. A 45-degree diagonal divides the image: the empty cab of the hanging F-650. INSET: Sean in shock, hands raised, handcuffs falling. Von Steele has escaped.',
+    dialogue: '',
+    chars: ['Sean', 'Von Steele']
+  },
+  {
+    num: '44', label: '44',
+    scene: 'SCENE 9 — ADVENTURE WORLD',
+    desc: 'EXT. BIG RIVER BRIDGE. Sean holds the Rover 6x6 in the foreground with determination. Crosby and Ted to the left, Aimee and Charmaine to the right with their hands on his shoulders. Pull back with focus shift to the Rover.',
+    dialogue: '',
+    chars: ['Sean', 'Ted', 'Charmaine', 'Aimee', 'Crosby']
+  },
+  {
+    num: '45', label: '45',
+    scene: 'SCENE 9 — ADVENTURE WORLD',
+    desc: 'INT. SMALLEY\'S GARAGE. The five kids standing behind the play area, smiling. From right to left: Charmaine/Helicopter, Aimee/Mustang, Sean/Rover, Ted/Triumph, Crosby/Excavator. Arms raise in rapid succession. Camera pulls back.',
+    dialogue: '',
+    chars: ['Sean', 'Ted', 'Charmaine', 'Aimee', 'Crosby']
+  }
+];
+
+const VILLAIN = ['Von Steele'];
+
+function imgSrc(num) {
+  return LINEART_FOLDER + 'P' + num.padStart(2,'0') + LINEART_EXT;
+}
+
+function renderPanels() {
+  const container = document.getElementById('panels-container');
+  container.innerHTML = '';
+
+  PANELS.forEach(p => {
+    const src = imgSrc(p.num);
+
+    const chars = p.chars.map(c =>
+      `<span class="char-tag">${c}</span>`
+    ).join('');
+
+    container.innerHTML += `
+    <div class="page panel-page">
+      <!-- HEADER -->
+      <div class="panel-page-header">
+        <span class="ph-ep">CVY26_001_101</span>
+        <span class="ph-title">Line Art Review · Dangerous Bridge High-Speed Chase!</span>
+        <span class="ph-num">PANEL ${p.label}</span>
+      </div>
+
+      <!-- SPACER -->
+      <div class="panel-spacer"></div>
+
+      <!-- IMAGE: full width -->
+      <div class="panel-img-col">
+        <img src="${src}" alt="Panel ${p.label}"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="panel-img-placeholder" style="display:none">
+          <div class="pip-icon"></div>
+          <div class="pip-label">Panel ${p.label}<br>Line Art</div>
+        </div>
+      </div>
+
+      <!-- INFO: below image -->
+      <div class="panel-info-section">
+        <div class="panel-info-row">
+
+          <!-- LEFT: num + scene + visual -->
+          <div class="panel-info-main">
+            <div class="panel-num-badge">
+              <div class="panel-num">${p.label.replace(/[A-Z–]/g,'')}</div>
+              ${p.label.match(/[A-Z–]/) ? `<div class="panel-num-sub">${p.label}</div>` : ''}
+              ${p.scene ? `<div class="panel-num-sub" style="color:var(--accent);font-size:8px;letter-spacing:2px;text-transform:uppercase">${p.scene}</div>` : ''}
+            </div>
+            <div class="info-block">
+              <div class="info-label">Visual</div>
+              <div class="info-value">${p.desc}</div>
+            </div>
+          </div>
+
+          <!-- RIGHT: dialogue + chars + notes -->
+          <div class="panel-info-side">
+            <div class="dialogue-block">
+              <div class="info-label">Dialogue / VO</div>
+              <div class="editable" contenteditable="true"
+                   data-placeholder="Paste dialogue here...">${p.dialogue.replace(/\n/g,'<br>')}</div>
+            </div>
+
+            ${p.chars.length ? `
+            <div class="info-block">
+              <div class="info-label">Characters in Scene</div>
+              <div class="chars-in-scene">${chars}</div>
+            </div>` : ''}
+
+            <div class="info-block" style="margin-top:auto">
+              <div class="info-label">Caveats:</div>
+              <div class="editable" contenteditable="true"
+                   data-placeholder="Production notes for the client..."></div>
+            </div>
+          </div>
+
+        </div><!-- /panel-info-row -->
+
+        <!-- BOTTOM STRIP: Mattel feedback -->
+        <div class="panel-notes-row">
+          <div class="notes-col">
+            <div class="info-label">Mattel Feedback</div>
+            <div class="editable" contenteditable="true"
+                 data-placeholder="Mattel comments / requests for revision..."></div>
+          </div>
+        </div>
+
+      </div><!-- /panel-info-section -->
+    </div>`;
+  });
+}
+
+function renderStoryboard() {
+  const container = document.getElementById('panels-container');
+  const cells = PANELS.map(p => {
+    const src = imgSrc(p.num);
+    return `
+    <div class="sb-cell">
+      <div class="sb-img-wrap">
+        <img src="${src}" alt="Panel ${p.label}"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="sb-placeholder" style="display:none">${p.label}</div>
+      </div>
+      <div class="sb-label">${p.label}</div>
+    </div>`;
+  }).join('');
+
+  container.innerHTML += `
+  <div class="page storyboard-page">
+    <div class="sb-header">
+      <div class="sb-eyebrow">CVY26_001_101 · Line Art Review · Episode 101</div>
+      <div class="sb-title">Line Art <span>Overview</span></div>
+      <div class="sb-subtitle">Dangerous Bridge High-Speed Chase! · 45 Panels</div>
+    </div>
+    <div class="sb-grid">${cells}</div>
+  </div>`;
+}
+
+let editingOn = true;
+function toggleEditing() {
+  editingOn = !editingOn;
+  document.querySelectorAll('[contenteditable]').forEach(el => {
+    el.contentEditable = editingOn ? 'true' : 'false';
+  });
+}
+
+</script>
+
+<div id="panels-container"></div>
+<script>renderPanels(); renderStoryboard();</script>
+
+</div><!-- /doc-wrapper -->
+</body>
+</html>

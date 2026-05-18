@@ -769,6 +769,9 @@
 
     .editable:empty::before { color: #ddd; }
 
+    /* Ocultar bloque Caveats si no hay texto escrito */
+    .caveats-block:has(.editable:empty) { display: none; }
+
     @page {
       size: A4 portrait;
       margin: 0;
@@ -1350,7 +1353,7 @@ function renderPanels() {
               <div class="chars-in-scene">${chars}</div>
             </div>` : ''}
 
-            <div class="info-block" style="margin-top:auto">
+            <div class="info-block caveats-block" style="margin-top:auto">
               <div class="info-label">Caveats:</div>
               <div class="editable" contenteditable="true"
                    data-placeholder="Production notes for the client..."></div>

@@ -3244,7 +3244,35 @@ function buildItemCard(item) {
   </div>`;
   }
 
-  // ── VEHICLE / PLAYSET: original layout ──
+  // ── PLAYSET: featured main image layout (like characters) ──
+  if(item.badge === 'playset') {
+    return `
+  <div class="item-card" id="card-${item.id}">
+    <div class="card-header">
+      <div>
+        <div class="card-name">${item.name}</div>
+        <div class="card-role">${item.sku || ''}</div>
+      </div>
+      <span class="card-badge ${badgeClass}">${badgeLabel}</span>
+    </div>
+    <div class="char-main-wrap" id="char-main-wrap-${item.id}"
+      ondragover="event.preventDefault(); this.classList.add('drag-over')"
+      ondragleave="this.classList.remove('drag-over')"
+      ondrop="this.classList.remove('drag-over'); handleDropMain(event, '${item.id}')"
+    >${buildMainImage(item.id)}</div>
+    <div class="upload-status" id="status-${item.id}"></div>
+    <input type="file" id="file-main-${item.id}" accept="image/*" onchange="handleFileMain(event, '${item.id}')">
+    <input type="file" id="file-${item.id}" accept="image/*" multiple onchange="handleFile(event, '${item.id}')">
+    <div class="card-body">
+      <div class="card-appearances">${epTags}</div>
+      <div class="card-detail">${item.detail}</div>
+      ${item.sku ? `<div class="card-sku">SKU: ${item.sku}</div>` : ''}
+    </div>
+    <div id="expr-section-${item.id}">${buildExpressionsSection(item.id)}</div>
+  </div>`;
+  }
+
+  // ── VEHICLE: original layout ──
   const savedNotes = notesData[item.id] || '';
   return `
   <div class="item-card" id="card-${item.id}">

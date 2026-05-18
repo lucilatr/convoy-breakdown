@@ -1355,7 +1355,8 @@ function renderPanels() {
 
             <div class="info-block caveats-block" style="margin-top:auto">
               <div class="info-label">Caveats:</div>
-              <div class="editable" contenteditable="true"
+              <div class="editable caveat-field" contenteditable="true"
+                   data-panel="${p.num}"
                    data-placeholder="Production notes for the client..."></div>
             </div>
           </div>
@@ -1405,7 +1406,59 @@ function toggleEditing() {
 </script>
 
 <div id="panels-container"></div>
-<script>renderPanels(); renderStoryboard();</script>
+<script>
+renderPanels();
+renderStoryboard();
+
+/* ── JSONBIN SYNC ─────────────────────────────────────── */
+const REVIEW_BIN_ID  = '6a0a5ddf250b1311c3667973';
+const REVIEW_BIN_KEY = '$2a$10$G/S5QC8pq2vpHyiOEdxjp.rmJOR4deLMjyDvs1.Zq7W9dMQt9uqQq';
+const BIN_URL = 'https://api.jsonbin.io/v3/b/' + REVIEW_BIN_ID;
+
+async function loadAnnotations() {
+  try {
+    const res = await fetch(BIN_URL + '/latest', {
+      headers: { 'X-Master-Key': REVIEW_BIN_KEY, 'X-Bin-Meta': 'false' }
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    const caveats = data.caveats || {};
+    document.querySelectorAll('.caveat-field[data-panel]').forEach(el => {
+      const v = caveats[el.dataset.panel];
+      if (v) el.textContent = v;
+    });
+  } catch(e) {}
+}
+
+let _saveTimer = null;
+function scheduleSync() {
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(saveAnnotations, 1500);
+}
+
+async function saveAnnotations() {
+  const caveats = {};
+  document.querySelectorAll('.caveat-field[data-panel]').forEach(el => {
+    const v = el.textContent.trim();
+    if (v) caveats[el.dataset.panel] = v;
+  });
+  try {
+    await fetch(BIN_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': REVIEW_BIN_KEY },
+      body: JSON.stringify({ caveats })
+    });
+  } catch(e) {}
+}
+
+// Escuchar cambios en todos los campos caveats
+document.querySelectorAll('.caveat-field[data-panel]').forEach(el => {
+  el.addEventListener('input', scheduleSync);
+});
+
+// Cargar al abrir
+loadAnnotations();
+</script>
 
 </div><!-- /doc-wrapper -->
 </body>

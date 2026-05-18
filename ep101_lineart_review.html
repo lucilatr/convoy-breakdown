@@ -394,6 +394,7 @@
     height: 100%;
     object-fit: contain;
     display: block;
+    filter: grayscale(100%);
   }
   .panel-img-placeholder {
     display: flex;
@@ -964,6 +965,48 @@
 const LINEART_FOLDER = './EP101_LA/';
 const LINEART_EXT   = '.jpg';
 
+// ── ACTION DESCRIPTIONS (from script) ──────────────────────────
+const ACTIONS = {
+  '01': 'Zoom in as the cars land and side-bump each other. Sparks fly and fill the frame.',
+  '02': 'The vibrating cars slide into frame neck and neck. Tire smoke trails them. The yellow "narrow bridge" sign moves off screen, revealing the narrow bridge. Push in on the Rover 6x6.',
+  '03': 'The title zips into position as Sean says the title.',
+  '04': 'Five singles stack vertically to form a split-screen of the whole team. After a beat, the stack is squeezed tighter as Sean with an eyepatch (Von Steele) is added to the frame. The name of each character splashes over the correlating character image.',
+  '05': 'The pieces of the room build one piece at a time from all directions — walls, shelves, decoration, dioramas, kids!',
+  '06': 'Sean\'s arm with the Durango stretches out into the foreground, foreshortened to take up half of the screen.',
+  '07': 'Push in on the cars, controlled by the kids. Sean moves the Rover in the left lane and the Durango in the right lane towards the others moving towards him in the left lane.',
+  '08': 'Starting close to the Rover 6x6, track with the Rover as it moves towards camera into the right lane behind the Dodge Durango, just as the other cars race by in the left lane. Motion blur and sun flares of light off the vehicles as they pass.',
+  '09': 'The back of the Dodge Durango fills the panel and moves forward to reveal the bridge background and the passing cars. The Durango lands in the middle of the frame on the bridge, shocks bouncing, the frame shaking.',
+  '10': 'The Rover 6x6 shifts from side to side in the frame as Sean\'s hands and body lean left and right. Image slowly moves closer to the camera. The reflection of the Durango slides in and out as the Rover changes lanes.',
+  '11': 'Pull out as the frame rotates 180 degrees clockwise on the y-axis. The Rover 6x6 and Dodge Durango move along the bridge, weaving around the other cars. The silhouette of Matchbox City moves towards the viewer and changes from silhouette to detailed drawing.',
+  '12': 'Sweat flies from their foreheads as the faces move towards the center panel divider. Images shake with the vibrations of moving cars.',
+  '13': 'Start on a CU of the Durango and the Rover side by side. As we pull back the Excavator slides in from the left to reveal Crosby. Crosby\'s eyebrows raise.',
+  '14': 'Pan along the bridge as the cars move. Lens flares off the shiny, pristine arches and support columns.',
+  '15': 'Transition from Panel 14 match dissolve, same vehicle action.',
+  '16': 'The bucket of the Excavator opens as huge chunks of concrete rubble rain down into the Turf Hauler. Through the rock in the foreground we see the Rover chasing the Durango.',
+  '17': 'The Skidster rolls through the panel horizontally while its bucket lift arm moves up.',
+  '18': 'We pull out from Sean\'s waving foreshortened hands to see the construction play happening on the table. Lower to Crosby and Aimee moving their vehicles, taking up full frame.',
+  '19': 'Sean\'s hand reaches to stop Crosby\'s hand which is moving away from the bridge with the cardboard tube.',
+  '20': 'Crosby\'s hands with the vehicles shake with enticement. The one in his left hand moves towards Sean.',
+  '21': 'The Excavator moves at Sean. We move in on the Excavator. Match-cut.',
+  '22': 'CU on the surprised and confused face of Sean slightly angled towards camera, body moving with the rumble of the vehicle. Pop to full-frame on the Excavator and pull out as it rumbles along the bridge with the Dodge Durango "getting away."',
+  '23': 'The Dodge Durango slides left as the Skidster and spool of bridge cabling slides right. The spool fills the frame as the Durango disappears into the background.',
+  '24': 'The industrial carabiner holding the pallet releases. The pallet descends toward the bridge.',
+  '25': 'The pallet drops into frame and lands, shaking the bridge, sending out a plume of construction dust in all directions.',
+  '26': 'The i-beams shoot out in all directions. The F-650 moves forward behind them. Dust and debris fill the air.',
+  '27': 'We pull out from the F-650 and flying toothpicks. Charmaine with her helicopter and Crosby with his Excavator leaning back with hands raising. A little further back, Aimee\'s head shakes. Ted\'s arm swings across his body as he snaps.',
+  '28': 'Crosby moves laterally pushing the Excavator, tracking past the other vehicles to a part of the bridge that is empty.',
+  '29': 'Crosby\'s face gains excitement as his extended arms holding the two construction vehicles move from the sides towards each other.',
+  '30': 'The bucket of the Excavator drops through frame as huge chunks of the road (concrete) fly through the air.',
+  '31': 'The Excavator turns counterclockwise in front of the F-650 and its big bucket arm blocks its path. The F-650 turns counterclockwise and stops short to avoid a collision.',
+  '32': 'The Ford F-150 and Skidster move right to left in the frame. As they pull on a rod of rebar, chunks of the bridge fall out of frame, creating an "F-650-sized" gap in the bridge road.',
+  '33': 'We pull out from a CU of the Excavator bucket hooked to the F-650 tail hitch. Tire smoke spreads as the F-650\'s wheels spin and it slowly pulls the Excavator forward.',
+  '34': 'Starting wide, we zoom in on the Rescue Helicopter being blown right, left, forward and back by huge gusts of cross-wind blasting the drywall panel like a sail. INSET: stays in position.',
+  '35': 'Charmaine\'s arms, the helicopter and the paper swing back and forth. Ted\'s head and shoulders match that rhythm coming in and out of frame. His cheeks puff-out and relax as his face gets redder. Sean and Aimee rock forward and back.',
+  '36': 'Crosby and Charmaine\'s arms lower evenly until the paper lays on the bridge. The paper bows in the middle a bit.',
+  '37': 'The Excavator arm pops up a bit and the F-650 zooms out the right side of the frame. Tire smoke plumes.',
+  '38': 'The bridge moves right to left in the background. The F-650 and the Excavator trade the lead back and forth several times. The background blurs a little as they speed up.'
+};
+
 // ── PANEL DATA ─────────────────────────────────────────────────
 const PANELS = [
   {
@@ -1337,6 +1380,10 @@ function renderPanels() {
               <div class="info-label">Visual</div>
               <div class="info-value">${p.desc}</div>
             </div>
+            ${ACTIONS[p.num] ? `<div class="info-block" style="margin-top:8px">
+              <div class="info-label">Action</div>
+              <div class="info-value">${ACTIONS[p.num]}</div>
+            </div>` : ''}
           </div>
 
           <!-- RIGHT: dialogue + chars + notes -->

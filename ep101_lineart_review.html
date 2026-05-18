@@ -1367,12 +1367,16 @@ function renderPanels() {
 
       <!-- IMAGE: full width -->
       <div class="panel-img-col">
+        ${p.num === '03' ? `
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#111;">
+          <div style="font-size:80px;font-weight:900;letter-spacing:12px;color:rgba(255,255,255,0.08);transform:rotate(-35deg);text-transform:uppercase;user-select:none;">PENDING</div>
+        </div>` : `
         <img src="${src}" alt="Panel ${p.label}"
              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
         <div class="panel-img-placeholder" style="display:none">
           <div class="pip-icon"></div>
           <div class="pip-label">Panel ${p.label}<br>Line Art</div>
-        </div>
+        </div>`}
       </div>
 
       <!-- INFO: below image -->

@@ -996,6 +996,56 @@
   }
   .p-world-rw { background: rgba(255,180,0,.15); color: #ffb400; }
   .p-world-aw { background: rgba(0,180,255,.12); color: #00b4ff; }
+  .p-fb-badge {
+    position: absolute; bottom: 6px; right: 6px;
+    background: rgba(0,0,0,0.6); color: #f0f0f0;
+    border: 2px solid #e08030;
+    font-family: var(--font); font-size: 11px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 3px 8px; line-height: 1; cursor: pointer;
+    transition: background .15s, transform .15s; z-index: 5;
+    backdrop-filter: blur(4px);
+  }
+  .p-fb-badge:hover { background: #e08030; color: #fff; transform: translateY(-1px); }
+
+  /* ─── FEEDBACK MODAL ─── */
+  .fb-overlay {
+    position: fixed; inset: 0; z-index: 9500;
+    background: rgba(0,0,0,0.88); display: none;
+    align-items: center; justify-content: center;
+  }
+  .fb-overlay.open { display: flex; }
+  .fb-box {
+    background: var(--bg-card); border: 1px solid var(--border-pink);
+    width: 640px; max-width: 95vw; max-height: 85vh;
+    display: flex; flex-direction: column;
+  }
+  .fb-header {
+    padding: 16px 24px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .fb-title {
+    font-size: 18px; font-weight: 900; letter-spacing: 1px;
+    text-transform: uppercase; font-family: var(--font);
+  }
+  .fb-title span { color: var(--pink); }
+  .fb-close {
+    background: transparent; border: none; color: var(--text-dim);
+    font-size: 26px; cursor: pointer; padding: 0 4px; line-height: 1;
+    transition: color .15s;
+  }
+  .fb-close:hover { color: var(--pink); }
+  .fb-body {
+    padding: 20px 24px; overflow-y: auto; flex: 1;
+    font-family: var(--fontb); font-size: 14px;
+    line-height: 1.55; color: var(--text);
+    white-space: pre-wrap;
+  }
+  .fb-meta {
+    padding: 10px 24px 14px; border-top: 1px solid var(--border);
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--text-muted); font-family: var(--fontb);
+  }
   .p-info { padding: 10px 10px 11px; }
   .p-desc {
     font-size: 13px; color: var(--text-dim); line-height: 1.4; font-family: var(--fontb);
@@ -2201,6 +2251,18 @@
 </div>
 
 <div id="toast"></div>
+
+<!-- FEEDBACK MODAL -->
+<div class="fb-overlay" id="fb-overlay" onclick="if(event.target===this) closeFeedbackModal()">
+  <div class="fb-box">
+    <div class="fb-header">
+      <div class="fb-title" id="fb-title">Feedback</div>
+      <button class="fb-close" onclick="closeFeedbackModal()">×</button>
+    </div>
+    <div class="fb-body" id="fb-body"></div>
+    <div class="fb-meta" id="fb-meta"></div>
+  </div>
+</div>
 
 <!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
@@ -5165,11 +5227,21 @@ function renderPanels() {
     else if(panelView === 'lineart') img = getApiImageForPanel(p.id, lineArtsCache, 'lineArt');
     else if(panelView === 'color') img = getApiImageForPanel(p.id, finalsCache, 'final');
     const sel = selectedPanel === p.id;
+    // Feedback badge: only on lineart/color views, when status is 'reviewed' and feedback text is loaded
+    const stageKey = panelView === 'lineart' ? 'lineart' : (panelView === 'color' ? 'color' : null);
+    let fbBadge = '';
+    if(stageKey) {
+      const trk = trackerData[currentChapter + '|' + p.id + '|' + stageKey];
+      if(trk && trk.status === 'reviewed' && trk.feedback && trk.feedback.trim()) {
+        fbBadge = `<button class="p-fb-badge" onclick="event.stopPropagation(); openFeedbackModal('${p.id}','${stageKey}');" title="Ver feedback de Mattel">Reviewed</button>`;
+      }
+    }
     return `<div class="p-card${sel?' p-selected':''}" id="pcard-${p.id}" onclick="selectPanel('${p.id}')">
       <div class="p-thumb">
         ${img ? `<img src="${img}" alt="P${p.label}">` : `<div class="p-thumb-ph"><svg width="22" height="16" viewBox="0 0 22 16" fill="none"><rect x="1" y="1" width="20" height="14" rx="1" stroke="currentColor" stroke-width="1.2"/><polyline points="1,11 5,7 9,10 14,5 21,9" stroke="currentColor" stroke-width="1" fill="none"/><circle cx="5.5" cy="4.5" r="1.5" fill="currentColor" opacity="0.5"/></svg></div>`}
         <span class="p-num">${p.label}</span>
         <span class="p-world ${p.world==='rw'?'p-world-rw':'p-world-aw'}">${p.world==='rw'?'RW':'AW'}</span>
+        ${fbBadge}
       </div>
       <div class="p-info">
         <div class="p-desc">${panelLang==='es' && p.desc_es ? p.desc_es : p.desc}</div>
@@ -5514,8 +5586,39 @@ function lbNav(dir) {
   document.getElementById('lightbox-img').src = imgs[lbIdx]?.r2Url || imgs[lbIdx]?.cloudinaryUrl || imgs[lbIdx]?.url || '';
   document.getElementById('lightbox-counter').textContent = (lbIdx+1) + ' / ' + imgs.length;
 }
+
+// ════════════════════════════════════════
+// FEEDBACK MODAL (panel-level review feedback from Mattel)
+// ════════════════════════════════════════
+function openFeedbackModal(panelId, stage) {
+  const ep = currentChapter;
+  const k = ep + '|' + panelId + '|' + stage;
+  const data = trackerData[k] || {};
+  const feedback = (data.feedback || '').trim();
+  if(!feedback) return;
+  const panel = (PANELS_BY_EP[ep] || []).find(p => p.id === panelId);
+  const label = panel ? panel.label : panelId;
+  const stageLabel = stage === 'lineart' ? 'Line Art' : stage === 'color' ? 'Color' : stage;
+  document.getElementById('fb-title').innerHTML = 'Panel ' + label + ' <span>·</span> ' + stageLabel + ' feedback';
+  document.getElementById('fb-body').textContent = feedback;
+  let meta = '';
+  if(data.feedbackBy) meta += 'Loaded by ' + data.feedbackBy;
+  if(data.feedbackAt) {
+    if(meta) meta += ' · ';
+    meta += new Date(data.feedbackAt).toLocaleString();
+  }
+  document.getElementById('fb-meta').textContent = meta;
+  document.getElementById('fb-overlay').classList.add('open');
+}
+function closeFeedbackModal() {
+  document.getElementById('fb-overlay').classList.remove('open');
+}
+
 document.addEventListener('keydown', e => {
-  if(e.key === 'Escape') closeLightbox();
+  if(e.key === 'Escape') {
+    closeLightbox();
+    closeFeedbackModal();
+  }
   if(e.key === 'ArrowLeft') lbNav(-1);
   if(e.key === 'ArrowRight') lbNav(1);
 });
@@ -6338,10 +6441,23 @@ async function syncTrackerToJSONBin() {
     });
     const existing = await res.json(); const record = existing.record || existing;
     if(Object.keys(trackerData).length > 0) {
-      // Merge: preserve remote keys not in local (e.g. tasks assigned by other users)
+      // Deep merge: preserve remote keys not in local AND preserve remote fields
+      // (e.g. feedback loaded by another user) that local doesn't have for the same key.
+      // Use updatedAt to decide who wins when both sides have the same field.
       const remoteTracker = record.trackerData || {};
-      Object.entries(remoteTracker).forEach(([k, v]) => {
-        if(!trackerData[k]) trackerData[k] = v;
+      Object.entries(remoteTracker).forEach(([k, remoteVal]) => {
+        if(!trackerData[k]) { trackerData[k] = remoteVal; return; }
+        const localVal = trackerData[k];
+        const remoteNewer = (remoteVal.updatedAt || '') > (localVal.updatedAt || '');
+        // Preserve remote-only fields (feedback, feedbackBy, feedbackAt, etc).
+        Object.keys(remoteVal).forEach(f => {
+          if(localVal[f] === undefined) localVal[f] = remoteVal[f];
+          else if(remoteNewer && f !== 'updatedAt' && f !== 'updatedBy') {
+            // Remote wins for content fields when its timestamp is newer
+            localVal[f] = remoteVal[f];
+          }
+        });
+        trackerData[k] = localVal;
       });
       record.trackerData = trackerData;
       saveTrackerDataLocal();

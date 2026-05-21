@@ -2581,6 +2581,11 @@ let users = [
 ];
 let currentUser = null;
 loadUsersLocal(); // cargar usuarios de localStorage como base
+// Diferimos tryRestoreSession a un microtask para que TODAS las variables `let`
+// declaradas más abajo (trackerData, etc) estén inicializadas antes de que
+// enterApp() → init() las use. Sin esto entran en temporal dead zone y rompen
+// el load del tracker.
+setTimeout(tryRestoreSession, 0);
 // Fetch usuarios desde JSONBin al startup para que estén disponibles en el login
 (async function prefetchUsers() {
   try {
@@ -2595,9 +2600,35 @@ loadUsersLocal(); // cargar usuarios de localStorage como base
     if(record.users && record.users.length > 0) {
       users = record.users;
       saveUsersLocal();
+      // Refrescar el currentUser con datos remotos (pickear cambios de rol)
+      if(currentUser) {
+        const fresh = users.find(u => u.id === currentUser.id);
+        if(fresh) { currentUser = fresh; updateUserBadge(); }
+        else { logout(); } // el usuario fue eliminado
+      }
     }
   } catch(e) {}
 })();
+
+function tryRestoreSession() {
+  try {
+    const raw = localStorage.getItem('convoy_current_user');
+    if(!raw) return;
+    const saved = JSON.parse(raw);
+    if(!saved || (!saved.id && !saved.username)) return;
+    // Re-resolve contra la lista actual de users por si cambió el rol
+    const fresh = users.find(u => u.id === saved.id) || users.find(u => u.username === saved.username);
+    if(!fresh) {
+      // El usuario ya no existe — limpiar sesión vieja
+      localStorage.removeItem('convoy_current_user');
+      return;
+    }
+    currentUser = fresh;
+    enterApp();
+  } catch(e) {
+    localStorage.removeItem('convoy_current_user');
+  }
+}
 
 function isAdmin()  { return currentUser?.role === 'admin'; }
 function isLead()   { return currentUser?.role === 'lead' || isAdmin(); }

@@ -2567,9 +2567,57 @@ let imageData = {}; // id -> { images: [{url, r2Url}, ...] }
 let notesData = {}; // id -> string
 let pipeline = {
   workerUrl: 'https://convoy-upload.valentin-e9a.workers.dev',
+  // R2 state sync (primary). Token debe coincidir con STATE_TOKEN en convoy-upload-worker.mjs.
+  stateToken: '85f794a04981cb862fe94156045d71c131249cd9bbec21c6',
+  // JSONBin queda como fallback de LECTURA si R2 todavía no tiene state.json o el Worker está caído.
   binId: '69c55584b7ec241ddca7651b',
   binKey: '$2a$10$G/S5QC8pq2vpHyiOEdxjp.rmJOR4deLMjyDvs1.Zq7W9dMQt9uqQq'
 };
+
+// ─── Helpers R2 state (reemplazo de JSONBin) ───
+async function r2StateGet() {
+  if(!pipeline.workerUrl) return null;
+  const res = await fetch(pipeline.workerUrl + '/state', { cache: 'no-store' });
+  if(!res.ok) throw new Error('R2 state GET failed: ' + res.status);
+  const text = await res.text();
+  if(!text || text === '{}') return {};
+  return JSON.parse(text);
+}
+async function r2StatePut(record) {
+  if(!pipeline.workerUrl) throw new Error('Worker URL not configured');
+  const res = await fetch(pipeline.workerUrl + '/state', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'X-State-Token': pipeline.stateToken },
+    body: JSON.stringify(record)
+  });
+  if(!res.ok) throw new Error('R2 state PUT failed: ' + res.status);
+  return res.json();
+}
+// Lectura del state remoto. Intenta R2 primero; si falla, cae a JSONBin (fallback de seguridad).
+async function fetchRemoteState() {
+  try {
+    const r = await r2StateGet();
+    if(r && Object.keys(r).length > 0) return { source: 'r2', record: r };
+    // R2 vacío (state.json todavía no existe): cae a JSONBin para no perder data en la migración
+  } catch(e) {
+    console.warn('R2 state GET falló, intentando JSONBin fallback:', e);
+  }
+  if(pipeline.binId && pipeline.binKey) {
+    try {
+      const res = await fetch('https://api.jsonbin.io/v3/b/' + pipeline.binId + '/latest', {
+        headers: { 'X-Master-Key': pipeline.binKey, 'X-Bin-Meta': 'false' }
+      });
+      if(res.ok) {
+        const data = await res.json();
+        return { source: 'jsonbin', record: (data.record || data) };
+      }
+      console.warn('JSONBin fallback HTTP error:', res.status);
+    } catch(e) {
+      console.warn('JSONBin fallback también falló:', e);
+    }
+  }
+  return { source: null, record: null };
+}
 
 // ════════════════════════════════════════
 // USERS & AUTH
@@ -2586,18 +2634,14 @@ loadUsersLocal(); // cargar usuarios de localStorage como base
 // enterApp() → init() las use. Sin esto entran en temporal dead zone y rompen
 // el load del tracker.
 setTimeout(tryRestoreSession, 0);
-// Fetch usuarios desde JSONBin al startup para que estén disponibles en el login
+// Fetch usuarios desde R2 (fallback JSONBin) al startup para que estén disponibles en el login
 (async function prefetchUsers() {
   try {
     loadPipelineConfig();
-    if(!pipeline.binId || !pipeline.binKey) return;
-    const res = await fetch('https://api.jsonbin.io/v3/b/' + pipeline.binId + '/latest', {
-      headers: { 'X-Master-Key': pipeline.binKey, 'X-Bin-Meta': 'false' }
-    });
-    if(!res.ok) return;
-    const data = await res.json();
-    const record = data.record || data;
-    if(record.users && record.users.length > 0) {
+    if(!pipeline.workerUrl) return;
+    const fetched = await fetchRemoteState();
+    const record = fetched.record;
+    if(record && record.users && record.users.length > 0) {
       users = record.users;
       saveUsersLocal();
       // Refrescar el currentUser con datos remotos (pickear cambios de rol)
@@ -3736,14 +3780,12 @@ function setStatus(id, msg, type) {
 // JSONBIN SYNC
 // ════════════════════════════════════════
 async function saveJSONBin() {
-  if(!pipeline.binId || !pipeline.binKey) return;
+  if(!pipeline.workerUrl) return;
   try {
     // Read existing record first to preserve other data (panels, wardrobe, tracker, boardmatic)
-    const existing = await fetch('https://api.jsonbin.io/v3/b/' + pipeline.binId + '/latest', {
-      headers:{ 'X-Master-Key': pipeline.binKey, 'X-Bin-Meta': 'false' }
-    });
-    const data = await existing.json();
-    const record = data.record || data || {};
+    // R2 primero; si R2 GET falla cae a JSONBin para no perder merge contra remoto
+    const fetched = await fetchRemoteState();
+    const record = (fetched.record && typeof fetched.record === 'object') ? fetched.record : {};
 
     // Build local images object
     const images = {};
@@ -3767,12 +3809,9 @@ async function saveJSONBin() {
     if(prodTasks && prodTasks.length > 0) record.prodTasks = prodTasks;
     if(prodWeeklyGoal) record.prodWeeklyGoal = prodWeeklyGoal;
 
-    await fetch('https://api.jsonbin.io/v3/b/' + pipeline.binId, {
-      method:'PUT',
-      headers:{ 'Content-Type':'application/json', 'X-Master-Key': pipeline.binKey },
-      body: JSON.stringify(record)
-    });
-  } catch(e) { console.warn('JSONBin sync failed', e); }
+    // Escritura SOLO a R2 (no JSONBin: quota agotada y queremos cortar dependencia)
+    await r2StatePut(record);
+  } catch(e) { console.warn('R2 state sync failed', e); }
 }
 
 // ════════════════════════════════════════
@@ -5369,18 +5408,18 @@ async function deletePanelLayout(panelId) {
 }
 
 async function syncPanelImagesToJSONBin() {
-  if(!pipeline.binId || !pipeline.binKey) return;
+  if(!pipeline.workerUrl) return;
   try {
-    const res = await fetch('https://api.jsonbin.io/v3/b/'+pipeline.binId+'/latest',{headers:{'X-Master-Key':pipeline.binKey,'X-Bin-Meta':'false'}});
-    const existing = await res.json(); const record = existing.record || existing;
+    const fetched = await fetchRemoteState();
+    const record = (fetched.record && typeof fetched.record === 'object') ? fetched.record : {};
     record.panelImages = panelImageData;
-    await fetch('https://api.jsonbin.io/v3/b/'+pipeline.binId,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':pipeline.binKey},body:JSON.stringify(record)});
-  } catch(e) { console.warn('Panel JSONBin sync failed:', e); }
+    await r2StatePut(record);
+  } catch(e) { console.warn('Panel R2 sync failed:', e); }
 }
 
 
 async function manualSyncFromBin() {
-  if(!pipeline.binId || !pipeline.binKey) {
+  if(!pipeline.workerUrl) {
     showToast('⚠ Configurá el Pipeline primero (botón ⚙).');
     return;
   }
@@ -5394,22 +5433,16 @@ async function manualSyncFromBin() {
 }
 
 async function loadJSONBin() {
-  if(!pipeline.binId || !pipeline.binKey) return;
+  if(!pipeline.workerUrl) return;
   try {
-    const res = await fetch('https://api.jsonbin.io/v3/b/' + pipeline.binId + '/latest', {
-      method: 'GET',
-      headers:{
-        'X-Master-Key': pipeline.binKey,
-        'X-Bin-Meta': 'false'
-      }
-    });
-    if(!res.ok) {
-      console.warn('JSONBin load HTTP error:', res.status);
+    // R2 primero; JSONBin como fallback (durante la ventana de migración)
+    const fetched = await fetchRemoteState();
+    const record = fetched.record;
+    if(!record) {
+      console.warn('No se pudo cargar state ni desde R2 ni desde JSONBin');
       return;
     }
-    const data = await res.json();
-    const record = data.record || data;
-    if(!record) return;
+    console.log('State source:', fetched.source);
     // JSONBin is source of truth — full replace, not merge
     if(record.notes) {
       notesData = record.notes;
@@ -5490,9 +5523,9 @@ async function loadJSONBin() {
     saveLocal();
     renderActive();
     updateStats();
-    console.log('JSONBin loaded OK — full sync');
+    console.log('Remote state loaded OK — full sync (source: ' + fetched.source + ')');
   } catch(e) {
-    console.warn('JSONBin load failed:', e);
+    console.warn('Remote state load failed:', e);
   }
 }
 
@@ -6466,12 +6499,10 @@ function saveDue(scope, assetId, val) {
 }
 
 async function syncTrackerToJSONBin() {
-  if(!pipeline.binId || !pipeline.binKey) return;
+  if(!pipeline.workerUrl) return;
   try {
-    const res = await fetch('https://api.jsonbin.io/v3/b/'+pipeline.binId+'/latest', {
-      headers:{'X-Master-Key':pipeline.binKey,'X-Bin-Meta':'false'}
-    });
-    const existing = await res.json(); const record = existing.record || existing;
+    const fetched = await fetchRemoteState();
+    const record = (fetched.record && typeof fetched.record === 'object') ? fetched.record : {};
     if(Object.keys(trackerData).length > 0) {
       // Deep merge: preserve remote keys not in local AND preserve remote fields
       // (e.g. feedback loaded by another user) that local doesn't have for the same key.
@@ -6494,24 +6525,18 @@ async function syncTrackerToJSONBin() {
       record.trackerData = trackerData;
       saveTrackerDataLocal();
     }
-    await fetch('https://api.jsonbin.io/v3/b/'+pipeline.binId, {
-      method:'PUT',
-      headers:{'Content-Type':'application/json','X-Master-Key':pipeline.binKey},
-      body: JSON.stringify(record)
-    });
+    await r2StatePut(record);
     _trackerDirty = false;
-  } catch(e) { console.warn('Tracker JSONBin sync failed:', e); }
+  } catch(e) { console.warn('Tracker R2 sync failed:', e); }
 }
 
 async function syncTrackerFromJSONBin() {
-  if(!pipeline.binId || !pipeline.binKey) { showToast('Pipeline not configured.'); return; }
+  if(!pipeline.workerUrl) { showToast('Pipeline not configured.'); return; }
   if(_trackerDirty) { showToast('Esperando que tus cambios se guarden...'); return; }
   try {
-    const res = await fetch('https://api.jsonbin.io/v3/b/'+pipeline.binId+'/latest', {
-      headers:{'X-Master-Key':pipeline.binKey,'X-Bin-Meta':'false'}
-    });
-    const existing = await res.json(); const record = existing.record || existing;
-    if(record.trackerData) {
+    const fetched = await fetchRemoteState();
+    const record = fetched.record;
+    if(record && record.trackerData) {
       trackerData = record.trackerData;
       saveTrackerDataLocal();
       renderTracker();
@@ -6935,19 +6960,13 @@ async function saveBoardmatic() {
 }
 
 async function syncBoardmaticToJSONBin() {
-  if(!pipeline.binId || !pipeline.binKey) return;
+  if(!pipeline.workerUrl) return;
   try {
-    const res = await fetch('https://api.jsonbin.io/v3/b/'+pipeline.binId+'/latest', {
-      headers:{'X-Master-Key':pipeline.binKey,'X-Bin-Meta':'false'}
-    });
-    const existing = await res.json(); const record = existing.record || existing;
+    const fetched = await fetchRemoteState();
+    const record = (fetched.record && typeof fetched.record === 'object') ? fetched.record : {};
     record.boardmaticUrls = boardmaticUrls;
-    await fetch('https://api.jsonbin.io/v3/b/'+pipeline.binId, {
-      method:'PUT',
-      headers:{'Content-Type':'application/json','X-Master-Key':pipeline.binKey},
-      body: JSON.stringify(record)
-    });
-  } catch(e) { console.warn('BoardMatic JSONBin sync failed:', e); }
+    await r2StatePut(record);
+  } catch(e) { console.warn('BoardMatic R2 sync failed:', e); }
 }
 
 // ════════════════════════════════════════
@@ -7275,12 +7294,10 @@ function clearCellSelection() {
 }
 
 async function syncWardrobeToJSONBin() {
-  if(!pipeline.binId || !pipeline.binKey) return;
+  if(!pipeline.workerUrl) return;
   try {
-    const res = await fetch('https://api.jsonbin.io/v3/b/'+pipeline.binId+'/latest', {
-      headers:{'X-Master-Key':pipeline.binKey,'X-Bin-Meta':'false'}
-    });
-    const existing = await res.json(); const record = existing.record || existing;
+    const fetched = await fetchRemoteState();
+    const record = (fetched.record && typeof fetched.record === 'object') ? fetched.record : {};
     // Merge: start from remote, but ensure our local wardrobeImageData wins for
     // every ID we have locally. This prevents concurrent uploads from clobbering
     // each other via stale GET + PUT.
@@ -7294,12 +7311,8 @@ async function syncWardrobeToJSONBin() {
     // Keep our local state in sync with what we are about to persist.
     wardrobeImageData = merged;
     saveWardrobeImages();
-    await fetch('https://api.jsonbin.io/v3/b/'+pipeline.binId, {
-      method:'PUT',
-      headers:{'Content-Type':'application/json','X-Master-Key':pipeline.binKey},
-      body: JSON.stringify(record)
-    });
-  } catch(e) { console.warn('Wardrobe JSONBin sync failed:', e); }
+    await r2StatePut(record);
+  } catch(e) { console.warn('Wardrobe R2 sync failed:', e); }
 }
 
 // ════════════════════════════════════════
@@ -7633,34 +7646,24 @@ function saveProdData() {
 }
 
 async function syncProdToJSONBin() {
-  if(!pipeline.binId || !pipeline.binKey) return;
+  if(!pipeline.workerUrl) return;
   try {
-    const res = await fetch('https://api.jsonbin.io/v3/b/'+pipeline.binId+'/latest', {
-      headers:{'X-Master-Key':pipeline.binKey,'X-Bin-Meta':'false'}
-    });
-    const existing = await res.json();
-    const record = existing.record || existing;
+    const fetched = await fetchRemoteState();
+    const record = (fetched.record && typeof fetched.record === 'object') ? fetched.record : {};
     record.prodTasks = prodTasks;
     record.prodWeeklyGoal = prodWeeklyGoal;
-    await fetch('https://api.jsonbin.io/v3/b/'+pipeline.binId, {
-      method:'PUT',
-      headers:{'Content-Type':'application/json','X-Master-Key':pipeline.binKey},
-      body: JSON.stringify(record)
-    });
+    await r2StatePut(record);
     _prodDirty = false;
-  } catch(e) { console.warn('Prod JSONBin sync failed:', e); }
+  } catch(e) { console.warn('Prod R2 sync failed:', e); }
 }
 
 async function pollProdData() {
   // Don't overwrite local changes that haven't been saved yet
-  if(_prodDirty || !pipeline.binId || !pipeline.binKey) return;
+  if(_prodDirty || !pipeline.workerUrl) return;
   try {
-    const res = await fetch('https://api.jsonbin.io/v3/b/'+pipeline.binId+'/latest', {
-      headers:{'X-Master-Key':pipeline.binKey,'X-Bin-Meta':'false'}
-    });
-    if(!res.ok) return;
-    const data = await res.json();
-    const record = data.record || data;
+    const fetched = await fetchRemoteState();
+    const record = fetched.record;
+    if(!record) return;
     if(record.prodTasks !== undefined) {
       const remoteJson = JSON.stringify(record.prodTasks);
       const localJson  = JSON.stringify(prodTasks);

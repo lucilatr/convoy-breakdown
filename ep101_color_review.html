@@ -1597,16 +1597,6 @@ function renderPanels() {
               ${p.label.match(/[A-Z–]/) ? `<div class="panel-num-sub">${p.label}</div>` : ''}
               ${p.scene ? `<div class="panel-num-sub" style="color:var(--accent);font-size:8px;letter-spacing:2px;text-transform:uppercase">${p.scene}</div>` : ''}
             </div>
-            <div class="info-block">
-              <div class="info-label">Visual</div>
-              <div class="info-value">${p.desc}</div>
-            </div>
-            ${ADDRESSED[p.num] && ADDRESSED[p.num].length ? `<div class="info-block" style="margin-top:8px;border-top:1px solid rgba(124,196,255,0.25);padding-top:8px">
-              <div class="info-label" style="color:#7cc4ff">Addressed in Color</div>
-              <ul class="addressed-list" style="margin:4px 0 0 0;padding-left:16px;font-size:11px;line-height:1.6;color:var(--text-muted)" contenteditable="true" data-panel="${p.num}">
-                ${ADDRESSED[p.num].map(fb => `<li>${fb}</li>`).join('')}
-              </ul>
-            </div>` : ''}
           </div>
 
           <!-- RIGHT: dialogue + chars + notes -->

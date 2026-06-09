@@ -2428,7 +2428,9 @@ const COLOR_FEEDBACK = {
         {
           from: 'Production (overall)',
           note: "Aimee's head also looks bigger than the other kids in several panels.",
-          applyTo: { chars: ['aimee'] }
+          // Excluded: P07 is a table-level shot — Aimee is in the scene but her face is not framed,
+          // so the head-size note doesn't apply visually.
+          applyTo: { chars: ['aimee'], excludePanels: ['ep101-p07'] }
         },
         {
           from: 'Production (overall)',
@@ -5653,7 +5655,7 @@ async function loadJSONBin() {
 // Tracked via a localStorage marker so it only runs once per seed version.
 // Bump SEED_VERSION when a new feedback round comes in to re-run.
 function seedColorFeedbackOnce() {
-  const SEED_VERSION = 'ep101-color-2026-06-08';
+  const SEED_VERSION = 'ep101-color-2026-06-08-r2';
   if(localStorage.getItem('convoy_color_feedback_seed') === SEED_VERSION) return;
   const now = new Date().toISOString();
   let dirty = false;
@@ -5830,6 +5832,7 @@ function getPanelFeedbackItems(ep, panelId, stage) {
   specific.forEach(it => items.push(it));
   (stageBucket.overall || []).forEach(o => {
     const applyTo = o.applyTo || {};
+    if(applyTo.excludePanels && applyTo.excludePanels.includes(panelId)) return;
     const charMatch = applyTo.chars && applyTo.chars.some(c => (panel.chars||[]).includes(c));
     const vehMatch  = applyTo.vehicles && applyTo.vehicles.some(v => (panel.vehicles||[]).includes(v));
     if(charMatch || vehMatch) items.push(o);

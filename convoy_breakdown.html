@@ -2385,9 +2385,7 @@ const COLOR_FEEDBACK = {
           { from: 'Leffler', note: 'Are the elements separated enough that we can start with the bridge clean in Panel 15 without any of the construction elements, then when Crosby says "under construction!" they transition in? Seeing the play scenario / world change on screen has been part of the idea from early on.' },
           { from: 'Leffler', note: 'Can we add dirt tracks and texture (dust puffs?) to the bridge roadway? That will make the bridge feel like a "construction zone" more than just a bridge with construction stuff on it.' }
         ],
-        'ep101-p21': [
-          { from: 'Production', note: 'The arms of the excavators come from different places on each vehicle. Per the e-sheet, the excavator on the right side of the panel is closer to correct, with the arm coming from right next to the cab. Please update the excavator on the left to match.' }
-        ],
+        // P21 — excluded by user (no feedback applies to this panel)
         'ep101-p26': [
           { from: 'Production', note: "The bed of the truck doesn't look long enough — please lengthen." }
         ],
@@ -2428,19 +2426,37 @@ const COLOR_FEEDBACK = {
         {
           from: 'Production (overall)',
           note: "Aimee's head also looks bigger than the other kids in several panels.",
-          // Excluded: P07 is a table-level shot — Aimee is in the scene but her face is not framed,
-          // so the head-size note doesn't apply visually.
-          applyTo: { chars: ['aimee'], excludePanels: ['ep101-p07'] }
+          // Excluded: panels where Aimee's face is not visible in the actual frame.
+          // Included: panels where Aimee appears in the art even though she's not in chars.
+          applyTo: {
+            chars: ['aimee'],
+            excludePanels: ['ep101-p07', 'ep101-p13', 'ep101-p32'],
+            includePanels: ['ep101-p19']
+          }
         },
         {
           from: 'Production (overall)',
           note: "Once Panel 42/33 is resolved, please go through the rest of the panels to make sure the Excavator and F-650 scales are adjusted as needed to be consistent across the full episode.",
-          applyTo: { vehicles: ['excavator', 'f650-rollback'] }
+          // Excluded: panels where only one of Excavator/F-650 is in frame (no scale to compare),
+          // real-world panels where the toy version doesn't carry the AW scale issue, and panels
+          // where the user reviewed the art and judged the note didn't apply.
+          applyTo: {
+            vehicles: ['excavator', 'f650-rollback'],
+            excludePanels: [
+              'ep101-p13','ep101-p16','ep101-p18','ep101-p20','ep101-p21','ep101-p22',
+              'ep101-p26','ep101-p28','ep101-p29','ep101-p30','ep101-p41','ep101-p43','ep101-p45'
+            ]
+          }
         },
         {
           from: 'Rebecca',
           note: "If we can see the call letters on the helicopter, please ensure they are fictitious. (Production: please double-check and ensure they match the e-sheet.)",
-          applyTo: { vehicles: ['rescue-heli'] }
+          // Excluded: P35 is the kids playing with the toy helicopter inside Smalley's garage —
+          // call letters don't apply to the real-world toy version.
+          applyTo: {
+            vehicles: ['rescue-heli'],
+            excludePanels: ['ep101-p35']
+          }
         }
       ]
     }
@@ -5655,7 +5671,7 @@ async function loadJSONBin() {
 // Tracked via a localStorage marker so it only runs once per seed version.
 // Bump SEED_VERSION when a new feedback round comes in to re-run.
 function seedColorFeedbackOnce() {
-  const SEED_VERSION = 'ep101-color-2026-06-08-r2';
+  const SEED_VERSION = 'ep101-color-2026-06-08-r4';
   if(localStorage.getItem('convoy_color_feedback_seed') === SEED_VERSION) return;
   const now = new Date().toISOString();
   let dirty = false;
@@ -5833,9 +5849,10 @@ function getPanelFeedbackItems(ep, panelId, stage) {
   (stageBucket.overall || []).forEach(o => {
     const applyTo = o.applyTo || {};
     if(applyTo.excludePanels && applyTo.excludePanels.includes(panelId)) return;
+    const includeMatch = applyTo.includePanels && applyTo.includePanels.includes(panelId);
     const charMatch = applyTo.chars && applyTo.chars.some(c => (panel.chars||[]).includes(c));
     const vehMatch  = applyTo.vehicles && applyTo.vehicles.some(v => (panel.vehicles||[]).includes(v));
-    if(charMatch || vehMatch) items.push(o);
+    if(includeMatch || charMatch || vehMatch) items.push(o);
   });
   return items;
 }

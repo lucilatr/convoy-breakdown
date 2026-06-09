@@ -2347,6 +2347,104 @@ const EP_SYNOPSES = {
   }
 };
 
+// ═══════════════════════════════════════════════════════════════════════════
+// MATTEL COLOR FEEDBACK — EP101 (Line Art V2.5 with Color, notes 2026-06-08)
+// Per-panel comments are exact quotes from the Mattel PDF.
+// "overall" entries are duplicated into every panel matching applyTo (chars/vehicles).
+// ═══════════════════════════════════════════════════════════════════════════
+const COLOR_FEEDBACK = {
+  ep101: {
+    color: {
+      reviewedAt: '2026-06-08T15:00:00.000Z',
+      reviewedBy: 'Mattel',
+      decisions: [
+        'Leffler — Approved with Changes',
+        'Production — Approved with Changes',
+        'Rebecca — Approved',
+        'Curran — Approved'
+      ],
+      // Episode-level notes (informational, not duplicated per panel)
+      epNotes: [
+        "Production (overall): Thank you for the work on the vehicle scale in Smalley's — aside from Panel 28, Smalley's scale is approved.",
+        "Production (overall): Some panels have dialogue/VO that does not match the latest V4 script. Please make sure you're using V4 and update all VOs to match.",
+        "Curran: Possible to bring this into a full BMLA to give the entire creative team a chance to view?"
+      ],
+      // Specific per-panel notes
+      panels: {
+        'ep101-p03': [
+          { from: 'Production', note: 'Panel 3 is missing the dialogue "The Matchbox Crew In…". Please update to V4 script.' }
+        ],
+        'ep101-p04': [
+          { from: 'Leffler', note: "Aimee's skin tone is a little too red overall, especially thinking of her being the same character as Jessica Biel." },
+          { from: 'Leffler', note: 'Can we have a non-gray background color? Something on brand, could be "Matchbox Orange"? (Production note: please reference the MBX26_HR file in your brand docs / creative briefs folder for the MBX brand pantone colors.)' }
+        ],
+        'ep101-p11': [
+          { from: 'Production', note: 'It is clearer in this V2.5 that the background vehicles are not Matchbox vehicles and are instead generic drawings. We cannot have random generic vehicles — only vehicles approved for the series/episode. Please remove all but 2 vehicles, and replace those two with the Ford F-150 and the Porsche 911 seen in panel 8.' }
+        ],
+        'ep101-p15': [
+          { from: 'Leffler', note: 'Are the elements separated enough that we can start with the bridge clean in Panel 15 without any of the construction elements, then when Crosby says "under construction!" they transition in? Seeing the play scenario / world change on screen has been part of the idea from early on.' },
+          { from: 'Leffler', note: 'Can we add dirt tracks and texture (dust puffs?) to the bridge roadway? That will make the bridge feel like a "construction zone" more than just a bridge with construction stuff on it.' }
+        ],
+        'ep101-p21': [
+          { from: 'Production', note: 'The arms of the excavators come from different places on each vehicle. Per the e-sheet, the excavator on the right side of the panel is closer to correct, with the arm coming from right next to the cab. Please update the excavator on the left to match.' }
+        ],
+        'ep101-p26': [
+          { from: 'Production', note: "The bed of the truck doesn't look long enough — please lengthen." }
+        ],
+        'ep101-p27': [
+          { from: 'Leffler', note: "Sean should have his EYEPATCH on since he's controlling the Von Steele car in this shot and we're coming off a Von Steele moment." },
+          { from: 'Production', note: "Aimee's head looks bigger than the other kids — notably in this panel." }
+        ],
+        'ep101-p28': [
+          { from: 'Production', note: "With this forced perspective these vehicles look minuscule. Can we find a happy medium between this version and the V1? (Smalley's scale is otherwise approved.)" }
+        ],
+        'ep101-p29': [
+          { from: 'Production', note: "The vehicles don't pop here — feels like they get lost." }
+        ],
+        'ep101-p31': [
+          { from: 'Leffler', note: 'The excavator arm looks like it\'s doing something an excavator can\'t do. The "elbow" of the arm needs to always bend in a way where the bucket is below it, otherwise it looks double-jointed and backwards.' },
+          { from: 'Production', note: "The angle of the arm/bucket doesn't make sense given the narration that that's what's being used to hold off Von Steele. Please adjust." },
+          { from: 'Production', note: 'Panel 31 is missing the dialogue "And you\'re not going anywhere. My crew is preparing a very special surprise for you." Please update to V4 script.' }
+        ],
+        'ep101-p32': [
+          { from: 'Production', note: "We have a close-up of the hook attached to nothing — in the script it's attached to a section of rebar within a chunk of the road. Are we able to add something for the hook to hang onto?" }
+        ],
+        'ep101-p37': [
+          { from: 'Production', note: "The bed of the truck isn't quite long enough — please lengthen." }
+        ],
+        'ep101-p39': [
+          { from: 'Leffler', note: "More construction elements? Maybe the center line isn't painted yet?" }
+        ],
+        'ep101-p40': [
+          { from: 'Leffler', note: "Can we add cracks or breaking lines to the drywall? Right now it just looks like a gray plane and doesn't present as the truck breaking through it." },
+          { from: 'Leffler', note: "Sean/Von Steele in the separate panel — looks like a different character. Can we adjust?" }
+        ],
+        'ep101-p42': [
+          { from: 'Production', note: 'Panel 42 vs Panel 33 — the scale of the excavator vs the Ford F-650 is completely different in these 2 panels. Can we split the difference so they look more consistent together?' }
+        ]
+      },
+      // Overall notes — duplicated into every panel that matches applyTo
+      overall: [
+        {
+          from: 'Production (overall)',
+          note: "Aimee's head also looks bigger than the other kids in several panels.",
+          applyTo: { chars: ['aimee'] }
+        },
+        {
+          from: 'Production (overall)',
+          note: "Once Panel 42/33 is resolved, please go through the rest of the panels to make sure the Excavator and F-650 scales are adjusted as needed to be consistent across the full episode.",
+          applyTo: { vehicles: ['excavator', 'f650-rollback'] }
+        },
+        {
+          from: 'Rebecca',
+          note: "If we can see the call letters on the helicopter, please ensure they are fictitious. (Production: please double-check and ensure they match the e-sheet.)",
+          applyTo: { vehicles: ['rescue-heli'] }
+        }
+      ]
+    }
+  }
+};
+
 let synopsisLang = 'en';
 let panelLang = 'en';
 let charLang = 'en';
@@ -5311,13 +5409,16 @@ function renderPanels() {
     else if(panelView === 'lineart') img = getApiImageForPanel(p.id, lineArtsCache, 'lineArt');
     else if(panelView === 'color') img = getApiImageForPanel(p.id, finalsCache, 'final');
     const sel = selectedPanel === p.id;
-    // Feedback badge: only on lineart/color views, when status is 'reviewed' and feedback text is loaded
+    // Feedback badge: only on lineart/color views. Shows when feedback exists either
+    // in trackerData (seeded or manually loaded) or in the static COLOR_FEEDBACK constant.
     const stageKey = panelView === 'lineart' ? 'lineart' : (panelView === 'color' ? 'color' : null);
     let fbBadge = '';
     if(stageKey) {
       const trk = trackerData[currentChapter + '|' + p.id + '|' + stageKey];
-      if(trk && trk.status === 'reviewed' && trk.feedback && trk.feedback.trim()) {
-        fbBadge = `<button class="p-fb-badge" onclick="event.stopPropagation(); openFeedbackModal('${p.id}','${stageKey}');" title="Ver feedback de Mattel">Reviewed</button>`;
+      const hasTrkFeedback = trk && trk.feedback && trk.feedback.trim();
+      const hasStaticFeedback = getPanelFeedbackItems(currentChapter, p.id, stageKey).length > 0;
+      if(hasTrkFeedback || hasStaticFeedback) {
+        fbBadge = `<button class="p-fb-badge" onclick="event.stopPropagation(); openFeedbackModal('${p.id}','${stageKey}');" title="Click para ver feedback de Mattel">Feedback</button>`;
       }
     }
     return `<div class="p-card${sel?' p-selected':''}" id="pcard-${p.id}" onclick="selectPanel('${p.id}')">
@@ -5534,11 +5635,59 @@ async function loadJSONBin() {
     if(record.prodTasks !== undefined) prodTasks = record.prodTasks || [];
     if(record.prodWeeklyGoal !== undefined) prodWeeklyGoal = record.prodWeeklyGoal || '';
     saveLocal();
+    seedColorFeedbackOnce();
     renderActive();
     updateStats();
     console.log('Remote state loaded OK — full sync (source: ' + fetched.source + ')');
   } catch(e) {
     console.warn('Remote state load failed:', e);
+  }
+}
+
+// ════════════════════════════════════════
+// COLOR FEEDBACK SEEDING (one-shot, per seed version)
+// ════════════════════════════════════════
+// For every episode/stage defined in COLOR_FEEDBACK, this seeds trackerData so:
+//   - panels with feedback  → status='reviewed', feedback=<merged text>
+//   - panels without feedback → status='app-mattel'
+// Tracked via a localStorage marker so it only runs once per seed version.
+// Bump SEED_VERSION when a new feedback round comes in to re-run.
+function seedColorFeedbackOnce() {
+  const SEED_VERSION = 'ep101-color-2026-06-08';
+  if(localStorage.getItem('convoy_color_feedback_seed') === SEED_VERSION) return;
+  const now = new Date().toISOString();
+  let dirty = false;
+  Object.entries(COLOR_FEEDBACK).forEach(([ep, stageMap]) => {
+    Object.entries(stageMap).forEach(([stage, bucket]) => {
+      const panels = PANELS_BY_EP[ep] || [];
+      panels.forEach(p => {
+        const k = ep + '|' + p.id + '|' + stage;
+        const items = getPanelFeedbackItems(ep, p.id, stage);
+        if(!trackerData[k]) trackerData[k] = {};
+        if(items.length > 0) {
+          trackerData[k].status = 'reviewed';
+          trackerData[k].feedback = formatPanelFeedback(items);
+          trackerData[k].feedbackBy = bucket.reviewedBy || 'Mattel';
+          trackerData[k].feedbackAt = bucket.reviewedAt || now;
+        } else {
+          trackerData[k].status = 'app-mattel';
+          delete trackerData[k].feedback;
+          delete trackerData[k].feedbackBy;
+          delete trackerData[k].feedbackAt;
+        }
+        trackerData[k].updatedAt = now;
+        trackerData[k].updatedBy = 'system (Mattel seed)';
+        dirty = true;
+      });
+    });
+  });
+  if(dirty) {
+    saveTrackerDataLocal();
+    localStorage.setItem('convoy_color_feedback_seed', SEED_VERSION);
+    _trackerDirty = true;
+    clearTimeout(_trkSyncTimer);
+    _trkSyncTimer = setTimeout(() => syncTrackerToJSONBin(), 1200);
+    console.log('Color feedback seeded:', SEED_VERSION);
   }
 }
 
@@ -5668,11 +5817,42 @@ function lbNav(dir) {
 // ════════════════════════════════════════
 // FEEDBACK MODAL (panel-level review feedback from Mattel)
 // ════════════════════════════════════════
+
+// Computes the merged feedback items for a panel from the COLOR_FEEDBACK constant.
+// Returns array of {from, note} or [] if no feedback applies.
+function getPanelFeedbackItems(ep, panelId, stage) {
+  const stageBucket = (COLOR_FEEDBACK[ep] || {})[stage];
+  if(!stageBucket) return [];
+  const panel = (PANELS_BY_EP[ep] || []).find(p => p.id === panelId);
+  if(!panel) return [];
+  const items = [];
+  const specific = stageBucket.panels[panelId] || [];
+  specific.forEach(it => items.push(it));
+  (stageBucket.overall || []).forEach(o => {
+    const applyTo = o.applyTo || {};
+    const charMatch = applyTo.chars && applyTo.chars.some(c => (panel.chars||[]).includes(c));
+    const vehMatch  = applyTo.vehicles && applyTo.vehicles.some(v => (panel.vehicles||[]).includes(v));
+    if(charMatch || vehMatch) items.push(o);
+  });
+  return items;
+}
+
+function formatPanelFeedback(items) {
+  if(!items || items.length === 0) return '';
+  return items.map(it => '• ' + it.from + ' — ' + it.note).join('\n\n');
+}
+
 function openFeedbackModal(panelId, stage) {
   const ep = currentChapter;
   const k = ep + '|' + panelId + '|' + stage;
   const data = trackerData[k] || {};
-  const feedback = (data.feedback || '').trim();
+  // Prefer trackerData.feedback (which may have been seeded or edited), fall back
+  // to computing on-the-fly from the constant so the modal still works even if
+  // seeding hasn't run yet.
+  let feedback = (data.feedback || '').trim();
+  if(!feedback) {
+    feedback = formatPanelFeedback(getPanelFeedbackItems(ep, panelId, stage));
+  }
   if(!feedback) return;
   const panel = (PANELS_BY_EP[ep] || []).find(p => p.id === panelId);
   const label = panel ? panel.label : panelId;
@@ -5680,10 +5860,12 @@ function openFeedbackModal(panelId, stage) {
   document.getElementById('fb-title').innerHTML = 'Panel ' + label + ' <span>·</span> ' + stageLabel + ' feedback';
   document.getElementById('fb-body').textContent = feedback;
   let meta = '';
-  if(data.feedbackBy) meta += 'Loaded by ' + data.feedbackBy;
-  if(data.feedbackAt) {
+  const by = data.feedbackBy || (COLOR_FEEDBACK[ep] && COLOR_FEEDBACK[ep][stage] && COLOR_FEEDBACK[ep][stage].reviewedBy) || '';
+  const at = data.feedbackAt || (COLOR_FEEDBACK[ep] && COLOR_FEEDBACK[ep][stage] && COLOR_FEEDBACK[ep][stage].reviewedAt) || '';
+  if(by) meta += 'Loaded by ' + by;
+  if(at) {
     if(meta) meta += ' · ';
-    meta += new Date(data.feedbackAt).toLocaleString();
+    meta += new Date(at).toLocaleString();
   }
   document.getElementById('fb-meta').textContent = meta;
   document.getElementById('fb-overlay').classList.add('open');

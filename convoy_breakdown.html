@@ -6521,17 +6521,24 @@ async function syncTrackerToJSONBin() {
       // (e.g. feedback loaded by another user) that local doesn't have for the same key.
       // Use updatedAt to decide who wins when both sides have the same field.
       const remoteTracker = record.trackerData || {};
+      // Fields injected externally (panel feedback loaded by a lead) — never edited via
+      // the task UI, so a missing-locally value here is always "we just haven't seen it
+      // yet", never a user deletion. Always preserve from remote.
+      const EXTERNAL_PRESERVE = ['feedback','feedbackBy','feedbackAt'];
       Object.entries(remoteTracker).forEach(([k, remoteVal]) => {
         if(!trackerData[k]) { trackerData[k] = remoteVal; return; }
         const localVal = trackerData[k];
         const remoteNewer = (remoteVal.updatedAt || '') > (localVal.updatedAt || '');
-        // Preserve remote-only fields (feedback, feedbackBy, feedbackAt, etc).
         Object.keys(remoteVal).forEach(f => {
-          if(localVal[f] === undefined) localVal[f] = remoteVal[f];
-          else if(remoteNewer && f !== 'updatedAt' && f !== 'updatedBy') {
-            // Remote wins for content fields when its timestamp is newer
+          if(remoteNewer && f !== 'updatedAt' && f !== 'updatedBy') {
+            // Remote is the newer source of truth — adopt its value.
+            localVal[f] = remoteVal[f];
+          } else if(localVal[f] === undefined && EXTERNAL_PRESERVE.includes(f)) {
+            // Externally-injected field; bring it in even when local is newer.
             localVal[f] = remoteVal[f];
           }
+          // Otherwise: local is newer (or equal) and the field is editable via the UI.
+          // If it's missing locally, the user explicitly cleared it — don't restore.
         });
         trackerData[k] = localVal;
       });

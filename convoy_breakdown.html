@@ -5654,6 +5654,7 @@ async function loadJSONBin() {
     if(record.prodWeeklyGoal !== undefined) prodWeeklyGoal = record.prodWeeklyGoal || '';
     saveLocal();
     seedColorFeedbackOnce();
+    unassignEp101LineArtOnce();
     renderActive();
     updateStats();
     console.log('Remote state loaded OK — full sync (source: ' + fetched.source + ')');
@@ -5707,6 +5708,37 @@ function seedColorFeedbackOnce() {
     _trkSyncTimer = setTimeout(() => syncTrackerToJSONBin(), 1200);
     console.log('Color feedback seeded:', SEED_VERSION);
   }
+}
+
+// ════════════════════════════════════════
+// ONE-SHOT MIGRATIONS (tracker bulk ops driven by a single localStorage marker)
+// ════════════════════════════════════════
+// Bulk-unassign EP101 line art: clears assignedTo on every ep101 lineart entry.
+// Runs once per migration version so re-assignments stay intact afterwards.
+function unassignEp101LineArtOnce() {
+  const VERSION = 'ep101-lineart-unassign-2026-06-10';
+  if(localStorage.getItem('convoy_migrations') === VERSION) return;
+  const panels = PANELS_BY_EP['ep101'] || [];
+  const now = new Date().toISOString();
+  let dirty = false;
+  panels.forEach(p => {
+    const k = 'ep101|' + p.id + '|lineart';
+    const entry = trackerData[k];
+    if(entry && entry.assignedTo) {
+      delete entry.assignedTo;
+      entry.updatedAt = now;
+      entry.updatedBy = 'system (unassign migration)';
+      dirty = true;
+    }
+  });
+  if(dirty) {
+    saveTrackerDataLocal();
+    _trackerDirty = true;
+    clearTimeout(_trkSyncTimer);
+    _trkSyncTimer = setTimeout(() => syncTrackerToJSONBin(), 1200);
+    console.log('EP101 line art unassigned:', VERSION);
+  }
+  localStorage.setItem('convoy_migrations', VERSION);
 }
 
 // ════════════════════════════════════════

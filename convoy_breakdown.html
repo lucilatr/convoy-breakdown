@@ -980,11 +980,11 @@
   .p-card:hover { border-color: var(--border-pink); }
   .p-card.p-selected { border-color: var(--pink); }
   .p-thumb {
-    width: 100%; aspect-ratio: 16/11; background: var(--bg-card2);
+    width: 100%; aspect-ratio: 16/9; background: var(--bg-card2);
     display: flex; align-items: center; justify-content: center;
     position: relative; overflow: hidden;
   }
-  .p-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .p-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
   .p-thumb-ph { opacity: .12; color: var(--text-muted); }
   .p-num {
     position: absolute; top: 5px; left: 7px; font-size: 18px; font-weight: 900;

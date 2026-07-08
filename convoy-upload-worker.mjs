@@ -68,6 +68,46 @@ export default {
       });
     }
 
+    // ───────── PROXY DE IMÁGENES (para bypass CORS al descargar finales/line arts) ─────────
+    if (path === '/proxy' && request.method === 'GET') {
+      const target = url.searchParams.get('url');
+      if (!target) {
+        return new Response(JSON.stringify({ error: 'Missing url param' }), {
+          status: 400, headers: { ...cors, 'Content-Type': 'application/json' }
+        });
+      }
+      const ALLOWED_HOSTS = [
+        'refineria.onrender.com',
+        'pub-9f8e9d8bac584406ad24a3a81e7da806.r2.dev',
+        'pub-6e4fa026b36b41799b635aa2ac4b3739.r2.dev',
+      ];
+      let parsed;
+      try { parsed = new URL(target); } catch {
+        return new Response(JSON.stringify({ error: 'Invalid url' }), {
+          status: 400, headers: { ...cors, 'Content-Type': 'application/json' }
+        });
+      }
+      if (!ALLOWED_HOSTS.includes(parsed.hostname)) {
+        return new Response(JSON.stringify({ error: 'Host not allowed' }), {
+          status: 403, headers: { ...cors, 'Content-Type': 'application/json' }
+        });
+      }
+      try {
+        const upstream = await fetch(target, { redirect: 'follow' });
+        const headers = new Headers(cors);
+        const ct = upstream.headers.get('Content-Type');
+        if (ct) headers.set('Content-Type', ct);
+        const cl = upstream.headers.get('Content-Length');
+        if (cl) headers.set('Content-Length', cl);
+        headers.set('Cache-Control', 'public, max-age=300');
+        return new Response(upstream.body, { status: upstream.status, headers });
+      } catch (e) {
+        return new Response(JSON.stringify({ error: e.message }), {
+          status: 502, headers: { ...cors, 'Content-Type': 'application/json' }
+        });
+      }
+    }
+
     // ───────── UPLOAD DE IMÁGENES (comportamiento original) ─────────
     if (request.method === 'POST') {
       try {

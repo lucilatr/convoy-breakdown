@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CVY26_001_105 — Color Review</title>
+<style>
+  /* ── VARIABLES ──────────────────────────────────────────────── */
+  :root {
+    --black: #0a0a0a;
+    --white: #ffffff;
+    --off-white: #f5f5f0;
+    --grey-light: #e8e8e4;
+    --grey-mid: #999;
+    --grey-dark: #333;
+    --accent: #e8002d;
+    --accent-dark: #b5001e;
+    --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --font-mono: 'Courier New', monospace;
+  }
+
+  /* ── RESET ──────────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    background: #e8e8e4;
+    color: var(--black);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ── SCREEN NAV BAR ─────────────────────────────────────────── */
+  #topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: var(--black);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 24px;
+    gap: 16px;
+    border-bottom: 2px solid var(--accent);
+  }
+  #topbar .tb-title {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--white);
+  }
+  #topbar .tb-title span { color: var(--accent); }
+  #topbar .tb-controls { display: flex; gap: 10px; }
+  .tb-btn {
+    background: var(--accent);
+    color: var(--white);
+    border: none;
+    padding: 7px 16px;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .tb-btn:hover { background: var(--accent-dark); }
+  .tb-btn.secondary {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.25);
+    color: rgba(255,255,255,0.7);
+  }
+  .tb-btn.secondary:hover { border-color: var(--white); color: var(--white); background: transparent; }
+
+  /* ── PAGE WRAPPER ───────────────────────────────────────────── */
+  #doc-wrapper {
+    padding-top: 60px;
+  }
+
+  /* ── SHARED PAGE STYLES ─────────────────────────────────────── */
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    background: var(--white);
+    margin: 24px auto;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ── COVER PAGE ─────────────────────────────────────────────── */
+  .cover {
+    background: var(--white);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0;
+  }
+  .cover-stripe {
+    background: var(--accent);
+    height: 10px;
+    width: 100%;
+  }
+  .cover-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 48px 56px;
+    gap: 24px;
+    border-bottom: 1px solid var(--grey-light);
+  }
+  .cover-eyebrow {
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .cover-title {
+    font-size: 42px;
+    font-weight: 900;
+    color: var(--black);
+    line-height: 1.05;
+    letter-spacing: -1px;
+    text-transform: uppercase;
+  }
+  .cover-title span { color: var(--accent); }
+  .cover-subtitle {
+    font-size: 18px;
+    font-weight: 300;
+    color: var(--grey-mid);
+    letter-spacing: 1px;
+  }
+  .cover-divider {
+    width: 48px;
+    height: 2px;
+    background: var(--accent);
+  }
+  .cover-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 32px;
+    padding: 32px 56px 48px;
+  }
+  .cover-meta-item { display: flex; flex-direction: column; gap: 2px; }
+  .cover-meta-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--grey-mid);
+    font-weight: 600;
+  }
+  .cover-meta-value {
+    font-size: 12px;
+    color: var(--grey-dark);
+    font-weight: 500;
+  }
+  .cover-meta-value[contenteditable="true"] {
+    outline: none;
+    border-bottom: 1px dashed var(--grey-light);
+    min-width: 80px;
+    display: inline-block;
+  }
+  .cover-logo-area {
+    position: absolute;
+    bottom: 56px;
+    right: 56px;
+    text-align: right;
+  }
+  .cover-logo {
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 6px;
+    color: var(--grey-light);
+    text-transform: uppercase;
+  }
+  .cover-confidential {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--grey-mid);
+    margin-top: 4px;
+  }
+
+  /* ── SECTION HEADER PAGE ────────────────────────────────────── */
+  .section-page {
+    background: var(--off-white);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 64px 56px;
+    min-height: 160px;
+  }
+  .section-page.compact { min-height: unset; padding: 28px 40px 0; }
+  .section-eyebrow {
+    font-size: 9px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .section-title {
+    font-size: 28px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+    color: var(--black);
+  }
+  .section-rule {
+    width: 100%;
+    height: 1px;
+    background: var(--grey-light);
+    margin: 0 40px;
+  }
+
+  /* ── CHARACTER LINEUP PAGE ──────────────────────────────────── */
+  .lineup-page {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .lineup-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    background: var(--black);
+    border-bottom: 2px solid var(--accent);
+    padding: 14px 28px;
+    flex-shrink: 0;
+  }
+  .lineup-header-title {
+    font-size: 14px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--white);
+  }
+  .lineup-header-ep {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+  }
+  .lineup-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--grey-light);
+  }
+  .char-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    padding: 16px 20px 14px;
+    gap: 10px;
+  }
+
+  .char-img-wrap {
+    width: 100%;
+    background: var(--off-white);
+    overflow: visible;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .char-img-wrap > img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .char-img-placeholder {
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--grey-mid);
+    text-transform: uppercase;
+    text-align: center;
+    padding: 32px;
+  }
+  /* Franja inferior: texto izquierda + pin derecha */
+  .char-bottom {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    border-top: 1px solid var(--grey-light);
+    padding-top: 10px;
+    margin-top: 8px;
+  }
+  .char-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .char-name {
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--black);
+  }
+  .char-role {
+    font-size: 9.5px;
+    color: var(--grey-mid);
+    letter-spacing: 0.3px;
+  }
+  .char-vehicle {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  /* Wardrobe pin — polaroid a la derecha */
+  .char-wardrobe-pin {
+    width: 32%;
+    flex-shrink: 0;
+    background: var(--white);
+    padding: 5px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    transform: rotate(3deg);
+  }
+  .char-wardrobe-pin img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* ── PANEL PAGE ─────────────────────────────────────────────── */
+  .panel-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 297mm;
+  }
+  .panel-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 20px;
+    background: var(--black);
+    border-bottom: 2px solid var(--accent);
+    flex-shrink: 0;
+  }
+  .panel-page-header .ph-ep {
+    font-size: 8px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+  }
+  .panel-page-header .ph-title {
+    font-size: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+  }
+  .panel-page-header .ph-num {
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: var(--accent);
+  }
+
+  /* SPACER between header and image */
+  .panel-spacer {
+    height: 14mm;
+    flex-shrink: 0;
+    background: var(--white);
+  }
+
+  /* IMAGE: full width with 1cm side margins + border frame */
+  .panel-img-col {
+    width: calc(100% - 2cm);
+    margin: 0 1cm;
+    background: var(--black);
+    border: 1px solid #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    aspect-ratio: 16 / 9;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .panel-img-col img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+  .panel-img-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 24px;
+    color: #555;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+  }
+  .panel-img-placeholder .pip-icon {
+    width: 64px;
+    height: 48px;
+    border: 2px dashed currentColor;
+    border-radius: 2px;
+    position: relative;
+  }
+  .panel-img-placeholder .pip-icon::after {
+    content: '';
+    position: absolute;
+    bottom: 8px; left: 8px; right: 8px;
+    height: 2px;
+    background: currentColor;
+    box-shadow: 0 -6px 0 currentColor;
+  }
+  .panel-img-placeholder .pip-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: var(--font-mono);
+    color: #555;
+  }
+
+  /* INFO SECTION: below image */
+  .panel-info-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* top info row: 2 columns */
+  .panel-info-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    flex: 1;
+  }
+
+  /* left col: panel num + scene + visual */
+  .panel-info-main {
+    padding: 14px 20px 14px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-right: 1px solid var(--grey-light);
+  }
+
+  /* right col: dialogue + chars */
+  .panel-info-side {
+    padding: 14px 22px 14px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .panel-num-badge {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .panel-num {
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--black);
+    letter-spacing: -1px;
+  }
+  .panel-num-sub {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--grey-mid);
+    letter-spacing: 1px;
+  }
+
+  .info-block { display: flex; flex-direction: column; gap: 4px; }
+  .info-label {
+    font-size: 7.5px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--grey-mid);
+  }
+  .info-value {
+    font-size: 10.5px;
+    line-height: 1.55;
+    color: var(--grey-dark);
+  }
+
+  /* editable fields */
+  .editable {
+    outline: none;
+    border-bottom: 1px dashed var(--grey-light);
+    min-height: 18px;
+    padding: 2px 0;
+    color: var(--grey-dark);
+    font-size: 10.5px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+  }
+  .editable:empty::before {
+    content: attr(data-placeholder);
+    color: #ccc;
+    font-style: italic;
+    pointer-events: none;
+  }
+  .editable:focus {
+    border-bottom-color: var(--accent);
+    border-bottom-style: solid;
+  }
+
+  /* dialogue block */
+  .dialogue-block {
+    background: var(--off-white);
+    border-left: 3px solid var(--accent);
+    padding: 10px 12px;
+    border-radius: 0 2px 2px 0;
+  }
+  .dialogue-block .info-label { color: var(--accent); }
+  .dialogue-block .editable {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    line-height: 1.6;
+    border-bottom-color: transparent;
+  }
+  .dialogue-block .editable:focus { border-bottom-color: var(--accent); }
+
+  /* chars in scene */
+  .chars-in-scene {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 2px;
+  }
+  .char-tag {
+    font-size: 7.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: var(--grey-light);
+    padding: 2px 7px;
+    border-radius: 2px;
+    color: var(--grey-dark);
+  }
+  .char-tag.villain { background: #fdecea; color: var(--accent); }
+
+  /* notes row: bottom strip */
+  .panel-notes-row {
+    border-top: 1px solid var(--grey-light);
+    padding: 8px 22px 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+  .panel-notes-row .info-label { margin-bottom: 2px; }
+  .panel-notes-row .editable {
+    font-size: 10px;
+    border-bottom-color: transparent;
+  }
+  .panel-notes-row .editable:focus { border-bottom-color: var(--accent); }
+  .notes-col { flex: 1; }
+
+  /* ── WARDROBE PAGE ──────────────────────────────────────────── */
+  .wardrobe-page {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+  }
+  .wardrobe-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    background: var(--grey-light);
+    padding: 0;
+  }
+  .wardrobe-card {
+    background: var(--white);
+    display: flex;
+    flex-direction: column;
+    padding: 16px 12px 14px;
+    gap: 10px;
+  }
+  .wardrobe-img-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--off-white);
+    overflow: hidden;
+  }
+  .wardrobe-img-wrap img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .wardrobe-info {
+    border-top: 1px solid var(--grey-light);
+    padding-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .wardrobe-name {
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--black);
+  }
+  .wardrobe-label {
+    font-size: 8px;
+    color: var(--grey-mid);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  /* ── STORYBOARD PAGE ────────────────────────────────────────── */
+  .storyboard-page {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+  }
+  .sb-header {
+    background: var(--black);
+    border-bottom: 2px solid var(--accent);
+    padding: 18px 24px 14px;
+    flex-shrink: 0;
+  }
+  .sb-eyebrow {
+    font-size: 8px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 4px;
+  }
+  .sb-title {
+    font-size: 22px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+    color: var(--white);
+    line-height: 1;
+  }
+  .sb-title span { color: var(--accent); }
+  .sb-subtitle {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.35);
+    margin-top: 5px;
+    text-transform: uppercase;
+  }
+  .sb-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+    padding: 14px;
+    align-content: start;
+  }
+  .sb-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .sb-img-wrap {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: var(--grey-light);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .sb-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .sb-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    font-family: var(--font-mono);
+    color: #bbb;
+    letter-spacing: 1px;
+  }
+  .sb-label {
+    font-size: 6.5px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--grey-mid);
+    text-align: center;
+    line-height: 1;
+  }
+
+  /* ── PRINT STYLES ───────────────────────────────────────────── */
+  @media print {
+    body { background: white; font-size: 11px; }
+    #topbar { display: none !important; }
+    #doc-wrapper { padding-top: 0; }
+
+    .page {
+      width: 100%;
+      min-height: 100vh;
+      margin: 0;
+      box-shadow: none;
+      page-break-after: always;
+      break-after: page;
+    }
+    .page:last-child { page-break-after: avoid; break-after: avoid; }
+
+    .cover { min-height: 100vh; }
+    .lineup-page { min-height: 100vh; }
+
+    .panel-page {
+      min-height: 100vh;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .panel-img-col { aspect-ratio: 16/9; }
+    .panel-page-header { background: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+    /* Spacer: forzar visibilidad en print */
+    .panel-spacer {
+      height: 14mm !important;
+      min-height: 14mm !important;
+      display: block !important;
+      flex-shrink: 0 !important;
+    }
+
+    /* Lineup: exactamente una página A4, sin overflow */
+    .lineup-page {
+      height: 297mm;
+      overflow: hidden;
+    }
+    .lineup-grid {
+      overflow: hidden;
+    }
+    .char-card {
+      overflow: hidden;
+      min-height: 0;
+    }
+    .char-img-wrap {
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .char-img-wrap > img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: top;
+    }
+
+    .editable:empty::before { color: #ddd; }
+
+    /* Ocultar bloque Caveats si no hay texto escrito */
+    .caveats-block:has(.editable:empty) { display: none; }
+
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── TOP BAR (screen only) ───────────────────────────────────────── -->
+<div id="topbar">
+  <div class="tb-title">CVY26_001 <span>·</span> EP101 <span>·</span> Color Review</div>
+  <div class="tb-controls">
+    <button class="tb-btn secondary" onclick="toggleEditing()">Toggle Editing</button>
+    <button class="tb-btn" onclick="window.print()">Export PDF</button>
+  </div>
+</div>
+
+<div id="doc-wrapper">
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     COVER PAGE
+═══════════════════════════════════════════════════════════════════ -->
+<div class="page cover">
+  <div class="cover-stripe"></div>
+  <div class="cover-body">
+    <div class="cover-eyebrow">Matchbox Crew</div>
+    <div class="cover-title">Color<br><span>Review</span></div>
+    <div class="cover-subtitle">Episode 105 — Booby Trap Building!</div>
+    <div class="cover-divider"></div>
+  </div>
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Project Code</div>
+      <div class="cover-meta-value">CVY26_001</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Episode</div>
+      <div class="cover-meta-value">105 — Booby Trap Building!</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Document Type</div>
+      <div class="cover-meta-value">Color Review Package</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Total Panels</div>
+      <div class="cover-meta-value">44</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Version</div>
+      <div class="cover-meta-value" contenteditable="true" data-placeholder="V1">V1</div>
+    </div>
+  </div>
+  <div class="cover-logo-area">
+    <div class="cover-logo">Convoy</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     CHARACTER LINEUP PAGE — EP105 (Booby Trap Building)
+═══════════════════════════════════════════════════════════════════ -->
+<style>
+  /* EP102: cuadros de vestuario Adventure World +10% (32% -> 35.2%) */
+  .lineup-page .char-wardrobe-pin { width: 35.2%; }
+</style>
+<div class="page lineup-page">
+  <div class="lineup-header">
+    <div class="lineup-header-title">Character Lineup</div>
+    <div class="lineup-header-ep">Episode 105 · Cast · Booby Trap Building</div>
+  </div>
+
+  <div class="lineup-grid">
+
+    <!-- SEAN -->
+    <div class="char-card">
+      <div class="char-img-wrap">
+        <img src="./MATCHBOX-SEAN-turn1.jpg" alt="Sean" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="char-img-placeholder" style="display:none">Sean — Turn 1</div>
+      </div>
+      <div class="char-bottom">
+        <div class="char-info">
+          <div class="char-name">Sean</div>
+          <div class="char-role">Lead — The Spy Kid</div>
+          <div class="char-vehicle">Land Rover 6x6 · #JKH28</div>
+        </div>
+        <div class="char-wardrobe-pin"><img src="./wardrobe/105/SEAN_EP105.png" alt="Sean wardrobe"></div>
+
+      </div>
+    </div>
+
+    <!-- TED -->
+    <div class="char-card">
+      <div class="char-img-wrap">
+        <img src="./MATCHBOX-TED-turn1.jpg" alt="Ted" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="char-img-placeholder" style="display:none">Ted — Turn 1</div>
+      </div>
+      <div class="char-bottom">
+        <div class="char-info">
+          <div class="char-name">Ted</div>
+          <div class="char-role">Crew Leader</div>
+          <div class="char-vehicle">Turf Hauler · #HFB90</div>
+        </div>
+        <div class="char-wardrobe-pin">
+          <img src="./wardrobe/105/TED_EP105.png" alt="Ted wardrobe">
+        </div>
+      </div>
+    </div>
+
+    <!-- CHARMAINE -->
+    <div class="char-card">
+      <div class="char-img-wrap">
+        <img src="./MATCHBOX-CHARMAINErevisedHAIR.jpg" alt="Charmaine" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="char-img-placeholder" style="display:none">Charmaine — Turn 1</div>
+      </div>
+      <div class="char-bottom">
+        <div class="char-info">
+          <div class="char-name">Charmaine</div>
+          <div class="char-role">Tech &amp; Air Support</div>
+          <div class="char-vehicle">Rescue Helicopter · #JKH39</div>
+        </div>
+        <div class="char-wardrobe-pin">
+          <img src="./wardrobe/105/CHARMAINE_EP105.png" alt="Charmaine wardrobe">
+        </div>
+      </div>
+    </div>
+
+    <!-- AIMEE -->
+    <div class="char-card">
+      <div class="char-img-wrap">
+        <img src="./MATCHBOX-AIMEE-turn1.jpg" alt="Aimee" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="char-img-placeholder" style="display:none">Aimee — Turn 1</div>
+      </div>
+      <div class="char-bottom">
+        <div class="char-info">
+          <div class="char-name">Aimee</div>
+          <div class="char-role">Speed &amp; Driving Expert</div>
+          <div class="char-vehicle">Bulldozer · #JFB96</div>
+        </div>
+        <div class="char-wardrobe-pin">
+          <img src="./wardrobe/105/AIMEE_EP105.png" alt="Aimee wardrobe">
+        </div>
+      </div>
+    </div>
+
+    <!-- CROSBY -->
+    <div class="char-card">
+      <div class="char-img-wrap">
+        <img src="./MATCHBOX-CROSBY-turn1.jpg" alt="Crosby" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="char-img-placeholder" style="display:none">Crosby — Turn 1</div>
+      </div>
+      <div class="char-bottom">
+        <div class="char-info">
+          <div class="char-name">Crosby</div>
+          <div class="char-role">Engineering &amp; Heavy Machinery</div>
+          <div class="char-vehicle">Excavator · #JKH38</div>
+        </div>
+        <div class="char-wardrobe-pin">
+          <img src="./wardrobe/105/CROSBY_EP105.png" alt="Crosby wardrobe">
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /lineup-grid -->
+</div><!-- /lineup-page -->
+
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     PANELS
+     Image path: COLOR_URLS map below. URLs come from refineria.onrender.com.
+═══════════════════════════════════════════════════════════════════ -->
+
+<script>
+// ── CONFIGURATION ──────────────────────────────────────────────
+// Color images are served directly from refineria.onrender.com (Valen's app).
+// If a URL changes (regenerated final), refresh by running:
+//   curl -s 'https://refineria.onrender.com/api/projects/convoy/episodes/ep101/finals' | node scripts/build_color_urls.js
+const COLOR_URLS = {"01": "https://refineria.onrender.com/uploads/generated/fd1de3b5-21a4-46af-b74a-885676736762.jpg", "02": "https://refineria.onrender.com/uploads/generated/67be9924-acee-4661-964a-9ddd2b7f7980.png", "04": "https://refineria.onrender.com/uploads/generated/ea7af6fc-ee66-44e0-8390-d61b41e6f5d3.png", "05": "https://refineria.onrender.com/uploads/generated/a0840267-7540-4799-81d5-3e2fe775b135.jpg", "06": "https://refineria.onrender.com/uploads/generated/f218361c-4857-4ba8-8657-5514302ade53.jpg", "07": "https://refineria.onrender.com/uploads/generated/ef1753eb-6019-44ce-b5df-16980b558f82.jpg", "08": "https://refineria.onrender.com/uploads/generated/b2a85af3-4c5a-43ef-be18-92638ef0d7e8.png", "09": "https://refineria.onrender.com/uploads/generated/003b2c2e-1b34-4db5-8165-d3ce9a349acb.png", "10": "https://refineria.onrender.com/uploads/generated/56f11d7e-c35b-45b4-aa8a-635f11be6cca.png", "11": "https://refineria.onrender.com/uploads/generated/fa13e0de-c383-460f-a1b0-778ecbd9cbf6.png", "12": "https://refineria.onrender.com/uploads/generated/ac362253-b3ba-4c08-abd8-0295944e01e7.png", "13": "https://refineria.onrender.com/uploads/generated/e7600a2d-5b3f-438c-8d6b-b81612f8e7e2.png", "14": "https://refineria.onrender.com/uploads/generated/0e7977b9-c7c7-4bd2-9678-25772e72bab5.png", "15": "https://refineria.onrender.com/uploads/generated/1da4760f-c6fa-4219-9cce-fa4fb845527d.png", "16": "https://refineria.onrender.com/uploads/generated/d7d998ab-312f-4567-8ae7-53994bf3de8d.png", "17": "https://refineria.onrender.com/uploads/generated/fb7cdf60-85f1-49b4-a8e9-d55b3faed9ba.jpg", "18": "https://refineria.onrender.com/uploads/generated/bf0593ef-0427-4cc9-b2da-832775428dbd.jpg", "19": "https://refineria.onrender.com/uploads/generated/447c1fe9-9c6e-4b75-8ceb-66d92f057f3a.png", "20": "https://refineria.onrender.com/uploads/generated/69ea05be-8921-4973-8da1-4238aa9886ca.jpg", "21": "https://refineria.onrender.com/uploads/generated/ea0ffa64-764a-4c9d-be73-e24214663516.jpg", "22": "https://refineria.onrender.com/uploads/generated/e15178ad-c410-4a54-8a38-cb568a6776fb.png", "23": "https://refineria.onrender.com/uploads/generated/cf7ad997-7ab8-4632-b040-864271d08e4f.jpg", "24": "https://refineria.onrender.com/uploads/generated/d8e84ac0-d33a-4fd5-bb99-c774c73d6549.png", "25": "https://refineria.onrender.com/uploads/generated/759c8571-bbe9-4ca4-86a3-d9748750f8d9.jpg", "26": "https://refineria.onrender.com/uploads/generated/cd13dcda-5c0a-4966-b009-b018eaf56e97.jpg", "27": "https://refineria.onrender.com/uploads/generated/833c4d8d-14bb-4bc1-b80c-4253d1b6cafe.png", "28": "https://refineria.onrender.com/uploads/generated/594bcfdc-64dd-4f5c-b553-736002b3e422.jpg", "29": "https://refineria.onrender.com/uploads/generated/6141dce7-6a84-4eb8-b049-761b6e5f5f98.jpg", "30": "https://refineria.onrender.com/uploads/generated/8c5ead88-e667-4f74-b97e-4ee82ba97efa.png", "31": "https://refineria.onrender.com/uploads/generated/f4987155-7c72-41d7-b3ef-dc70fbeab918.jpg", "32": "https://refineria.onrender.com/uploads/generated/72997335-347e-4cef-bcea-c392c9fa2088.png", "33": "https://refineria.onrender.com/uploads/generated/48ff39ed-0f4c-46d3-8853-d261856d187d.png", "34": "https://refineria.onrender.com/uploads/generated/3ecf3b4d-fbf9-4883-b248-1110f20ffee9.png", "35": "https://refineria.onrender.com/uploads/generated/449326e2-3ff9-45d8-b38b-d59ab0c4860b.png", "36": "https://refineria.onrender.com/uploads/generated/770fad08-a18a-4c19-92f6-ccc1a183d689.png", "37": "https://refineria.onrender.com/uploads/generated/4d999d94-c17a-47e6-b183-d4ba33277717.png", "38": "https://refineria.onrender.com/uploads/generated/e912eee4-cdf9-4d5f-94c8-2db17f5e89a6.png", "39": "https://refineria.onrender.com/uploads/generated/d0e758eb-3150-423e-b9bc-b4dc561932b6.png", "40": "https://refineria.onrender.com/uploads/generated/ada888d1-2a13-4751-870d-1cce56853cfb.png", "41": "https://refineria.onrender.com/uploads/generated/77f0b5eb-992c-4a2f-bdb0-c600869f07b6.png", "42": "https://refineria.onrender.com/uploads/generated/22fe2e7a-5ebd-4dd6-944f-617dd3817e37.png", "43": "https://refineria.onrender.com/uploads/generated/907cec2c-04bf-496c-9faf-b8e2b26dc57e.jpg", "44": "https://refineria.onrender.com/uploads/generated/7d097b05-a86e-4dbc-bdb7-d4a3459488e1.jpg", "45": "https://refineria.onrender.com/uploads/generated/d5b48eef-85a9-4a6d-9bba-46e809e7a177.png"};
+// ── VEHICLES IN PANEL (with toy numbers) ──────────────────────
+const VEHICLES_IN_PANEL = {"01": [{"name": "Excavator", "sku": "JKH38"}], "02": [{"name": "Excavator", "sku": "JKH38"}, {"name": "Rescue Helicopter", "sku": "JKH39"}], "04": [{"name": "Excavator", "sku": "JKH38"}, {"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Bulldozer", "sku": "JFB96"}, {"name": "Turf Hauler", "sku": "HFB90"}, {"name": "Rescue Helicopter", "sku": "JKH39"}], "05": [], "06": [{"name": "Excavator", "sku": "JKH38"}, {"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Bulldozer", "sku": "JFB96"}, {"name": "Turf Hauler", "sku": "HFB90"}, {"name": "Rescue Helicopter", "sku": "JKH39"}], "07": [{"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Bulldozer", "sku": "JFB96"}, {"name": "Turf Hauler", "sku": "HFB90"}, {"name": "Rescue Helicopter", "sku": "JKH39"}], "08": [{"name": "Bulldozer", "sku": "JFB96"}], "09": [{"name": "Land Rover 6x6", "sku": "JKH28"}], "10": [{"name": "Turf Hauler", "sku": "HFB90"}], "11": [{"name": "Rescue Helicopter", "sku": "JKH39"}], "12": [{"name": "Excavator", "sku": "JKH38"}, {"name": "Turf Hauler", "sku": "HFB90"}, {"name": "Land Rover 6x6", "sku": "JKH28"}], "13": [{"name": "Excavator", "sku": "JKH38"}], "14": [{"name": "Excavator", "sku": "JKH38"}], "15": [], "16": [], "17": [{"name": "Excavator", "sku": "JKH38"}, {"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Bulldozer", "sku": "JFB96"}, {"name": "Turf Hauler", "sku": "HFB90"}], "18": [{"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Excavator", "sku": "JKH38"}, {"name": "Bulldozer", "sku": "JFB96"}, {"name": "Turf Hauler", "sku": "HFB90"}], "19": [], "20": [{"name": "Turf Hauler", "sku": "HFB90"}, {"name": "Land Rover 6x6", "sku": "JKH28"}], "21": [{"name": "Excavator", "sku": "JKH38"}], "22": [], "23": [{"name": "Bulldozer", "sku": "JFB96"}, {"name": "Land Rover 6x6", "sku": "JKH28"}], "24": [{"name": "Excavator", "sku": "JKH38"}, {"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Turf Hauler", "sku": "HFB90"}], "25": [{"name": "Land Rover 6x6", "sku": "JKH28"}], "26": [], "27": [], "28": [], "29": [], "30": [], "31": [], "32": [{"name": "Excavator", "sku": "JKH38"}], "33": [{"name": "Excavator", "sku": "JKH38"}], "34": [{"name": "Excavator", "sku": "JKH38"}, {"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Bulldozer", "sku": "JFB96"}], "35": [{"name": "Excavator", "sku": "JKH38"}, {"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Bulldozer", "sku": "JFB96"}], "36": [{"name": "Excavator", "sku": "JKH38"}], "37": [{"name": "Excavator", "sku": "JKH38"}], "38": [{"name": "Excavator", "sku": "JKH38"}], "39": [{"name": "Excavator", "sku": "JKH38"}], "40": [{"name": "Excavator", "sku": "JKH38"}, {"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Bulldozer", "sku": "JFB96"}, {"name": "Turf Hauler", "sku": "HFB90"}, {"name": "Rescue Helicopter", "sku": "JKH39"}], "41": [{"name": "Excavator", "sku": "JKH38"}, {"name": "Bulldozer", "sku": "JFB96"}, {"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Turf Hauler", "sku": "HFB90"}, {"name": "Rescue Helicopter", "sku": "JKH39"}], "42": [{"name": "Excavator", "sku": "JKH38"}, {"name": "Bulldozer", "sku": "JFB96"}], "43": [{"name": "Rescue Helicopter", "sku": "JKH39"}], "44": [{"name": "Rescue Helicopter", "sku": "JKH39"}], "45": [{"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Bulldozer", "sku": "JFB96"}, {"name": "Excavator", "sku": "JKH38"}, {"name": "Rescue Helicopter", "sku": "JKH39"}, {"name": "Turf Hauler", "sku": "HFB90"}]};
+// ── DIALOGUES (from Script V3, 04/14/2026 Playmation) ─────────
+const SCRIPT_DIALOGUES = {"01": "Crosby (V.O.): Can this crane go any faster, Ted? We've got a deadline. / Ted (V.O.): Just putting safety first, boss. / Crosby (V.O.): Of course. Of course. But, maybe could you safely hurry up. Please.", "02": "Crosby (V.O.): (narration) Charmaine and Crosby work to install the water tank on the roof of the city's newest skyscraper. / Charmaine (V.O.): Wow, Crosby. This will be the tallest building in the city... if we can finish it! / Crosby (V.O.): We're gonna finish it... today... by noon. I've got it all planned out to the very last nail. And, I've got the best construction crew in town.", "04": "Crosby (V.O.): Aimee, Sean, Charmaine and Ted...", "05": "Crosby (V.O.): If everyone keeps working together and following my plans exactly, this building will be done in time for the ribbon cutting ceremony.", "06": "Crosby (V.O.): You're my crack construction crew and the clock is ticking. Let's get to work. / ALL (V.O.): (construction worker walla: we got this, grab your helmets, I love building stuff, when's lunch).", "07": "Crosby (V.O.): (narration) Everybody in the crew climbs into their work vehicles and starts 'em up!", "08": "Crosby (V.O.): Aimee, we need to clear that concrete rubble. / Aimee (V.O.): On it, chief!", "09": "Crosby (V.O.): Sean, how're we looking with that electrical transformer? / Sean (V.O.): Got it right here, boss!", "10": "Crosby (V.O.): Ted, hurry up with that fresh soil for the flower bed. / Ted (V.O.): Consider that dirt dumped!", "11": "Charmaine (V.O.): (narration) Charmaine, carefully flies in a giant pane of window glass. (as Charmaine) Whoo-hoo! / Crosby (V.O.): I thought you said \"carefully?\" / Charmaine (V.O.): Oh, right. Let me try that again. (narration) Charmaine, super duper carefully flies in a giant pane of window glass.", "12": "Crosby (V.O.): (narration) With everything almost done, Crosby installs the flag pole.", "13": "Crosby (V.O.): (narration) The monster bucket of the excavator plunges into the ground. / Charmaine (V.O.): (narration) But it clunks into something. Some sort of very old stone tablet. Oh, no! Crosby's Excavator triggers the ancient booby trap of the Cavern of the Stone Crocodile.", "14": "Charmaine (V.O.): (narration) Whoa! The ground begins to shake.", "15": "Charmaine (V.O.): (narration) Then the building starts to shake. And then...", "16": "Charmaine (V.O.): (narration) The entire building lowers on a giant, stone platform into the legendary underground Cavern of the Stone Crocodile.", "17": "Charmaine (V.O.): (narration) Everyone is okay, but the crew and their vehicles are all at the bottom of a huge cavern with steep walls and a watery floor!", "18": "Crosby (V.O.): Charmaine, what did you do to my beautiful building? I had a plan.", "19": "Charmaine (V.O.): It wasn't me. It was the ancient crocodile booby trap. (then) Pretty cool challenge, huh?", "20": "Crosby (V.O.): Hmmm. As a builder, I do love a challenge.", "21": "Sean/Aimee/Ted/Charmaine (V.O.): (concerned walla: this seems impossible, there's no way out, what are we gonna do, did anyone bring snacks) / Crosby (V.O.): It's okay everyone. I've drawn up a new plan! We're gonna build our way out!", "22": "Crosby (V.O.): We can use our construction materials and trucks to build a ramp all the way out.", "23": "Crosby (V.O.): Aimee, please start pushing all the dirt you can between the building and the cavern wall. / Aimee (V.O.): On it, chief! / Crosby (V.O.): Sean, please pull those sheets of plywood into a ramp.", "24": "Charmaine (V.O.): (narration) But, as they go higher, the dirt ramp becomes unstable. / Crosby (V.O.): (narration) Right. And Crosby thought of that. So the Excavator supports a platform to get everyone into the building. / Charmaine (V.O.): Great idea! Because the building is more sturdy. / Aimee (V.O.): Way to go, Crosby! The plan is working!", "25": "Crosby (V.O.): We'll safely build the ramp up from here. / Charmaine (V.O.): (narration) Which would totally work, buuut Sean bumps some scaffolding, sending a paint can falling to the bottom of the cavern. / Sean (V.O.): (clocking Charmaine's idea) Whoops. Well, it's just a little paint can. Shouldn't cause any problems. / Charmaine (V.O.): Actually, it hits another booby trap! / ALL (V.O.): (in unison) Oh no!", "26": "Charmaine (V.O.): Crosby! Look! The crocodile head is now gushing water.", "27": "Charmaine (V.O.): The cavern is filling up fast. Like, really fast. / Crosby (V.O.): (narration) Crosby quickly revises the blueprints to make a bridge from the building to the crocodile head. (as Crosby) If we can push down the head it will shut the mouth and stop the water!", "28": "Charmaine (V.O.): There's not enough time. That water is rising super fast, Crosby. What do we do?", "29": "Charmaine (V.O.): (rushing water) ShoooOSH! / Crosby (V.O.): Urgh! Every time I make a plan, something changes.", "30": "Charmaine (V.O.): Crosby, maybe adventure is what happens outside of the blueprints.", "31": "Crosby (V.O.): No blueprints? Okay. I can do that. Let's go!", "32": "Crosby (V.O.): Charmaine! Hop in the crane and lower the vehicle platform! / Charmaine (V.O.): Sure thing!", "33": "Crosby (V.O.): (narration) Crosby tells the crew his wild plan to get on top of the croc head as fast as possible. (as Crosby) We're gonna use the crane's platform. / Charmaine (V.O.): (narration) Charmaine climbs up into the huge crane and lowers the platform into the cavern. (as Charmaine) I don't think that it'll reach.", "34": "Crosby (V.O.): It will if we swing across the gap. / Ted (V.O.): In what? / Crosby (V.O.): The Excavator! / Sean/Ted/Aimee/Charmaine (V.O.): (disbelief) The Excavator?", "35": "Sean (V.O.): Here's a boost, Crosby! / Aimee (V.O.): You can do this! / ALL (V.O.): (big effort interjection) HUH!", "36": "Crosby (V.O.): (as Crosby) WhooOa! (narration) The Excavator just barely makes it onto the platform and uses its bucket arm to stop. / Charmaine (V.O.): Did he make it? / Ted (V.O.): Yep, and it was crazy!", "37": "Crosby (V.O.): The huge Excavator swings through the air. Back and forth. Back and forth. Building up momentum. / Charmaine (V.O.): I've got you, Crosby! / ALL (V.O.): GO CROSBY!", "38": "Charmaine (V.O.): (narration) Crosby floors the Excavator! Giving the treads every ounce of power it has to jump off the swinging platform. / Crosby (V.O.): Come on Goldie! / Sean (V.O.): It's gonna be close! / Ted (V.O.): Did he name his Excavator Goldie?", "39": "Charmaine (V.O.): (narration) He lands perfectly on the crocodile head. / Aimee (V.O.): Look! The weight of the Excavator is closing the mouth. The water is stopping! He did it! / Crosby (V.O.): Ooof! Yes! Nailed it! Whew!", "40": "ALL (V.O.): (cheering) Way to go Crosby! You did it! Wow! Do it again!", "41": "Crosby (V.O.): We've created the world's first ever underground skyscraper. / Ted (V.O.): I think you mean \"ground\"-scraper. / ALL (V.O.): (mix of cheers, laughter, and groans).", "42": "Sean (V.O.): With a huge pool. / Aimee (V.O.): Great views. / Ted (V.O.): And vintage art!", "43": "Crosby (V.O.): That was the wildest building project I've ever done! / Charmaine (V.O.): Yeah. You did something pretty amazing with no blueprints.", "44": "Crosby (V.O.): I couldn't have done without the best construction team in the city!", "45": "Crosby (V.O.): Nothing can stop the... / ALL (V.O.): MATCHBOX CREW!"};
+// ── ADDRESSED IN COLOR (draft from MATTEL feedback) ───────────
+const ADDRESSED = {};
+
+// ── ACTION DESCRIPTIONS (from script) ──────────────────────────
+const ACTIONS = {};
+
+// ── MATTEL FEEDBACK ────────────────────────────────────────────
+const MATTEL_FEEDBACK = {};
+
+// ── PANEL DATA ─────────────────────────────────────────────────
+const PANELS = [
+  {
+    "num": "01",
+    "label": "01",
+    "scene": "ADVENTURE WORLD · CONSTRUCTION SITE",
+    "dialogue": "Crosby (V.O.): Can this crane go any faster, Ted? We've got a deadline. / Ted (V.O.): Just putting safety first, boss. / Crosby (V.O.): Of course. Of course. But, maybe could you safely hurry up. Please.",
+    "chars": []
+  },
+  {
+    "num": "02",
+    "label": "02",
+    "scene": "ADVENTURE WORLD · CONSTRUCTION SITE",
+    "dialogue": "Crosby (V.O.): (narration) Charmaine and Crosby work to install the water tank on the roof of the city's newest skyscraper. / Charmaine (V.O.): Wow, Crosby. This will be the tallest building in the city... if we can finish it! / Crosby (V.O.): We're gonna finish it... today... by noon. I've got it all planned out to the very last nail. And, I've got the best construction crew in town.",
+    "chars": []
+  },
+  {
+    "num": "04",
+    "label": "04",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Crosby (V.O.): Aimee, Sean, Charmaine and Ted...",
+    "chars": []
+  },
+  {
+    "num": "05",
+    "label": "05",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Crosby (V.O.): If everyone keeps working together and following my plans exactly, this building will be done in time for the ribbon cutting ceremony.",
+    "chars": []
+  },
+  {
+    "num": "06",
+    "label": "06",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Crosby (V.O.): You're my crack construction crew and the clock is ticking. Let's get to work. / ALL (V.O.): (construction worker walla: we got this, grab your helmets, I love building stuff, when's lunch).",
+    "chars": []
+  },
+  {
+    "num": "07",
+    "label": "07",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Crosby (V.O.): (narration) Everybody in the crew climbs into their work vehicles and starts 'em up!",
+    "chars": []
+  },
+  {
+    "num": "08",
+    "label": "08",
+    "scene": "ADVENTURE WORLD · CONSTRUCTION SITE",
+    "dialogue": "Crosby (V.O.): Aimee, we need to clear that concrete rubble. / Aimee (V.O.): On it, chief!",
+    "chars": []
+  },
+  {
+    "num": "09",
+    "label": "09",
+    "scene": "ADVENTURE WORLD · CONSTRUCTION SITE",
+    "dialogue": "Crosby (V.O.): Sean, how're we looking with that electrical transformer? / Sean (V.O.): Got it right here, boss!",
+    "chars": []
+  },
+  {
+    "num": "10",
+    "label": "10",
+    "scene": "ADVENTURE WORLD · CONSTRUCTION SITE",
+    "dialogue": "Crosby (V.O.): Ted, hurry up with that fresh soil for the flower bed. / Ted (V.O.): Consider that dirt dumped!",
+    "chars": []
+  },
+  {
+    "num": "11",
+    "label": "11",
+    "scene": "ADVENTURE WORLD · CONSTRUCTION SITE",
+    "dialogue": "Charmaine (V.O.): (narration) Charmaine, carefully flies in a giant pane of window glass. (as Charmaine) Whoo-hoo! / Crosby (V.O.): I thought you said \"carefully?\" / Charmaine (V.O.): Oh, right. Let me try that again. (narration) Charmaine, super duper carefully flies in a giant pane of window glass.",
+    "chars": []
+  },
+  {
+    "num": "12",
+    "label": "12",
+    "scene": "ADVENTURE WORLD · CONSTRUCTION SITE",
+    "dialogue": "Crosby (V.O.): (narration) With everything almost done, Crosby installs the flag pole.",
+    "chars": []
+  },
+  {
+    "num": "13",
+    "label": "13",
+    "scene": "ADVENTURE WORLD · CONSTRUCTION SITE",
+    "dialogue": "Crosby (V.O.): (narration) The monster bucket of the excavator plunges into the ground. / Charmaine (V.O.): (narration) But it clunks into something. Some sort of very old stone tablet. Oh, no! Crosby's Excavator triggers the ancient booby trap of the Cavern of the Stone Crocodile.",
+    "chars": []
+  },
+  {
+    "num": "14",
+    "label": "14",
+    "scene": "ADVENTURE WORLD · CONSTRUCTION SITE",
+    "dialogue": "Charmaine (V.O.): (narration) Whoa! The ground begins to shake.",
+    "chars": []
+  },
+  {
+    "num": "15",
+    "label": "15",
+    "scene": "ADVENTURE WORLD · CONSTRUCTION SITE",
+    "dialogue": "Charmaine (V.O.): (narration) Then the building starts to shake. And then...",
+    "chars": []
+  },
+  {
+    "num": "16",
+    "label": "16",
+    "scene": "ADVENTURE WORLD · UNDERGROUND CAVERN",
+    "dialogue": "Charmaine (V.O.): (narration) The entire building lowers on a giant, stone platform into the legendary underground Cavern of the Stone Crocodile.",
+    "chars": []
+  },
+  {
+    "num": "17",
+    "label": "17",
+    "scene": "ADVENTURE WORLD · UNDERGROUND CAVERN",
+    "dialogue": "Charmaine (V.O.): (narration) Everyone is okay, but the crew and their vehicles are all at the bottom of a huge cavern with steep walls and a watery floor!",
+    "chars": []
+  },
+  {
+    "num": "18",
+    "label": "18",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Crosby (V.O.): Charmaine, what did you do to my beautiful building? I had a plan.",
+    "chars": []
+  },
+  {
+    "num": "19",
+    "label": "19",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Charmaine (V.O.): It wasn't me. It was the ancient crocodile booby trap. (then) Pretty cool challenge, huh?",
+    "chars": []
+  },
+  {
+    "num": "20",
+    "label": "20",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Crosby (V.O.): Hmmm. As a builder, I do love a challenge.",
+    "chars": []
+  },
+  {
+    "num": "21",
+    "label": "21",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Sean/Aimee/Ted/Charmaine (V.O.): (concerned walla: this seems impossible, there's no way out, what are we gonna do, did anyone bring snacks) / Crosby (V.O.): It's okay everyone. I've drawn up a new plan! We're gonna build our way out!",
+    "chars": []
+  },
+  {
+    "num": "22",
+    "label": "22",
+    "scene": "ADVENTURE WORLD · UNDERGROUND CAVERN",
+    "dialogue": "Crosby (V.O.): We can use our construction materials and trucks to build a ramp all the way out.",
+    "chars": []
+  },
+  {
+    "num": "23",
+    "label": "23",
+    "scene": "ADVENTURE WORLD · UNDERGROUND CAVERN",
+    "dialogue": "Crosby (V.O.): Aimee, please start pushing all the dirt you can between the building and the cavern wall. / Aimee (V.O.): On it, chief! / Crosby (V.O.): Sean, please pull those sheets of plywood into a ramp.",
+    "chars": []
+  },
+  {
+    "num": "24",
+    "label": "24",
+    "scene": "ADVENTURE WORLD · UNDERGROUND CAVERN",
+    "dialogue": "Charmaine (V.O.): (narration) But, as they go higher, the dirt ramp becomes unstable. / Crosby (V.O.): (narration) Right. And Crosby thought of that. So the Excavator supports a platform to get everyone into the building. / Charmaine (V.O.): Great idea! Because the building is more sturdy. / Aimee (V.O.): Way to go, Crosby! The plan is working!",
+    "chars": []
+  },
+  {
+    "num": "25",
+    "label": "25",
+    "scene": "ADVENTURE WORLD · UNDERGROUND CAVERN",
+    "dialogue": "Crosby (V.O.): We'll safely build the ramp up from here. / Charmaine (V.O.): (narration) Which would totally work, buuut Sean bumps some scaffolding, sending a paint can falling to the bottom of the cavern. / Sean (V.O.): (clocking Charmaine's idea) Whoops. Well, it's just a little paint can. Shouldn't cause any problems. / Charmaine (V.O.): Actually, it hits another booby trap! / ALL (V.O.): (in unison) Oh no!",
+    "chars": []
+  },
+  {
+    "num": "26",
+    "label": "26",
+    "scene": "ADVENTURE WORLD · UNDERGROUND CAVERN",
+    "dialogue": "Charmaine (V.O.): Crosby! Look! The crocodile head is now gushing water.",
+    "chars": []
+  },
+  {
+    "num": "27",
+    "label": "27",
+    "scene": "ADVENTURE WORLD · UNDERGROUND CAVERN",
+    "dialogue": "Charmaine (V.O.): The cavern is filling up fast. Like, really fast. / Crosby (V.O.): (narration) Crosby quickly revises the blueprints to make a bridge from the building to the crocodile head. (as Crosby) If we can push down the head it will shut the mouth and stop the water!",
+    "chars": []
+  },
+  {
+    "num": "28",
+    "label": "28",
+    "scene": "ADVENTURE WORLD · UNDERGROUND CAVERN",
+    "dialogue": "Charmaine (V.O.): There's not enough time. That water is rising super fast, Crosby. What do we do?",
+    "chars": []
+  },
+  {
+    "num": "29",
+    "label": "29",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Charmaine (V.O.): (rushing water) ShoooOSH! / Crosby (V.O.): Urgh! Every time I make a plan, something changes.",
+    "chars": []
+  },
+  {
+    "num": "30",
+    "label": "30",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Charmaine (V.O.): Crosby, maybe adventure is what happens outside of the blueprints.",
+    "chars": []
+  },
+  {
+    "num": "31",
+    "label": "31",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Crosby (V.O.): No blueprints? Okay. I can do that. Let's go!",
+    "chars": []
+  },
+  {
+    "num": "32",
+    "label": "32",
+    "scene": "ADVENTURE WORLD · UNDERGROUND CAVERN",
+    "dialogue": "Crosby (V.O.): Charmaine! Hop in the crane and lower the vehicle platform! / Charmaine (V.O.): Sure thing!",
+    "chars": []
+  },
+  {
+    "num": "33",
+    "label": "33",
+    "scene": "ADVENTURE WORLD · UNDERGROUND CAVERN",
+    "dialogue": "Crosby (V.O.): (narration) Crosby tells the crew his wild plan to get on top of the croc head as fast as possible. (as Crosby) We're gonna use the crane's platform. / Charmaine (V.O.): (narration) Charmaine climbs up into the huge crane and lowers the platform into the cavern. (as Charmaine) I don't think that it'll reach.",
+    "chars": []
+  },
+  {
+    "num": "34",
+    "label": "34",
+    "scene": "ADVENTURE WORLD · UNDERGROUND CAVERN",
+    "dialogue": "Crosby (V.O.): It will if we swing across the gap. / Ted (V.O.): In what? / Crosby (V.O.): The Excavator! / Sean/Ted/Aimee/Charmaine (V.O.): (disbelief) The Excavator?",
+    "chars": []
+  },
+  {
+    "num": "35",
+    "label": "35",
+    "scene": "ADVENTURE WORLD · UNDERGROUND CAVERN",
+    "dialogue": "Sean (V.O.): Here's a boost, Crosby! / Aimee (V.O.): You can do this! / ALL (V.O.): (big effort interjection) HUH!",
+    "chars": []
+  },
+  {
+    "num": "36",
+    "label": "36",
+    "scene": "ADVENTURE WORLD · UNDERGROUND CAVERN",
+    "dialogue": "Crosby (V.O.): (as Crosby) WhooOa! (narration) The Excavator just barely makes it onto the platform and uses its bucket arm to stop. / Charmaine (V.O.): Did he make it? / Ted (V.O.): Yep, and it was crazy!",
+    "chars": []
+  },
+  {
+    "num": "37",
+    "label": "37",
+    "scene": "ADVENTURE WORLD · UNDERGROUND CAVERN",
+    "dialogue": "Crosby (V.O.): The huge Excavator swings through the air. Back and forth. Back and forth. Building up momentum. / Charmaine (V.O.): I've got you, Crosby! / ALL (V.O.): GO CROSBY!",
+    "chars": []
+  },
+  {
+    "num": "38",
+    "label": "38",
+    "scene": "ADVENTURE WORLD · UNDERGROUND CAVERN",
+    "dialogue": "Charmaine (V.O.): (narration) Crosby floors the Excavator! Giving the treads every ounce of power it has to jump off the swinging platform. / Crosby (V.O.): Come on Goldie! / Sean (V.O.): It's gonna be close! / Ted (V.O.): Did he name his Excavator Goldie?",
+    "chars": []
+  },
+  {
+    "num": "39",
+    "label": "39",
+    "scene": "ADVENTURE WORLD · UNDERGROUND CAVERN",
+    "dialogue": "Charmaine (V.O.): (narration) He lands perfectly on the crocodile head. / Aimee (V.O.): Look! The weight of the Excavator is closing the mouth. The water is stopping! He did it! / Crosby (V.O.): Ooof! Yes! Nailed it! Whew!",
+    "chars": []
+  },
+  {
+    "num": "40",
+    "label": "40",
+    "scene": "ADVENTURE WORLD · UNDERGROUND CAVERN",
+    "dialogue": "ALL (V.O.): (cheering) Way to go Crosby! You did it! Wow! Do it again!",
+    "chars": []
+  },
+  {
+    "num": "41",
+    "label": "41",
+    "scene": "ADVENTURE WORLD · CONSTRUCTION SITE",
+    "dialogue": "Crosby (V.O.): We've created the world's first ever underground skyscraper. / Ted (V.O.): I think you mean \"ground\"-scraper. / ALL (V.O.): (mix of cheers, laughter, and groans).",
+    "chars": []
+  },
+  {
+    "num": "42",
+    "label": "42",
+    "scene": "ADVENTURE WORLD · CONSTRUCTION SITE",
+    "dialogue": "Sean (V.O.): With a huge pool. / Aimee (V.O.): Great views. / Ted (V.O.): And vintage art!",
+    "chars": []
+  },
+  {
+    "num": "43",
+    "label": "43",
+    "scene": "ADVENTURE WORLD · CONSTRUCTION SITE",
+    "dialogue": "Crosby (V.O.): That was the wildest building project I've ever done! / Charmaine (V.O.): Yeah. You did something pretty amazing with no blueprints.",
+    "chars": []
+  },
+  {
+    "num": "44",
+    "label": "44",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Crosby (V.O.): I couldn't have done without the best construction team in the city!",
+    "chars": []
+  },
+  {
+    "num": "45",
+    "label": "45",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Crosby (V.O.): Nothing can stop the... / ALL (V.O.): MATCHBOX CREW!",
+    "chars": []
+  }
+];
+
+const VILLAIN = ['Von Steele'];
+
+function imgSrc(num) {
+  return COLOR_URLS[num.padStart(2,'0')] || '';
+}
+
+function renderPanels() {
+  const container = document.getElementById('panels-container');
+  container.innerHTML = '';
+
+  PANELS.forEach(p => {
+    const src = imgSrc(p.num);
+
+    const chars = p.chars.map(c =>
+      `<span class="char-tag">${c}</span>`
+    ).join('');
+
+    container.innerHTML += `
+    <div class="page panel-page">
+      <!-- HEADER -->
+      <div class="panel-page-header">
+        <span class="ph-ep">CVY26_001_105</span>
+        <span class="ph-title">Color Review · Booby Trap Building!</span>
+        <span class="ph-num">PANEL ${p.label}</span>
+      </div>
+
+      <!-- SPACER -->
+      <div class="panel-spacer"></div>
+
+      <!-- IMAGE: full width -->
+      <div class="panel-img-col">
+        ${false ? `
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#111;">
+          <div style="font-size:80px;font-weight:900;letter-spacing:12px;color:rgba(255,255,255,0.08);transform:rotate(-35deg);text-transform:uppercase;user-select:none;">PENDING</div>
+        </div>` : `
+        <img src="${src}" alt="Panel ${p.label}"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="panel-img-placeholder" style="display:none">
+          <div class="pip-icon"></div>
+          <div class="pip-label">Panel ${p.label}<br>Color</div>
+        </div>`}
+      </div>
+
+      <!-- INFO: below image -->
+      <div class="panel-info-section">
+        <div class="panel-info-row">
+
+          <!-- LEFT: num + scene + visual -->
+          <div class="panel-info-main">
+            <div class="panel-num-badge">
+              <div class="panel-num">${p.label.replace(/[A-Z–]/g,'')}</div>
+              ${p.label.match(/[A-Z–]/) ? `<div class="panel-num-sub">${p.label}</div>` : ''}
+              ${p.scene ? `<div class="panel-num-sub" style="color:var(--accent);font-size:8px;letter-spacing:2px;text-transform:uppercase">${p.scene}</div>` : ''}
+            </div>
+          </div>
+
+          <!-- RIGHT: dialogue + chars + notes -->
+          <div class="panel-info-side">
+            ${(() => {
+              const dlg = (SCRIPT_DIALOGUES[p.num] !== undefined ? SCRIPT_DIALOGUES[p.num] : p.dialogue) || '';
+              return dlg.trim() ? `<div class="dialogue-block">
+              <div class="info-label">Dialogue / VO</div>
+              <div class="editable" contenteditable="true">${dlg.replace(/\n/g,'<br>')}</div>
+            </div>` : '';
+            })()}
+
+            ${(VEHICLES_IN_PANEL[p.num] && VEHICLES_IN_PANEL[p.num].length) ? `
+            <div class="info-block">
+              <div class="info-label">Vehicles in Panel</div>
+              <div class="chars-in-scene" style="flex-direction:column;align-items:flex-start;gap:4px;">${VEHICLES_IN_PANEL[p.num].map(v => `<span class="char-tag" style="display:block;width:fit-content;">${v.name} <span style="opacity:0.7;font-weight:400">· #${v.sku}</span></span>`).join('')}</div>
+            </div>` : ''}
+
+            <div class="info-block caveats-block" style="margin-top:auto">
+              <div class="info-label">Caveats:</div>
+              <div class="editable caveat-field" contenteditable="true"
+                   data-panel="${p.num}"
+                   data-placeholder="Production notes for the client..."></div>
+            </div>
+          </div>
+
+        </div><!-- /panel-info-row -->
+
+
+      </div><!-- /panel-info-section -->
+    </div>`;
+  });
+}
+
+function renderStoryboard() {
+  const container = document.getElementById('panels-container');
+  const cells = PANELS.map(p => {
+    const src = imgSrc(p.num);
+    return `
+    <div class="sb-cell">
+      <div class="sb-img-wrap">
+        <img src="${src}" alt="Panel ${p.label}"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="sb-placeholder" style="display:none">${p.label}</div>
+      </div>
+      <div class="sb-label">${p.label}</div>
+    </div>`;
+  }).join('');
+
+  container.innerHTML += `
+  <div class="page storyboard-page">
+    <div class="sb-header">
+      <div class="sb-eyebrow">CVY26_001_105 · Color Review · Episode 105</div>
+      <div class="sb-title">Color <span>Overview</span></div>
+      <div class="sb-subtitle">Booby Trap Building! · 44 Panels</div>
+    </div>
+    <div class="sb-grid">${cells}</div>
+  </div>`;
+}
+
+let editingOn = true;
+function toggleEditing() {
+  editingOn = !editingOn;
+  document.querySelectorAll('[contenteditable]').forEach(el => {
+    el.contentEditable = editingOn ? 'true' : 'false';
+  });
+}
+
+</script>
+
+<div id="panels-container"></div>
+<script>
+renderPanels();
+renderStoryboard();
+
+/* ── JSONBIN SYNC (color review uses _color suffix so it doesn't collide with line-art bin) ── */
+const REVIEW_BIN_ID  = '6a0a5ddf250b1311c3667973';
+const REVIEW_BIN_KEY = '$2a$10$G/S5QC8pq2vpHyiOEdxjp.rmJOR4deLMjyDvs1.Zq7W9dMQt9uqQq';
+const BIN_URL = 'https://api.jsonbin.io/v3/b/' + REVIEW_BIN_ID;
+
+async function loadAnnotations() {
+  try {
+    const res = await fetch(BIN_URL + '/latest', {
+      headers: { 'X-Master-Key': REVIEW_BIN_KEY, 'X-Bin-Meta': 'false' }
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    const caveats = data.caveats_color || {};
+    document.querySelectorAll('.caveat-field[data-panel]').forEach(el => {
+      const v = caveats[el.dataset.panel];
+      if (v) el.textContent = v;
+    });
+    const addressed = data.addressed_color || {};
+    document.querySelectorAll('.addressed-list[data-panel]').forEach(el => {
+      const v = addressed[el.dataset.panel];
+      if (v) el.innerHTML = v;
+    });
+  } catch(e) {}
+}
+
+let _saveTimer = null;
+function scheduleSync() {
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(saveAnnotations, 1500);
+}
+
+async function saveAnnotations() {
+  // Fetch existing to merge — don't wipe line-art caveats stored under `caveats`
+  let existing = {};
+  try {
+    const r = await fetch(BIN_URL + '/latest', { headers: { 'X-Master-Key': REVIEW_BIN_KEY, 'X-Bin-Meta': 'false' } });
+    if (r.ok) existing = await r.json();
+  } catch(e) {}
+  const caveats_color = {};
+  document.querySelectorAll('.caveat-field[data-panel]').forEach(el => {
+    const v = el.textContent.trim();
+    if (v) caveats_color[el.dataset.panel] = v;
+  });
+  const addressed_color = {};
+  document.querySelectorAll('.addressed-list[data-panel]').forEach(el => {
+    const v = el.innerHTML.trim();
+    if (v) addressed_color[el.dataset.panel] = v;
+  });
+  const payload = Object.assign({}, existing, { caveats_color, addressed_color });
+  try {
+    await fetch(BIN_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': REVIEW_BIN_KEY },
+      body: JSON.stringify(payload)
+    });
+  } catch(e) {}
+}
+
+// Escuchar cambios en caveats y addressed
+document.querySelectorAll('.caveat-field[data-panel], .addressed-list[data-panel]').forEach(el => {
+  el.addEventListener('input', scheduleSync);
+});
+
+// Cargar al abrir
+loadAnnotations();
+</script>
+
+<!-- THANKS PAGE -->
+<div class="page" style="display:flex;flex-direction:column;">
+  <div class="panel-page-header">
+    <span class="ph-ep">CVY26_001_105</span>
+    <span class="ph-title">Color Review · Booby Trap Building!</span>
+    <span class="ph-num"></span>
+  </div>
+  <div style="flex:1;display:flex;justify-content:center;align-items:center;text-align:center;">
+    <div class="cover-title">THANKS<span style="color:var(--accent)">!</span></div>
+  </div>
+</div>
+
+</div><!-- /doc-wrapper -->
+</body>
+</html>

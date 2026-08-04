@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CVY26_001_106 — Color Review</title>
+<style>
+  /* ── VARIABLES ──────────────────────────────────────────────── */
+  :root {
+    --black: #0a0a0a;
+    --white: #ffffff;
+    --off-white: #f5f5f0;
+    --grey-light: #e8e8e4;
+    --grey-mid: #999;
+    --grey-dark: #333;
+    --accent: #e8002d;
+    --accent-dark: #b5001e;
+    --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --font-mono: 'Courier New', monospace;
+  }
+
+  /* ── RESET ──────────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    background: #e8e8e4;
+    color: var(--black);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ── SCREEN NAV BAR ─────────────────────────────────────────── */
+  #topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: var(--black);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 24px;
+    gap: 16px;
+    border-bottom: 2px solid var(--accent);
+  }
+  #topbar .tb-title {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--white);
+  }
+  #topbar .tb-title span { color: var(--accent); }
+  #topbar .tb-controls { display: flex; gap: 10px; }
+  .tb-btn {
+    background: var(--accent);
+    color: var(--white);
+    border: none;
+    padding: 7px 16px;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .tb-btn:hover { background: var(--accent-dark); }
+  .tb-btn.secondary {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.25);
+    color: rgba(255,255,255,0.7);
+  }
+  .tb-btn.secondary:hover { border-color: var(--white); color: var(--white); background: transparent; }
+
+  /* ── PAGE WRAPPER ───────────────────────────────────────────── */
+  #doc-wrapper {
+    padding-top: 60px;
+  }
+
+  /* ── SHARED PAGE STYLES ─────────────────────────────────────── */
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    background: var(--white);
+    margin: 24px auto;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ── COVER PAGE ─────────────────────────────────────────────── */
+  .cover {
+    background: var(--white);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0;
+  }
+  .cover-stripe {
+    background: var(--accent);
+    height: 10px;
+    width: 100%;
+  }
+  .cover-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 48px 56px;
+    gap: 24px;
+    border-bottom: 1px solid var(--grey-light);
+  }
+  .cover-eyebrow {
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .cover-title {
+    font-size: 42px;
+    font-weight: 900;
+    color: var(--black);
+    line-height: 1.05;
+    letter-spacing: -1px;
+    text-transform: uppercase;
+  }
+  .cover-title span { color: var(--accent); }
+  .cover-subtitle {
+    font-size: 18px;
+    font-weight: 300;
+    color: var(--grey-mid);
+    letter-spacing: 1px;
+  }
+  .cover-divider {
+    width: 48px;
+    height: 2px;
+    background: var(--accent);
+  }
+  .cover-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 32px;
+    padding: 32px 56px 48px;
+  }
+  .cover-meta-item { display: flex; flex-direction: column; gap: 2px; }
+  .cover-meta-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--grey-mid);
+    font-weight: 600;
+  }
+  .cover-meta-value {
+    font-size: 12px;
+    color: var(--grey-dark);
+    font-weight: 500;
+  }
+  .cover-meta-value[contenteditable="true"] {
+    outline: none;
+    border-bottom: 1px dashed var(--grey-light);
+    min-width: 80px;
+    display: inline-block;
+  }
+  .cover-logo-area {
+    position: absolute;
+    bottom: 56px;
+    right: 56px;
+    text-align: right;
+  }
+  .cover-logo {
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 6px;
+    color: var(--grey-light);
+    text-transform: uppercase;
+  }
+  .cover-confidential {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--grey-mid);
+    margin-top: 4px;
+  }
+
+  /* ── SECTION HEADER PAGE ────────────────────────────────────── */
+  .section-page {
+    background: var(--off-white);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 64px 56px;
+    min-height: 160px;
+  }
+  .section-page.compact { min-height: unset; padding: 28px 40px 0; }
+  .section-eyebrow {
+    font-size: 9px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .section-title {
+    font-size: 28px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+    color: var(--black);
+  }
+  .section-rule {
+    width: 100%;
+    height: 1px;
+    background: var(--grey-light);
+    margin: 0 40px;
+  }
+
+  /* ── CHARACTER LINEUP PAGE ──────────────────────────────────── */
+  .lineup-page {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .lineup-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    background: var(--black);
+    border-bottom: 2px solid var(--accent);
+    padding: 14px 28px;
+    flex-shrink: 0;
+  }
+  .lineup-header-title {
+    font-size: 14px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--white);
+  }
+  .lineup-header-ep {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+  }
+  .lineup-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--grey-light);
+  }
+  .char-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    padding: 16px 20px 14px;
+    gap: 10px;
+  }
+
+  .char-img-wrap {
+    width: 100%;
+    background: var(--off-white);
+    overflow: visible;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .char-img-wrap > img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .char-img-placeholder {
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--grey-mid);
+    text-transform: uppercase;
+    text-align: center;
+    padding: 32px;
+  }
+  /* Franja inferior: texto izquierda + pin derecha */
+  .char-bottom {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    border-top: 1px solid var(--grey-light);
+    padding-top: 10px;
+    margin-top: 8px;
+  }
+  .char-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .char-name {
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--black);
+  }
+  .char-role {
+    font-size: 9.5px;
+    color: var(--grey-mid);
+    letter-spacing: 0.3px;
+  }
+  .char-vehicle {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  /* Wardrobe pin — polaroid a la derecha */
+  .char-wardrobe-pin {
+    width: 32%;
+    flex-shrink: 0;
+    background: var(--white);
+    padding: 5px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    transform: rotate(3deg);
+  }
+  .char-wardrobe-pin img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* ── PANEL PAGE ─────────────────────────────────────────────── */
+  .panel-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 297mm;
+  }
+  .panel-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 20px;
+    background: var(--black);
+    border-bottom: 2px solid var(--accent);
+    flex-shrink: 0;
+  }
+  .panel-page-header .ph-ep {
+    font-size: 8px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+  }
+  .panel-page-header .ph-title {
+    font-size: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+  }
+  .panel-page-header .ph-num {
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: var(--accent);
+  }
+
+  /* SPACER between header and image */
+  .panel-spacer {
+    height: 14mm;
+    flex-shrink: 0;
+    background: var(--white);
+  }
+
+  /* IMAGE: full width with 1cm side margins + border frame */
+  .panel-img-col {
+    width: calc(100% - 2cm);
+    margin: 0 1cm;
+    background: var(--black);
+    border: 1px solid #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    aspect-ratio: 16 / 9;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .panel-img-col img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+  .panel-img-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 24px;
+    color: #555;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+  }
+  .panel-img-placeholder .pip-icon {
+    width: 64px;
+    height: 48px;
+    border: 2px dashed currentColor;
+    border-radius: 2px;
+    position: relative;
+  }
+  .panel-img-placeholder .pip-icon::after {
+    content: '';
+    position: absolute;
+    bottom: 8px; left: 8px; right: 8px;
+    height: 2px;
+    background: currentColor;
+    box-shadow: 0 -6px 0 currentColor;
+  }
+  .panel-img-placeholder .pip-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: var(--font-mono);
+    color: #555;
+  }
+
+  /* INFO SECTION: below image */
+  .panel-info-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* top info row: 2 columns */
+  .panel-info-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    flex: 1;
+  }
+
+  /* left col: panel num + scene + visual */
+  .panel-info-main {
+    padding: 14px 20px 14px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-right: 1px solid var(--grey-light);
+  }
+
+  /* right col: dialogue + chars */
+  .panel-info-side {
+    padding: 14px 22px 14px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .panel-num-badge {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .panel-num {
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--black);
+    letter-spacing: -1px;
+  }
+  .panel-num-sub {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--grey-mid);
+    letter-spacing: 1px;
+  }
+
+  .info-block { display: flex; flex-direction: column; gap: 4px; }
+  .info-label {
+    font-size: 7.5px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--grey-mid);
+  }
+  .info-value {
+    font-size: 10.5px;
+    line-height: 1.55;
+    color: var(--grey-dark);
+  }
+
+  /* editable fields */
+  .editable {
+    outline: none;
+    border-bottom: 1px dashed var(--grey-light);
+    min-height: 18px;
+    padding: 2px 0;
+    color: var(--grey-dark);
+    font-size: 10.5px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+  }
+  .editable:empty::before {
+    content: attr(data-placeholder);
+    color: #ccc;
+    font-style: italic;
+    pointer-events: none;
+  }
+  .editable:focus {
+    border-bottom-color: var(--accent);
+    border-bottom-style: solid;
+  }
+
+  /* dialogue block */
+  .dialogue-block {
+    background: var(--off-white);
+    border-left: 3px solid var(--accent);
+    padding: 10px 12px;
+    border-radius: 0 2px 2px 0;
+  }
+  .dialogue-block .info-label { color: var(--accent); }
+  .dialogue-block .editable {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    line-height: 1.6;
+    border-bottom-color: transparent;
+  }
+  .dialogue-block .editable:focus { border-bottom-color: var(--accent); }
+
+  /* chars in scene */
+  .chars-in-scene {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 2px;
+  }
+  .char-tag {
+    font-size: 7.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: var(--grey-light);
+    padding: 2px 7px;
+    border-radius: 2px;
+    color: var(--grey-dark);
+  }
+  .char-tag.villain { background: #fdecea; color: var(--accent); }
+
+  /* notes row: bottom strip */
+  .panel-notes-row {
+    border-top: 1px solid var(--grey-light);
+    padding: 8px 22px 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+  .panel-notes-row .info-label { margin-bottom: 2px; }
+  .panel-notes-row .editable {
+    font-size: 10px;
+    border-bottom-color: transparent;
+  }
+  .panel-notes-row .editable:focus { border-bottom-color: var(--accent); }
+  .notes-col { flex: 1; }
+
+  /* ── WARDROBE PAGE ──────────────────────────────────────────── */
+  .wardrobe-page {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+  }
+  .wardrobe-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    background: var(--grey-light);
+    padding: 0;
+  }
+  .wardrobe-card {
+    background: var(--white);
+    display: flex;
+    flex-direction: column;
+    padding: 16px 12px 14px;
+    gap: 10px;
+  }
+  .wardrobe-img-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--off-white);
+    overflow: hidden;
+  }
+  .wardrobe-img-wrap img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .wardrobe-info {
+    border-top: 1px solid var(--grey-light);
+    padding-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .wardrobe-name {
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--black);
+  }
+  .wardrobe-label {
+    font-size: 8px;
+    color: var(--grey-mid);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  /* ── STORYBOARD PAGE ────────────────────────────────────────── */
+  .storyboard-page {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+  }
+  .sb-header {
+    background: var(--black);
+    border-bottom: 2px solid var(--accent);
+    padding: 18px 24px 14px;
+    flex-shrink: 0;
+  }
+  .sb-eyebrow {
+    font-size: 8px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 4px;
+  }
+  .sb-title {
+    font-size: 22px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+    color: var(--white);
+    line-height: 1;
+  }
+  .sb-title span { color: var(--accent); }
+  .sb-subtitle {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.35);
+    margin-top: 5px;
+    text-transform: uppercase;
+  }
+  .sb-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+    padding: 14px;
+    align-content: start;
+  }
+  .sb-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .sb-img-wrap {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: var(--grey-light);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .sb-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .sb-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    font-family: var(--font-mono);
+    color: #bbb;
+    letter-spacing: 1px;
+  }
+  .sb-label {
+    font-size: 6.5px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--grey-mid);
+    text-align: center;
+    line-height: 1;
+  }
+
+  /* ── PRINT STYLES ───────────────────────────────────────────── */
+  @media print {
+    body { background: white; font-size: 11px; }
+    #topbar { display: none !important; }
+    #doc-wrapper { padding-top: 0; }
+
+    .page {
+      width: 100%;
+      min-height: 100vh;
+      margin: 0;
+      box-shadow: none;
+      page-break-after: always;
+      break-after: page;
+    }
+    .page:last-child { page-break-after: avoid; break-after: avoid; }
+
+    .cover { min-height: 100vh; }
+    .lineup-page { min-height: 100vh; }
+
+    .panel-page {
+      min-height: 100vh;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .panel-img-col { aspect-ratio: 16/9; }
+    .panel-page-header { background: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+    /* Spacer: forzar visibilidad en print */
+    .panel-spacer {
+      height: 14mm !important;
+      min-height: 14mm !important;
+      display: block !important;
+      flex-shrink: 0 !important;
+    }
+
+    /* Lineup: exactamente una página A4, sin overflow */
+    .lineup-page {
+      height: 297mm;
+      overflow: hidden;
+    }
+    .lineup-grid {
+      overflow: hidden;
+    }
+    .char-card {
+      overflow: hidden;
+      min-height: 0;
+    }
+    .char-img-wrap {
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .char-img-wrap > img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: top;
+    }
+
+    .editable:empty::before { color: #ddd; }
+
+    /* Ocultar bloque Caveats si no hay texto escrito */
+    .caveats-block:has(.editable:empty) { display: none; }
+
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── TOP BAR (screen only) ───────────────────────────────────────── -->
+<div id="topbar">
+  <div class="tb-title">CVY26_001 <span>·</span> EP101 <span>·</span> Color Review</div>
+  <div class="tb-controls">
+    <button class="tb-btn secondary" onclick="toggleEditing()">Toggle Editing</button>
+    <button class="tb-btn" onclick="window.print()">Export PDF</button>
+  </div>
+</div>
+
+<div id="doc-wrapper">
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     COVER PAGE
+═══════════════════════════════════════════════════════════════════ -->
+<div class="page cover">
+  <div class="cover-stripe"></div>
+  <div class="cover-body">
+    <div class="cover-eyebrow">Matchbox Crew</div>
+    <div class="cover-title">Color<br><span>Review</span></div>
+    <div class="cover-subtitle">Episode 106 — Volcano Treasure!</div>
+    <div class="cover-divider"></div>
+  </div>
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Project Code</div>
+      <div class="cover-meta-value">CVY26_001</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Episode</div>
+      <div class="cover-meta-value">106 — Volcano Treasure!</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Document Type</div>
+      <div class="cover-meta-value">Color Review Package</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Total Panels</div>
+      <div class="cover-meta-value">44</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Version</div>
+      <div class="cover-meta-value" contenteditable="true" data-placeholder="V1">V1</div>
+    </div>
+  </div>
+  <div class="cover-logo-area">
+    <div class="cover-logo">Convoy</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     CHARACTER LINEUP PAGE — EP106 (Volcano Treasure)
+═══════════════════════════════════════════════════════════════════ -->
+<style>
+  /* EP102: cuadros de vestuario Adventure World +10% (32% -> 35.2%) */
+  .lineup-page .char-wardrobe-pin { width: 35.2%; }
+</style>
+<div class="page lineup-page">
+  <div class="lineup-header">
+    <div class="lineup-header-title">Character Lineup</div>
+    <div class="lineup-header-ep">Episode 106 · Cast · Volcano Treasure</div>
+  </div>
+
+  <div class="lineup-grid">
+
+    <!-- SEAN -->
+    <div class="char-card">
+      <div class="char-img-wrap">
+        <img src="./MATCHBOX-SEAN-turn1.jpg" alt="Sean" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="char-img-placeholder" style="display:none">Sean — Turn 1</div>
+      </div>
+      <div class="char-bottom">
+        <div class="char-info">
+          <div class="char-name">Sean</div>
+          <div class="char-role">Lead — The Spy Kid</div>
+          <div class="char-vehicle">Land Rover 6x6 · #JKH28</div>
+          <div class="char-vehicle">Mustang Fastback · #JKH34</div>
+        </div>
+        <div class="char-wardrobe-pin"><img src="./wardrobe/106/SEAN_EP106.png" alt="Sean wardrobe"></div>
+
+      </div>
+    </div>
+
+    <!-- TED -->
+    <div class="char-card">
+      <div class="char-img-wrap">
+        <img src="./MATCHBOX-TED-turn1.jpg" alt="Ted" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="char-img-placeholder" style="display:none">Ted — Turn 1</div>
+      </div>
+      <div class="char-bottom">
+        <div class="char-info">
+          <div class="char-name">Ted</div>
+          <div class="char-role">Crew Leader</div>
+          <div class="char-vehicle">Triumph Scrambler · #JKH31</div>
+        </div>
+        <div class="char-wardrobe-pin">
+          <img src="./wardrobe/106/TED_EP106.png" alt="Ted wardrobe">
+        </div>
+      </div>
+    </div>
+
+    <!-- CHARMAINE -->
+    <div class="char-card">
+      <div class="char-img-wrap">
+        <img src="./MATCHBOX-CHARMAINErevisedHAIR.jpg" alt="Charmaine" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="char-img-placeholder" style="display:none">Charmaine — Turn 1</div>
+      </div>
+      <div class="char-bottom">
+        <div class="char-info">
+          <div class="char-name">Charmaine</div>
+          <div class="char-role">Tech &amp; Air Support</div>
+          <div class="char-vehicle">Toyota Tacoma · #JMB54</div>
+          <div class="char-vehicle">1971 Dodge Challenger · #JKH42</div>
+          <div class="char-vehicle">Rescue Helicopter · #JKH39</div>
+        </div>
+        <div class="char-wardrobe-pin">
+          <img src="./wardrobe/106/CHARMAINE_EP106.png" alt="Charmaine wardrobe">
+        </div>
+      </div>
+    </div>
+
+    <!-- AIMEE -->
+    <div class="char-card">
+      <div class="char-img-wrap">
+        <img src="./MATCHBOX-AIMEE-turn1.jpg" alt="Aimee" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="char-img-placeholder" style="display:none">Aimee — Turn 1</div>
+      </div>
+      <div class="char-bottom">
+        <div class="char-info">
+          <div class="char-name">Aimee</div>
+          <div class="char-role">Speed &amp; Driving Expert</div>
+          <div class="char-vehicle">Polaris RZR · #BL251</div>
+          <div class="char-vehicle">Chevy Stock Car · #JKH33</div>
+        </div>
+        <div class="char-wardrobe-pin">
+          <img src="./wardrobe/106/AIMEE_EP106.png" alt="Aimee wardrobe">
+        </div>
+      </div>
+    </div>
+
+    <!-- CROSBY -->
+    <div class="char-card">
+      <div class="char-img-wrap">
+        <img src="./MATCHBOX-CROSBY-turn1.jpg" alt="Crosby" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="char-img-placeholder" style="display:none">Crosby — Turn 1</div>
+      </div>
+      <div class="char-bottom">
+        <div class="char-info">
+          <div class="char-name">Crosby</div>
+          <div class="char-role">Engineering &amp; Heavy Machinery</div>
+          <div class="char-vehicle">Ford F-150 · #JKH36</div>
+          <div class="char-vehicle">Porsche 911 · #BL252</div>
+        </div>
+        <div class="char-wardrobe-pin">
+          <img src="./wardrobe/106/CROSBY_EP106.png" alt="Crosby wardrobe">
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /lineup-grid -->
+</div><!-- /lineup-page -->
+
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     PANELS
+     Image path: COLOR_URLS map below. URLs come from refineria.onrender.com.
+═══════════════════════════════════════════════════════════════════ -->
+
+<script>
+// ── CONFIGURATION ──────────────────────────────────────────────
+// Color images are served directly from refineria.onrender.com (Valen's app).
+// If a URL changes (regenerated final), refresh by running:
+//   curl -s 'https://refineria.onrender.com/api/projects/convoy/episodes/ep101/finals' | node scripts/build_color_urls.js
+const COLOR_URLS = {"01": "https://refineria.onrender.com/uploads/generated/1ea06055-255f-4b91-88cd-c52e55fab29f.png", "02": "https://refineria.onrender.com/uploads/generated/189871f0-264f-4dea-9fd6-00c69977709f.jpg", "04": "https://refineria.onrender.com/uploads/generated/7d012270-ce1a-4dd2-9bc6-8447839083cf.png", "05": "https://refineria.onrender.com/uploads/generated/8832f25b-d0e8-430a-bb64-aa6b2c169eff.png", "06": "https://refineria.onrender.com/uploads/generated/1acf0001-fdce-4f09-bd60-d8c00f6fa5fb.png", "07": "https://refineria.onrender.com/uploads/generated/2380db19-f68f-48d8-8bda-6db84ca5fcc0.png", "08": "https://refineria.onrender.com/uploads/generated/7edb612d-5631-4348-bd58-cd58a29be8fd.png", "09": "https://refineria.onrender.com/uploads/generated/20a710c4-50af-42c5-b743-af97a1ec7212.png", "10": "https://refineria.onrender.com/uploads/generated/a154a138-dcea-46a6-b878-c1a71c544e1a.png", "11": "https://refineria.onrender.com/uploads/generated/1ba64aa3-b3d8-4da1-839b-fe8712e9f5c4.png", "12": "https://refineria.onrender.com/uploads/generated/90384e4b-0ec4-41c5-ae08-8135e9794b64.png", "13": "https://refineria.onrender.com/uploads/generated/5af9f605-c92b-4949-bf18-f8c792e9cbc2.png", "14": "https://refineria.onrender.com/uploads/generated/e61f4a3e-94a5-4134-a4f7-0529f1654f54.jpg", "15": "https://refineria.onrender.com/uploads/generated/7da95670-1975-4d85-99db-e0240311f90c.png", "16": "https://refineria.onrender.com/uploads/generated/d5654897-f406-4308-ab11-efa6ef5dc992.png", "17": "https://refineria.onrender.com/uploads/generated/ec12797f-3068-418b-8f67-b464293c88e3.png", "18": "https://refineria.onrender.com/uploads/generated/4184d8f4-3f16-447a-874d-9a68286ea9e8.png", "19": "https://refineria.onrender.com/uploads/generated/4cfc3876-48f3-46ba-87c4-6eaa9db8fd97.png", "20": "https://refineria.onrender.com/uploads/generated/b17614e3-2489-41cf-a1a0-c2900a6d1348.png", "21": "https://refineria.onrender.com/uploads/generated/8d19422b-a7a7-4496-9d19-dfa271f27a76.png", "22": "https://refineria.onrender.com/uploads/generated/c5060a9b-9a61-4e5c-ae62-4381b5de2a08.png", "23": "https://refineria.onrender.com/uploads/generated/60fecdc5-200b-48d1-84a3-b920f8ab3e2d.png", "24": "https://refineria.onrender.com/uploads/generated/18d80417-0531-4659-8d31-eaa5b83c0691.png", "25": "https://refineria.onrender.com/uploads/generated/ef1447e4-1874-40ac-b238-c505454fbf0d.png", "26": "https://refineria.onrender.com/uploads/generated/cb396257-4496-4120-83d9-476931185929.png", "27": "https://refineria.onrender.com/uploads/generated/bcaf521e-af70-43f9-b645-44e0156a1414.png", "28": "https://refineria.onrender.com/uploads/generated/e9ae21dc-81fb-48eb-97f0-205d63f3ef3e.png", "29": "https://refineria.onrender.com/uploads/generated/ea12f6b7-89b9-4659-84f5-eb70c8b0d7da.png", "30": "https://refineria.onrender.com/uploads/generated/5bc3f504-b0aa-4192-99aa-6ab32c99eac3.png", "31": "https://refineria.onrender.com/uploads/generated/269ae31f-e7ab-4757-b633-79ed8f7a74ea.png", "32": "https://refineria.onrender.com/uploads/generated/a1fb7fef-10f6-4119-81c8-fd18b10f7387.png", "33": "https://refineria.onrender.com/uploads/generated/290a4b24-3336-480a-8e58-96f5284ddd84.png", "34": "https://refineria.onrender.com/uploads/generated/44d7ecdc-06dc-4864-8871-6079c7d62273.jpg", "35": "https://refineria.onrender.com/uploads/generated/d0e52580-41db-44e5-bb4d-3bee039fd8fd.jpg", "36": "https://refineria.onrender.com/uploads/generated/cb2d72b6-442e-4efa-adad-899964c2e7a2.jpg", "37": "https://refineria.onrender.com/uploads/generated/aebed7ce-0a42-47ea-aff3-76eacb584b24.jpg", "38": "https://refineria.onrender.com/uploads/generated/4d2ce978-e46d-4207-87ba-6e339d3a9376.png", "39": "https://refineria.onrender.com/uploads/generated/ae4dc209-3ff3-4c72-9b04-8f04fb3db3ca.png", "40": "https://refineria.onrender.com/uploads/generated/662cb43d-7a08-4a8a-8f02-e023c6a9dd93.png", "41": "https://refineria.onrender.com/uploads/generated/0c60bb0f-54a5-44b0-a29f-24b7527fa72a.png", "42": "https://refineria.onrender.com/uploads/generated/3c9ec8ce-a9cb-4fcb-873e-0d79552f539a.png", "43": "https://refineria.onrender.com/uploads/generated/16ddc73e-8ba4-4ac1-9664-79efe31b7de9.jpg", "44": "https://refineria.onrender.com/uploads/generated/ae6762a1-f306-4efa-8f97-4cb85ebe52e8.png", "45": "https://refineria.onrender.com/uploads/generated/b902edca-00df-4062-870e-45f346b24854.png"};
+// ── VEHICLES IN PANEL (with toy numbers) ──────────────────────
+const VEHICLES_IN_PANEL = {"01": [{"name": "Toyota Tacoma", "sku": "JMB54"}], "02": [{"name": "Toyota Tacoma", "sku": "JMB54"}], "04": [{"name": "Polaris RZR", "sku": "BL251"}, {"name": "Land Rover 6x6 Distressed", "sku": "BL250"}, {"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "Ford F-150", "sku": "JKH36"}, {"name": "Toyota Tacoma", "sku": "JMB54"}], "05": [{"name": "Toyota Tacoma", "sku": "JMB54"}], "06": [], "07": [{"name": "Polaris RZR", "sku": "BL251"}, {"name": "Land Rover 6x6 Distressed", "sku": "BL250"}, {"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "Ford F-150", "sku": "JKH36"}, {"name": "Toyota Tacoma", "sku": "JMB54"}], "08": [{"name": "Polaris RZR", "sku": "BL251"}, {"name": "Land Rover 6x6 Distressed", "sku": "BL250"}, {"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "Ford F-150", "sku": "JKH36"}, {"name": "Toyota Tacoma", "sku": "JMB54"}], "09": [{"name": "Toyota Tacoma", "sku": "JMB54"}, {"name": "Land Rover 6x6 Distressed", "sku": "BL250"}, {"name": "Ford F-150", "sku": "JKH36"}, {"name": "Polaris RZR", "sku": "BL251"}, {"name": "Triumph Scrambler", "sku": "JKH31"}], "10": [{"name": "Toyota Tacoma", "sku": "JMB54"}], "11": [{"name": "Toyota Tacoma", "sku": "JMB54"}, {"name": "Land Rover 6x6 Distressed", "sku": "BL250"}, {"name": "Ford F-150", "sku": "JKH36"}, {"name": "Polaris RZR", "sku": "BL251"}, {"name": "Triumph Scrambler", "sku": "JKH31"}], "12": [{"name": "Land Rover 6x6 Distressed", "sku": "BL250"}], "13": [{"name": "Toyota Tacoma", "sku": "JMB54"}, {"name": "Land Rover 6x6 Distressed", "sku": "BL250"}, {"name": "Ford F-150", "sku": "JKH36"}, {"name": "Polaris RZR", "sku": "BL251"}, {"name": "Triumph Scrambler", "sku": "JKH31"}], "14": [{"name": "Land Rover 6x6 Distressed", "sku": "BL250"}, {"name": "Ford F-150", "sku": "JKH36"}, {"name": "Toyota Tacoma", "sku": "JMB54"}, {"name": "Chevy Stock Car", "sku": "JKH33"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Polaris RZR", "sku": "BL251"}, {"name": "1971 Dodge Challenger", "sku": "JKH42"}, {"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "Porsche 911", "sku": "BL252"}], "15": [{"name": "1971 Dodge Challenger", "sku": "JKH42"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Porsche 911", "sku": "BL252"}, {"name": "Chevy Stock Car", "sku": "JKH33"}], "16": [{"name": "Toyota Tacoma", "sku": "JMB54"}, {"name": "1971 Dodge Challenger", "sku": "JKH42"}], "17": [], "18": [{"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "Porsche 911", "sku": "BL252"}, {"name": "1971 Dodge Challenger", "sku": "JKH42"}, {"name": "Chevy Stock Car", "sku": "JKH33"}, {"name": "Mustang Fastback", "sku": "JKH34"}], "19": [{"name": "Chevy Stock Car", "sku": "JKH33"}, {"name": "1971 Dodge Challenger", "sku": "JKH42"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Porsche 911", "sku": "BL252"}, {"name": "Triumph Scrambler", "sku": "JKH31"}], "20": [{"name": "1971 Dodge Challenger", "sku": "JKH42"}, {"name": "Chevy Stock Car", "sku": "JKH33"}], "21": [{"name": "1971 Dodge Challenger", "sku": "JKH42"}, {"name": "Chevy Stock Car", "sku": "JKH33"}], "22": [{"name": "Chevy Stock Car", "sku": "JKH33"}, {"name": "1971 Dodge Challenger", "sku": "JKH42"}], "23": [], "24": [{"name": "Chevy Stock Car", "sku": "JKH33"}, {"name": "1971 Dodge Challenger", "sku": "JKH42"}], "25": [], "26": [{"name": "Chevy Stock Car", "sku": "JKH33"}, {"name": "1971 Dodge Challenger", "sku": "JKH42"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Porsche 911", "sku": "BL252"}, {"name": "Triumph Scrambler", "sku": "JKH31"}], "27": [{"name": "Chevy Stock Car", "sku": "JKH33"}, {"name": "1971 Dodge Challenger", "sku": "JKH42"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Porsche 911", "sku": "BL252"}, {"name": "Triumph Scrambler", "sku": "JKH31"}], "28": [{"name": "Chevy Stock Car", "sku": "JKH33"}], "29": [{"name": "1971 Dodge Challenger", "sku": "JKH42"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Porsche 911", "sku": "BL252"}, {"name": "Triumph Scrambler", "sku": "JKH31"}], "30": [{"name": "Chevy Stock Car", "sku": "JKH33"}, {"name": "1971 Dodge Challenger", "sku": "JKH42"}], "31": [{"name": "Chevy Stock Car", "sku": "JKH33"}, {"name": "1971 Dodge Challenger", "sku": "JKH42"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Porsche 911", "sku": "BL252"}, {"name": "Triumph Scrambler", "sku": "JKH31"}], "32": [{"name": "1971 Dodge Challenger", "sku": "JKH42"}, {"name": "Chevy Stock Car", "sku": "JKH33"}], "33": [{"name": "1971 Dodge Challenger", "sku": "JKH42"}, {"name": "Rescue Helicopter", "sku": "JKH39"}], "34": [{"name": "Chevy Stock Car", "sku": "JKH33"}], "35": [{"name": "Rescue Helicopter", "sku": "JKH39"}], "36": [{"name": "Rescue Helicopter", "sku": "JKH39"}], "37": [{"name": "Chevy Stock Car", "sku": "JKH33"}], "38": [{"name": "Porsche 911", "sku": "BL252"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "Chevy Stock Car", "sku": "JKH33"}], "39": [{"name": "Chevy Stock Car", "sku": "JKH33"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Porsche 911", "sku": "BL252"}, {"name": "Triumph Scrambler", "sku": "JKH31"}], "40": [], "41": [{"name": "Chevy Stock Car", "sku": "JKH33"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Porsche 911", "sku": "BL252"}, {"name": "Triumph Scrambler", "sku": "JKH31"}], "42": [{"name": "Chevy Stock Car", "sku": "JKH33"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Porsche 911", "sku": "BL252"}, {"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "Rescue Helicopter", "sku": "JKH39"}], "43": [{"name": "Chevy Stock Car", "sku": "JKH33"}, {"name": "Rescue Helicopter", "sku": "JKH39"}, {"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "Porsche 911", "sku": "BL252"}, {"name": "Mustang Fastback", "sku": "JKH34"}], "44": [{"name": "Rescue Helicopter", "sku": "JKH39"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Triumph Scrambler", "sku": "JKH31"}], "45": [{"name": "Rescue Helicopter", "sku": "JKH39"}, {"name": "Chevy Stock Car", "sku": "JKH33"}, {"name": "Land Rover 6x6 Distressed", "sku": "BL250"}, {"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "Polaris RZR", "sku": "BL251"}]};
+// ── DIALOGUES (from Script V3, 04/14/2026 Playmation) ─────────
+const SCRIPT_DIALOGUES = {"01": "Charmaine (V.O.): (narration) Just as Charmaine starts off to claim the mountain treasure, the volcano erupts!", "02": "Charmaine (V.O.): I have to rescue that ancient treasure before the volcano destroys it!", "04": "", "05": "Charmaine (V.O.): (as the truck) Vroom! (then) Everyone needs their toughest vehicle for this adventure.", "06": "Aimee (V.O.): That's the treasure? / Sean (V.O.): That's sooo close to the exploding volcano? / Charmaine (V.O.): Yep. So there's not a second to waste.", "07": "", "08": "Charmaine (V.O.): Follow me!", "09": "Charmaine (V.O.): (narration) Charmaine leads the crew up the narrow volcano mountain pass to the treasure.", "10": "Charmaine (V.O.): WhooOA! This shaking volcano is making the road tough.", "11": "Charmaine (V.O.): (narration) Everyone stay to the outside to avoid the lava. / Crosby (V.O.): Lava!", "12": "Sean (V.O.): We need to get that treasure and get off this mountain fast.", "13": "Aimee (V.O.): If we need to go fast, let's make this a race!", "14": "Aimee (V.O.): Welcome to the Volcano Treasure Rally Race! Go!", "15": "Charmaine (V.O.): Aimee what are you doing? / Aimee (V.O.): I'm winning the race to the treasure. See ya at the top.", "16": "Charmaine (V.O.): Aimee this is suppose to be a treasure adventure. / Aimee (V.O.): Yeah, a fast treasure adventure!", "17": "Aimee (V.O.): That volcano looks pretty dangerous. A race might actually keep us safe.", "18": "Charmaine (V.O.): Okay. New plan. First person to get the treasure to the bottom of the mountain wins!", "19": "Ted (V.O.): (playing announcer) The volcano is hot, but the racing is even hotter. It's neck and neck with big stakes. Aimee is in the lead and going strong.", "20": "Ted (V.O.): (playing announcer) Hold on race fans. Charmaine speeds up and passes Aimee on the inside!", "21": "Ted (V.O.): (playing announcer) What's this? Aimee peels off the main road! Where's she going? Whoa! She took a shortcut and jumps over Charmaine!", "22": "Ted (V.O.): (playing announcer) Aimee has snagged the treasure! / Aimee (V.O.): (to Charmaine) Hey, there Charmaine. What took ya so long? I'd love to stay and chat, but I've got a race to win. See ya at the bottom. / Charmaine (V.O.): Aimee, you can't take shortcuts!", "23": "Charmaine (V.O.): It's no fun if you change the rules all the time.", "24": "Aimee (V.O.): (genuine) I'm sorry, Charmaine. (teasing) I guess I should have just beat you fair and square. / Charmaine (V.O.): Oh, you are on!", "25": "Sean (V.O.): Whatever we're gonna do, we'd better do it quickly. The volcano just exploded!", "26": "Ted (V.O.): (as announcer) There is a new contestant in the race, flowing lava! / Charmaine (V.O.): Let's race!", "27": "Charmaine (V.O.): Stay safe everyone. And let us know if you see anything dangerous.", "28": "Aimee (V.O.): Boulder!", "29": "Charmaine (V.O.): Thanks, Aimee! / Ted (V.O.): Everyone narrowly avoids crashing into the giant boulder. Even me!", "30": "Ted (V.O.): Charmaine and Aimee are neck and neck. Charmaine - Aimee - Aimee - Charmaine - Aimee - lava! / Charmaine (V.O.): Lava! Jump!", "31": "Ted (V.O.): (as announcer) This just in. I made it over the lava! / Aimee (V.O.): (teasing) And into last place. / ALL (V.O.): (group giggles)", "32": "Charmaine (V.O.): (narration) With quick thinking, Charmaine takes a sharp left onto the old fire road. / Aimee (V.O.): Hey! Where's Charmaine going?", "33": "Charmaine (V.O.): (narration) She hops in the old Rescue Helicopter and lifts off. (as herself) Time to take this race to the air!", "34": "Ted (V.O.): (as announcer) Oh no, Aimee hits some falling debris and sends that treasure up for grabs!", "35": "Charmaine (V.O.): Yes! I caught the treasure. / Ted (V.O.): (narration) Yes, but from the air Charmaine spots a new danger.", "36": "Charmaine (V.O.): Aimee, the main road is blocked by a lava pool, you have to turn right now!", "37": "Aimee (V.O.): AaaHHH! / Charmaine (V.O.): Everyone follow Aimee! / Ted (V.O.): (as announcer) In a bizarre twist, one of the racers is now directing the race... from the air!", "38": "Crosby / Sean / Ted (V.O.): AaaHHH!", "39": "Aimee (V.O.): Thanks, Charmaine!", "40": "Charmaine (V.O.): Don't thank me yet. The bridge at the end of the trail is broken! You'll have to jump it.", "41": "Aimee (V.O.): Whoo-hoo! / Sean (V.O.): Yahoo! / Crosby (V.O.): Oh boy! / Ted (V.O.): Don't look down!", "42": "Charmaine (V.O.): Yes! Way to go! / Ted (V.O.): (as announcer) At the finish line, it's Aimee for the win, then Sean, then Crosby, then me. Wait. How did I come in last place? Sure, I was mostly talking, but I was still going really fast. Last place! Me? / All (except Ted) (V.O.): Ted! / Ted (V.O.): Oh well, at least everyone is safe and the treasure saved! Whew!", "43": "Charmaine (V.O.): You definitely earned that race trophy today, Aimee. / Aimee (V.O.): And you recovered the treasure. We both win. / Ted (V.O.): Um, Charmaine. You're gonna fly us all out of here, right?", "44": "Charmaine (V.O.): Now that's an adventure!", "45": "Sean (V.O.): Nothing can stop the... / All (V.O.): MATCHBOX CREW!"};
+// ── ADDRESSED IN COLOR (draft from MATTEL feedback) ───────────
+const ADDRESSED = {};
+
+// ── ACTION DESCRIPTIONS (from script) ──────────────────────────
+const ACTIONS = {};
+
+// ── MATTEL FEEDBACK ────────────────────────────────────────────
+const MATTEL_FEEDBACK = {};
+
+// ── PANEL DATA ─────────────────────────────────────────────────
+const PANELS = [
+  {
+    "num": "01",
+    "label": "01",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Charmaine (V.O.): (narration) Just as Charmaine starts off to claim the mountain treasure, the volcano erupts!",
+    "chars": []
+  },
+  {
+    "num": "02",
+    "label": "02",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Charmaine (V.O.): I have to rescue that ancient treasure before the volcano destroys it!",
+    "chars": []
+  },
+  {
+    "num": "04",
+    "label": "04",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "",
+    "chars": []
+  },
+  {
+    "num": "05",
+    "label": "05",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Charmaine (V.O.): (as the truck) Vroom! (then) Everyone needs their toughest vehicle for this adventure.",
+    "chars": []
+  },
+  {
+    "num": "06",
+    "label": "06",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Aimee (V.O.): That's the treasure? / Sean (V.O.): That's sooo close to the exploding volcano? / Charmaine (V.O.): Yep. So there's not a second to waste.",
+    "chars": []
+  },
+  {
+    "num": "07",
+    "label": "07",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "",
+    "chars": []
+  },
+  {
+    "num": "08",
+    "label": "08",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Charmaine (V.O.): Follow me!",
+    "chars": []
+  },
+  {
+    "num": "09",
+    "label": "09",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Charmaine (V.O.): (narration) Charmaine leads the crew up the narrow volcano mountain pass to the treasure.",
+    "chars": []
+  },
+  {
+    "num": "10",
+    "label": "10",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Charmaine (V.O.): WhooOA! This shaking volcano is making the road tough.",
+    "chars": []
+  },
+  {
+    "num": "11",
+    "label": "11",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Charmaine (V.O.): (narration) Everyone stay to the outside to avoid the lava. / Crosby (V.O.): Lava!",
+    "chars": []
+  },
+  {
+    "num": "12",
+    "label": "12",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Sean (V.O.): We need to get that treasure and get off this mountain fast.",
+    "chars": []
+  },
+  {
+    "num": "13",
+    "label": "13",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Aimee (V.O.): If we need to go fast, let's make this a race!",
+    "chars": []
+  },
+  {
+    "num": "14",
+    "label": "14",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Aimee (V.O.): Welcome to the Volcano Treasure Rally Race! Go!",
+    "chars": []
+  },
+  {
+    "num": "15",
+    "label": "15",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Charmaine (V.O.): Aimee what are you doing? / Aimee (V.O.): I'm winning the race to the treasure. See ya at the top.",
+    "chars": []
+  },
+  {
+    "num": "16",
+    "label": "16",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Charmaine (V.O.): Aimee this is suppose to be a treasure adventure. / Aimee (V.O.): Yeah, a fast treasure adventure!",
+    "chars": []
+  },
+  {
+    "num": "17",
+    "label": "17",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Aimee (V.O.): That volcano looks pretty dangerous. A race might actually keep us safe.",
+    "chars": []
+  },
+  {
+    "num": "18",
+    "label": "18",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Charmaine (V.O.): Okay. New plan. First person to get the treasure to the bottom of the mountain wins!",
+    "chars": []
+  },
+  {
+    "num": "19",
+    "label": "19",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Ted (V.O.): (playing announcer) The volcano is hot, but the racing is even hotter. It's neck and neck with big stakes. Aimee is in the lead and going strong.",
+    "chars": []
+  },
+  {
+    "num": "20",
+    "label": "20",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Ted (V.O.): (playing announcer) Hold on race fans. Charmaine speeds up and passes Aimee on the inside!",
+    "chars": []
+  },
+  {
+    "num": "21",
+    "label": "21",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Ted (V.O.): (playing announcer) What's this? Aimee peels off the main road! Where's she going? Whoa! She took a shortcut and jumps over Charmaine!",
+    "chars": []
+  },
+  {
+    "num": "22",
+    "label": "22",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Ted (V.O.): (playing announcer) Aimee has snagged the treasure! / Aimee (V.O.): (to Charmaine) Hey, there Charmaine. What took ya so long? I'd love to stay and chat, but I've got a race to win. See ya at the bottom. / Charmaine (V.O.): Aimee, you can't take shortcuts!",
+    "chars": []
+  },
+  {
+    "num": "23",
+    "label": "23",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Charmaine (V.O.): It's no fun if you change the rules all the time.",
+    "chars": []
+  },
+  {
+    "num": "24",
+    "label": "24",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Aimee (V.O.): (genuine) I'm sorry, Charmaine. (teasing) I guess I should have just beat you fair and square. / Charmaine (V.O.): Oh, you are on!",
+    "chars": []
+  },
+  {
+    "num": "25",
+    "label": "25",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Sean (V.O.): Whatever we're gonna do, we'd better do it quickly. The volcano just exploded!",
+    "chars": []
+  },
+  {
+    "num": "26",
+    "label": "26",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Ted (V.O.): (as announcer) There is a new contestant in the race, flowing lava! / Charmaine (V.O.): Let's race!",
+    "chars": []
+  },
+  {
+    "num": "27",
+    "label": "27",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Charmaine (V.O.): Stay safe everyone. And let us know if you see anything dangerous.",
+    "chars": []
+  },
+  {
+    "num": "28",
+    "label": "28",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Aimee (V.O.): Boulder!",
+    "chars": []
+  },
+  {
+    "num": "29",
+    "label": "29",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Charmaine (V.O.): Thanks, Aimee! / Ted (V.O.): Everyone narrowly avoids crashing into the giant boulder. Even me!",
+    "chars": []
+  },
+  {
+    "num": "30",
+    "label": "30",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Ted (V.O.): Charmaine and Aimee are neck and neck. Charmaine - Aimee - Aimee - Charmaine - Aimee - lava! / Charmaine (V.O.): Lava! Jump!",
+    "chars": []
+  },
+  {
+    "num": "31",
+    "label": "31",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Ted (V.O.): (as announcer) This just in. I made it over the lava! / Aimee (V.O.): (teasing) And into last place. / ALL (V.O.): (group giggles)",
+    "chars": []
+  },
+  {
+    "num": "32",
+    "label": "32",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Charmaine (V.O.): (narration) With quick thinking, Charmaine takes a sharp left onto the old fire road. / Aimee (V.O.): Hey! Where's Charmaine going?",
+    "chars": []
+  },
+  {
+    "num": "33",
+    "label": "33",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Charmaine (V.O.): (narration) She hops in the old Rescue Helicopter and lifts off. (as herself) Time to take this race to the air!",
+    "chars": []
+  },
+  {
+    "num": "34",
+    "label": "34",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Ted (V.O.): (as announcer) Oh no, Aimee hits some falling debris and sends that treasure up for grabs!",
+    "chars": []
+  },
+  {
+    "num": "35",
+    "label": "35",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Charmaine (V.O.): Yes! I caught the treasure. / Ted (V.O.): (narration) Yes, but from the air Charmaine spots a new danger.",
+    "chars": []
+  },
+  {
+    "num": "36",
+    "label": "36",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Charmaine (V.O.): Aimee, the main road is blocked by a lava pool, you have to turn right now!",
+    "chars": []
+  },
+  {
+    "num": "37",
+    "label": "37",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Aimee (V.O.): AaaHHH! / Charmaine (V.O.): Everyone follow Aimee! / Ted (V.O.): (as announcer) In a bizarre twist, one of the racers is now directing the race... from the air!",
+    "chars": []
+  },
+  {
+    "num": "38",
+    "label": "38",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Crosby / Sean / Ted (V.O.): AaaHHH!",
+    "chars": []
+  },
+  {
+    "num": "39",
+    "label": "39",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Aimee (V.O.): Thanks, Charmaine!",
+    "chars": []
+  },
+  {
+    "num": "40",
+    "label": "40",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Charmaine (V.O.): Don't thank me yet. The bridge at the end of the trail is broken! You'll have to jump it.",
+    "chars": []
+  },
+  {
+    "num": "41",
+    "label": "41",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Aimee (V.O.): Whoo-hoo! / Sean (V.O.): Yahoo! / Crosby (V.O.): Oh boy! / Ted (V.O.): Don't look down!",
+    "chars": []
+  },
+  {
+    "num": "42",
+    "label": "42",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Charmaine (V.O.): Yes! Way to go! / Ted (V.O.): (as announcer) At the finish line, it's Aimee for the win, then Sean, then Crosby, then me. Wait. How did I come in last place? Sure, I was mostly talking, but I was still going really fast. Last place! Me? / All (except Ted) (V.O.): Ted! / Ted (V.O.): Oh well, at least everyone is safe and the treasure saved! Whew!",
+    "chars": []
+  },
+  {
+    "num": "43",
+    "label": "43",
+    "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
+    "dialogue": "Charmaine (V.O.): You definitely earned that race trophy today, Aimee. / Aimee (V.O.): And you recovered the treasure. We both win. / Ted (V.O.): Um, Charmaine. You're gonna fly us all out of here, right?",
+    "chars": []
+  },
+  {
+    "num": "44",
+    "label": "44",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Charmaine (V.O.): Now that's an adventure!",
+    "chars": []
+  },
+  {
+    "num": "45",
+    "label": "45",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Sean (V.O.): Nothing can stop the... / All (V.O.): MATCHBOX CREW!",
+    "chars": []
+  }
+];
+
+const VILLAIN = ['Von Steele'];
+
+function imgSrc(num) {
+  return COLOR_URLS[num.padStart(2,'0')] || '';
+}
+
+function renderPanels() {
+  const container = document.getElementById('panels-container');
+  container.innerHTML = '';
+
+  PANELS.forEach(p => {
+    const src = imgSrc(p.num);
+
+    const chars = p.chars.map(c =>
+      `<span class="char-tag">${c}</span>`
+    ).join('');
+
+    container.innerHTML += `
+    <div class="page panel-page">
+      <!-- HEADER -->
+      <div class="panel-page-header">
+        <span class="ph-ep">CVY26_001_106</span>
+        <span class="ph-title">Color Review · Volcano Treasure!</span>
+        <span class="ph-num">PANEL ${p.label}</span>
+      </div>
+
+      <!-- SPACER -->
+      <div class="panel-spacer"></div>
+
+      <!-- IMAGE: full width -->
+      <div class="panel-img-col">
+        ${false ? `
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#111;">
+          <div style="font-size:80px;font-weight:900;letter-spacing:12px;color:rgba(255,255,255,0.08);transform:rotate(-35deg);text-transform:uppercase;user-select:none;">PENDING</div>
+        </div>` : `
+        <img src="${src}" alt="Panel ${p.label}"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="panel-img-placeholder" style="display:none">
+          <div class="pip-icon"></div>
+          <div class="pip-label">Panel ${p.label}<br>Color</div>
+        </div>`}
+      </div>
+
+      <!-- INFO: below image -->
+      <div class="panel-info-section">
+        <div class="panel-info-row">
+
+          <!-- LEFT: num + scene + visual -->
+          <div class="panel-info-main">
+            <div class="panel-num-badge">
+              <div class="panel-num">${p.label.replace(/[A-Z–]/g,'')}</div>
+              ${p.label.match(/[A-Z–]/) ? `<div class="panel-num-sub">${p.label}</div>` : ''}
+              ${p.scene ? `<div class="panel-num-sub" style="color:var(--accent);font-size:8px;letter-spacing:2px;text-transform:uppercase">${p.scene}</div>` : ''}
+            </div>
+          </div>
+
+          <!-- RIGHT: dialogue + chars + notes -->
+          <div class="panel-info-side">
+            ${(() => {
+              const dlg = (SCRIPT_DIALOGUES[p.num] !== undefined ? SCRIPT_DIALOGUES[p.num] : p.dialogue) || '';
+              return dlg.trim() ? `<div class="dialogue-block">
+              <div class="info-label">Dialogue / VO</div>
+              <div class="editable" contenteditable="true">${dlg.replace(/\n/g,'<br>')}</div>
+            </div>` : '';
+            })()}
+
+            ${(VEHICLES_IN_PANEL[p.num] && VEHICLES_IN_PANEL[p.num].length) ? `
+            <div class="info-block">
+              <div class="info-label">Vehicles in Panel</div>
+              <div class="chars-in-scene" style="flex-direction:column;align-items:flex-start;gap:4px;">${VEHICLES_IN_PANEL[p.num].map(v => `<span class="char-tag" style="display:block;width:fit-content;">${v.name} <span style="opacity:0.7;font-weight:400">· #${v.sku}</span></span>`).join('')}</div>
+            </div>` : ''}
+
+            <div class="info-block caveats-block" style="margin-top:auto">
+              <div class="info-label">Caveats:</div>
+              <div class="editable caveat-field" contenteditable="true"
+                   data-panel="${p.num}"
+                   data-placeholder="Production notes for the client..."></div>
+            </div>
+          </div>
+
+        </div><!-- /panel-info-row -->
+
+
+      </div><!-- /panel-info-section -->
+    </div>`;
+  });
+}
+
+function renderStoryboard() {
+  const container = document.getElementById('panels-container');
+  const cells = PANELS.map(p => {
+    const src = imgSrc(p.num);
+    return `
+    <div class="sb-cell">
+      <div class="sb-img-wrap">
+        <img src="${src}" alt="Panel ${p.label}"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="sb-placeholder" style="display:none">${p.label}</div>
+      </div>
+      <div class="sb-label">${p.label}</div>
+    </div>`;
+  }).join('');
+
+  container.innerHTML += `
+  <div class="page storyboard-page">
+    <div class="sb-header">
+      <div class="sb-eyebrow">CVY26_001_106 · Color Review · Episode 106</div>
+      <div class="sb-title">Color <span>Overview</span></div>
+      <div class="sb-subtitle">Volcano Treasure! · 44 Panels</div>
+    </div>
+    <div class="sb-grid">${cells}</div>
+  </div>`;
+}
+
+let editingOn = true;
+function toggleEditing() {
+  editingOn = !editingOn;
+  document.querySelectorAll('[contenteditable]').forEach(el => {
+    el.contentEditable = editingOn ? 'true' : 'false';
+  });
+}
+
+</script>
+
+<div id="panels-container"></div>
+<script>
+renderPanels();
+renderStoryboard();
+
+/* ── JSONBIN SYNC (color review uses _color suffix so it doesn't collide with line-art bin) ── */
+const REVIEW_BIN_ID  = '6a0a5ddf250b1311c3667973';
+const REVIEW_BIN_KEY = '$2a$10$G/S5QC8pq2vpHyiOEdxjp.rmJOR4deLMjyDvs1.Zq7W9dMQt9uqQq';
+const BIN_URL = 'https://api.jsonbin.io/v3/b/' + REVIEW_BIN_ID;
+
+async function loadAnnotations() {
+  try {
+    const res = await fetch(BIN_URL + '/latest', {
+      headers: { 'X-Master-Key': REVIEW_BIN_KEY, 'X-Bin-Meta': 'false' }
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    const caveats = data.caveats_color || {};
+    document.querySelectorAll('.caveat-field[data-panel]').forEach(el => {
+      const v = caveats[el.dataset.panel];
+      if (v) el.textContent = v;
+    });
+    const addressed = data.addressed_color || {};
+    document.querySelectorAll('.addressed-list[data-panel]').forEach(el => {
+      const v = addressed[el.dataset.panel];
+      if (v) el.innerHTML = v;
+    });
+  } catch(e) {}
+}
+
+let _saveTimer = null;
+function scheduleSync() {
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(saveAnnotations, 1500);
+}
+
+async function saveAnnotations() {
+  // Fetch existing to merge — don't wipe line-art caveats stored under `caveats`
+  let existing = {};
+  try {
+    const r = await fetch(BIN_URL + '/latest', { headers: { 'X-Master-Key': REVIEW_BIN_KEY, 'X-Bin-Meta': 'false' } });
+    if (r.ok) existing = await r.json();
+  } catch(e) {}
+  const caveats_color = {};
+  document.querySelectorAll('.caveat-field[data-panel]').forEach(el => {
+    const v = el.textContent.trim();
+    if (v) caveats_color[el.dataset.panel] = v;
+  });
+  const addressed_color = {};
+  document.querySelectorAll('.addressed-list[data-panel]').forEach(el => {
+    const v = el.innerHTML.trim();
+    if (v) addressed_color[el.dataset.panel] = v;
+  });
+  const payload = Object.assign({}, existing, { caveats_color, addressed_color });
+  try {
+    await fetch(BIN_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': REVIEW_BIN_KEY },
+      body: JSON.stringify(payload)
+    });
+  } catch(e) {}
+}
+
+// Escuchar cambios en caveats y addressed
+document.querySelectorAll('.caveat-field[data-panel], .addressed-list[data-panel]').forEach(el => {
+  el.addEventListener('input', scheduleSync);
+});
+
+// Cargar al abrir
+loadAnnotations();
+</script>
+
+<!-- THANKS PAGE -->
+<div class="page" style="display:flex;flex-direction:column;">
+  <div class="panel-page-header">
+    <span class="ph-ep">CVY26_001_106</span>
+    <span class="ph-title">Color Review · Volcano Treasure!</span>
+    <span class="ph-num"></span>
+  </div>
+  <div style="flex:1;display:flex;justify-content:center;align-items:center;text-align:center;">
+    <div class="cover-title">THANKS<span style="color:var(--accent)">!</span></div>
+  </div>
+</div>
+
+</div><!-- /doc-wrapper -->
+</body>
+</html>

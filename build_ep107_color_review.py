@@ -77,6 +77,39 @@ for _n, _ids in VEH_SET.items():
     if _n in VEHICLES_IN_PANEL:
         VEHICLES_IN_PANEL[_n] = [{'name': CAT[i]['name'], 'sku': CAT[i]['sku']} for i in _ids if i in CAT]
 
+# ── Altas/bajas por panel (revision de la usuaria, ronda 1) ──
+SKU2NAME = {v['sku']: v['name'] for v in CAT.values()}
+# sumar estos SKU (dedupe por sku)
+VEH_ADD = {
+    '01': ['JKH44'],                 # + 2020 Nissan Nismo
+    '04': ['JKH49'],                 # + F-650 Rollback
+    '07': ['JKH49'],                 # + F-650 Rollback
+    '14': ['JKH44'],                 # + 2020 Nissan Nismo
+    '15': ['JKH44'],                 # + 2020 Nissan Nismo
+    '20': ['JKH44', 'JKH35'],        # + Nismo, + Mercedes Sprinter Ambulance
+    '21': ['JKH28'],                 # + Land Rover 6x6
+    '23': ['JKH28'],                 # + Land Rover 6x6
+}
+# quitar estos SKU
+VEH_REMOVE = {
+    '04': ['JHN10'],                 # - Blaze Blaster III
+    '05': ['JKH44'],                 # - 2020 Nissan Nismo
+    '06': ['HFP46', 'JKH44'],        # - Dodge Durango, - 2020 Nissan Nismo
+    '13': ['JKH49'],                 # - F-650 Rollback
+    '18': ['JKH28'],                 # - Land Rover 6x6
+    '21': ['JKH49'],                 # - F-650 Rollback
+}
+for _n, _skus in VEH_REMOVE.items():
+    if _n in VEHICLES_IN_PANEL:
+        VEHICLES_IN_PANEL[_n] = [v for v in VEHICLES_IN_PANEL[_n] if v['sku'] not in _skus]
+for _n, _skus in VEH_ADD.items():
+    if _n in VEHICLES_IN_PANEL:
+        have = {v['sku'] for v in VEHICLES_IN_PANEL[_n]}
+        for s in _skus:
+            if s not in have:
+                VEHICLES_IN_PANEL[_n].append({'name': SKU2NAME.get(s, s), 'sku': s})
+                have.add(s)
+
 PANELS = [{'num':n,'label':n,'scene':scene_label(tracker.get(n,{})),
            'dialogue':SCRIPT_DIALOGUES.get(n,''),'chars':[]} for n in nums]
 

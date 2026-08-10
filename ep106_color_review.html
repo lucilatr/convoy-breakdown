@@ -954,11 +954,11 @@
 // Color images are served directly from refineria.onrender.com (Valen's app).
 // If a URL changes (regenerated final), refresh by running:
 //   curl -s 'https://refineria.onrender.com/api/projects/convoy/episodes/ep101/finals' | node scripts/build_color_urls.js
-const COLOR_URLS = {"01": "https://refineria.onrender.com/uploads/generated/1ea06055-255f-4b91-88cd-c52e55fab29f.png", "02": "https://refineria.onrender.com/uploads/generated/189871f0-264f-4dea-9fd6-00c69977709f.jpg", "04": "https://refineria.onrender.com/uploads/generated/7d012270-ce1a-4dd2-9bc6-8447839083cf.png", "05": "https://refineria.onrender.com/uploads/generated/8832f25b-d0e8-430a-bb64-aa6b2c169eff.png", "06": "https://refineria.onrender.com/uploads/generated/1acf0001-fdce-4f09-bd60-d8c00f6fa5fb.png", "07": "https://refineria.onrender.com/uploads/generated/2380db19-f68f-48d8-8bda-6db84ca5fcc0.png", "08": "https://refineria.onrender.com/uploads/generated/7edb612d-5631-4348-bd58-cd58a29be8fd.png", "09": "https://refineria.onrender.com/uploads/generated/20a710c4-50af-42c5-b743-af97a1ec7212.png", "10": "https://refineria.onrender.com/uploads/generated/a154a138-dcea-46a6-b878-c1a71c544e1a.png", "11": "https://refineria.onrender.com/uploads/generated/1ba64aa3-b3d8-4da1-839b-fe8712e9f5c4.png", "12": "https://refineria.onrender.com/uploads/generated/90384e4b-0ec4-41c5-ae08-8135e9794b64.png", "13": "https://refineria.onrender.com/uploads/generated/5af9f605-c92b-4949-bf18-f8c792e9cbc2.png", "14": "https://refineria.onrender.com/uploads/generated/e61f4a3e-94a5-4134-a4f7-0529f1654f54.jpg", "15": "https://refineria.onrender.com/uploads/generated/7da95670-1975-4d85-99db-e0240311f90c.png", "16": "https://refineria.onrender.com/uploads/generated/d5654897-f406-4308-ab11-efa6ef5dc992.png", "17": "https://refineria.onrender.com/uploads/generated/ec12797f-3068-418b-8f67-b464293c88e3.png", "18": "https://refineria.onrender.com/uploads/generated/4184d8f4-3f16-447a-874d-9a68286ea9e8.png", "19": "https://refineria.onrender.com/uploads/generated/4cfc3876-48f3-46ba-87c4-6eaa9db8fd97.png", "20": "https://refineria.onrender.com/uploads/generated/b17614e3-2489-41cf-a1a0-c2900a6d1348.png", "21": "https://refineria.onrender.com/uploads/generated/8d19422b-a7a7-4496-9d19-dfa271f27a76.png", "22": "https://refineria.onrender.com/uploads/generated/c5060a9b-9a61-4e5c-ae62-4381b5de2a08.png", "23": "https://refineria.onrender.com/uploads/generated/60fecdc5-200b-48d1-84a3-b920f8ab3e2d.png", "24": "https://refineria.onrender.com/uploads/generated/18d80417-0531-4659-8d31-eaa5b83c0691.png", "25": "https://refineria.onrender.com/uploads/generated/ef1447e4-1874-40ac-b238-c505454fbf0d.png", "26": "https://refineria.onrender.com/uploads/generated/cb396257-4496-4120-83d9-476931185929.png", "27": "https://refineria.onrender.com/uploads/generated/bcaf521e-af70-43f9-b645-44e0156a1414.png", "28": "https://refineria.onrender.com/uploads/generated/e9ae21dc-81fb-48eb-97f0-205d63f3ef3e.png", "29": "https://refineria.onrender.com/uploads/generated/ea12f6b7-89b9-4659-84f5-eb70c8b0d7da.png", "30": "https://refineria.onrender.com/uploads/generated/5bc3f504-b0aa-4192-99aa-6ab32c99eac3.png", "31": "https://refineria.onrender.com/uploads/generated/269ae31f-e7ab-4757-b633-79ed8f7a74ea.png", "32": "https://refineria.onrender.com/uploads/generated/a1fb7fef-10f6-4119-81c8-fd18b10f7387.png", "33": "https://refineria.onrender.com/uploads/generated/290a4b24-3336-480a-8e58-96f5284ddd84.png", "34": "https://refineria.onrender.com/uploads/generated/44d7ecdc-06dc-4864-8871-6079c7d62273.jpg", "35": "https://refineria.onrender.com/uploads/generated/d0e52580-41db-44e5-bb4d-3bee039fd8fd.jpg", "36": "https://refineria.onrender.com/uploads/generated/cb2d72b6-442e-4efa-adad-899964c2e7a2.jpg", "37": "https://refineria.onrender.com/uploads/generated/1aaedd95-74f0-47c1-870f-3b0efb566001.jpg", "38": "https://refineria.onrender.com/uploads/generated/4d2ce978-e46d-4207-87ba-6e339d3a9376.png", "39": "https://refineria.onrender.com/uploads/generated/ae4dc209-3ff3-4c72-9b04-8f04fb3db3ca.png", "40": "https://refineria.onrender.com/uploads/generated/da19ac25-2175-42d1-a579-23f9b2d0ebf3.png", "41": "https://refineria.onrender.com/uploads/generated/0c60bb0f-54a5-44b0-a29f-24b7527fa72a.png", "42": "https://refineria.onrender.com/uploads/generated/3666e503-ec73-49bc-908e-96a9f6e15176.png", "43": "https://refineria.onrender.com/uploads/generated/17692d9c-1c4a-4a00-9389-87f6fc64b29e.jpg", "44": "https://refineria.onrender.com/uploads/generated/8862317e-867e-4d71-b80b-3d6107363105.png", "45": "https://refineria.onrender.com/uploads/generated/b902edca-00df-4062-870e-45f346b24854.png"};
+const COLOR_URLS = {"01": "https://refineria.onrender.com/uploads/generated/1ea06055-255f-4b91-88cd-c52e55fab29f.png", "02": "https://refineria.onrender.com/uploads/generated/19bb4d52-0742-4f46-89dc-618943a9a44b.jpg", "04": "https://refineria.onrender.com/uploads/generated/7d012270-ce1a-4dd2-9bc6-8447839083cf.png", "05": "https://refineria.onrender.com/uploads/generated/8832f25b-d0e8-430a-bb64-aa6b2c169eff.png", "06": "https://refineria.onrender.com/uploads/generated/1acf0001-fdce-4f09-bd60-d8c00f6fa5fb.png", "07": "https://refineria.onrender.com/uploads/generated/e1023555-bed1-4ea5-8bde-5fdc3c88999f.png", "08": "https://refineria.onrender.com/uploads/generated/3de1899c-4b14-479f-a931-1e1077773667.png", "09": "https://refineria.onrender.com/uploads/generated/93304c92-12fa-45ec-84ac-ae67a9734241.png", "10": "https://refineria.onrender.com/uploads/generated/a154a138-dcea-46a6-b878-c1a71c544e1a.png", "11": "https://refineria.onrender.com/uploads/generated/3ca4ab5e-0d29-424a-a19f-27279f104a3c.png", "12": "https://refineria.onrender.com/uploads/generated/90384e4b-0ec4-41c5-ae08-8135e9794b64.png", "13": "https://refineria.onrender.com/uploads/generated/e16116b7-b46e-4cc2-8876-3cf064b03087.png", "14": "https://refineria.onrender.com/uploads/generated/7514c3df-0050-4f0c-a1e9-71d6ebbc7c53.jpg", "15": "https://refineria.onrender.com/uploads/generated/7da95670-1975-4d85-99db-e0240311f90c.png", "16": "https://refineria.onrender.com/uploads/generated/d5654897-f406-4308-ab11-efa6ef5dc992.png", "17": "https://refineria.onrender.com/uploads/generated/ec12797f-3068-418b-8f67-b464293c88e3.png", "18": "https://refineria.onrender.com/uploads/generated/4184d8f4-3f16-447a-874d-9a68286ea9e8.png", "19": "https://refineria.onrender.com/uploads/generated/4cfc3876-48f3-46ba-87c4-6eaa9db8fd97.png", "20": "https://refineria.onrender.com/uploads/generated/b17614e3-2489-41cf-a1a0-c2900a6d1348.png", "21": "https://refineria.onrender.com/uploads/generated/8d19422b-a7a7-4496-9d19-dfa271f27a76.png", "22": "https://refineria.onrender.com/uploads/generated/c5060a9b-9a61-4e5c-ae62-4381b5de2a08.png", "23": "https://refineria.onrender.com/uploads/generated/60fecdc5-200b-48d1-84a3-b920f8ab3e2d.png", "24": "https://refineria.onrender.com/uploads/generated/18d80417-0531-4659-8d31-eaa5b83c0691.png", "25": "https://refineria.onrender.com/uploads/generated/ef1447e4-1874-40ac-b238-c505454fbf0d.png", "26": "https://refineria.onrender.com/uploads/generated/cb396257-4496-4120-83d9-476931185929.png", "27": "https://refineria.onrender.com/uploads/generated/bcaf521e-af70-43f9-b645-44e0156a1414.png", "28": "https://refineria.onrender.com/uploads/generated/e9ae21dc-81fb-48eb-97f0-205d63f3ef3e.png", "29": "https://refineria.onrender.com/uploads/generated/ea12f6b7-89b9-4659-84f5-eb70c8b0d7da.png", "30": "https://refineria.onrender.com/uploads/generated/5bc3f504-b0aa-4192-99aa-6ab32c99eac3.png", "31": "https://refineria.onrender.com/uploads/generated/269ae31f-e7ab-4757-b633-79ed8f7a74ea.png", "32": "https://refineria.onrender.com/uploads/generated/a1fb7fef-10f6-4119-81c8-fd18b10f7387.png", "33": "https://refineria.onrender.com/uploads/generated/290a4b24-3336-480a-8e58-96f5284ddd84.png", "34": "https://refineria.onrender.com/uploads/generated/4a4fecec-b7aa-4d89-8094-09bf0d61d1b5.png", "35": "https://refineria.onrender.com/uploads/generated/d0e52580-41db-44e5-bb4d-3bee039fd8fd.jpg", "36": "https://refineria.onrender.com/uploads/generated/cb2d72b6-442e-4efa-adad-899964c2e7a2.jpg", "37": "https://refineria.onrender.com/uploads/generated/1aaedd95-74f0-47c1-870f-3b0efb566001.jpg", "38": "https://refineria.onrender.com/uploads/generated/4d2ce978-e46d-4207-87ba-6e339d3a9376.png", "39": "https://refineria.onrender.com/uploads/generated/ae4dc209-3ff3-4c72-9b04-8f04fb3db3ca.png", "40": "https://refineria.onrender.com/uploads/generated/af3ffe6e-3470-4046-875b-9ddf0c4081a5.png", "41": "https://refineria.onrender.com/uploads/generated/0c60bb0f-54a5-44b0-a29f-24b7527fa72a.png", "42": "https://refineria.onrender.com/uploads/generated/3666e503-ec73-49bc-908e-96a9f6e15176.png", "43": "https://refineria.onrender.com/uploads/generated/17692d9c-1c4a-4a00-9389-87f6fc64b29e.jpg", "44": "https://refineria.onrender.com/uploads/generated/8862317e-867e-4d71-b80b-3d6107363105.png", "45": "https://refineria.onrender.com/uploads/generated/b902edca-00df-4062-870e-45f346b24854.png"};
 // ── VEHICLES IN PANEL (with toy numbers) ──────────────────────
 const VEHICLES_IN_PANEL = {"01": [{"name": "Toyota Tacoma", "sku": "JMB54"}], "02": [{"name": "Toyota Tacoma", "sku": "JMB54"}], "04": [{"name": "Polaris RZR", "sku": "BL251"}, {"name": "Land Rover 6x6 Distressed", "sku": "BL250"}, {"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "Ford F-150", "sku": "JKH36"}, {"name": "Toyota Tacoma", "sku": "JMB54"}], "05": [{"name": "Toyota Tacoma", "sku": "JMB54"}], "06": [], "07": [{"name": "Polaris RZR", "sku": "BL251"}, {"name": "Land Rover 6x6 Distressed", "sku": "BL250"}, {"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "Ford F-150", "sku": "JKH36"}, {"name": "Toyota Tacoma", "sku": "JMB54"}], "08": [{"name": "Polaris RZR", "sku": "BL251"}, {"name": "Land Rover 6x6 Distressed", "sku": "BL250"}, {"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "Ford F-150", "sku": "JKH36"}, {"name": "Toyota Tacoma", "sku": "JMB54"}], "09": [{"name": "Toyota Tacoma", "sku": "JMB54"}, {"name": "Land Rover 6x6 Distressed", "sku": "BL250"}, {"name": "Ford F-150", "sku": "JKH36"}, {"name": "Polaris RZR", "sku": "BL251"}, {"name": "Triumph Scrambler", "sku": "JKH31"}], "10": [{"name": "Toyota Tacoma", "sku": "JMB54"}], "11": [{"name": "Toyota Tacoma", "sku": "JMB54"}, {"name": "Land Rover 6x6 Distressed", "sku": "BL250"}, {"name": "Ford F-150", "sku": "JKH36"}, {"name": "Polaris RZR", "sku": "BL251"}, {"name": "Triumph Scrambler", "sku": "JKH31"}], "12": [{"name": "Land Rover 6x6 Distressed", "sku": "BL250"}], "13": [{"name": "Toyota Tacoma", "sku": "JMB54"}, {"name": "Land Rover 6x6 Distressed", "sku": "BL250"}, {"name": "Ford F-150", "sku": "JKH36"}, {"name": "Polaris RZR", "sku": "BL251"}, {"name": "Triumph Scrambler", "sku": "JKH31"}], "14": [{"name": "Land Rover 6x6 Distressed", "sku": "BL250"}, {"name": "Ford F-150", "sku": "JKH36"}, {"name": "Toyota Tacoma", "sku": "JMB54"}, {"name": "Chevy Stock Car", "sku": "JKH33"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Polaris RZR", "sku": "BL251"}, {"name": "1971 Dodge Challenger", "sku": "JKH42"}, {"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "Porsche 911", "sku": "BL252"}], "15": [{"name": "1971 Dodge Challenger", "sku": "JKH42"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Porsche 911", "sku": "BL252"}, {"name": "Chevy Stock Car", "sku": "JKH33"}], "16": [{"name": "Toyota Tacoma", "sku": "JMB54"}, {"name": "1971 Dodge Challenger", "sku": "JKH42"}], "17": [], "18": [{"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "Porsche 911", "sku": "BL252"}, {"name": "1971 Dodge Challenger", "sku": "JKH42"}, {"name": "Chevy Stock Car", "sku": "JKH33"}, {"name": "Mustang Fastback", "sku": "JKH34"}], "19": [{"name": "Chevy Stock Car", "sku": "JKH33"}, {"name": "1971 Dodge Challenger", "sku": "JKH42"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Porsche 911", "sku": "BL252"}, {"name": "Triumph Scrambler", "sku": "JKH31"}], "20": [{"name": "1971 Dodge Challenger", "sku": "JKH42"}, {"name": "Chevy Stock Car", "sku": "JKH33"}], "21": [{"name": "1971 Dodge Challenger", "sku": "JKH42"}, {"name": "Chevy Stock Car", "sku": "JKH33"}], "22": [{"name": "Chevy Stock Car", "sku": "JKH33"}, {"name": "1971 Dodge Challenger", "sku": "JKH42"}], "23": [], "24": [{"name": "Chevy Stock Car", "sku": "JKH33"}, {"name": "1971 Dodge Challenger", "sku": "JKH42"}], "25": [], "26": [{"name": "Chevy Stock Car", "sku": "JKH33"}, {"name": "1971 Dodge Challenger", "sku": "JKH42"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Porsche 911", "sku": "BL252"}, {"name": "Triumph Scrambler", "sku": "JKH31"}], "27": [{"name": "Chevy Stock Car", "sku": "JKH33"}, {"name": "1971 Dodge Challenger", "sku": "JKH42"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Porsche 911", "sku": "BL252"}, {"name": "Triumph Scrambler", "sku": "JKH31"}], "28": [{"name": "Chevy Stock Car", "sku": "JKH33"}], "29": [{"name": "1971 Dodge Challenger", "sku": "JKH42"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Porsche 911", "sku": "BL252"}, {"name": "Triumph Scrambler", "sku": "JKH31"}], "30": [{"name": "Chevy Stock Car", "sku": "JKH33"}, {"name": "1971 Dodge Challenger", "sku": "JKH42"}], "31": [{"name": "Chevy Stock Car", "sku": "JKH33"}, {"name": "1971 Dodge Challenger", "sku": "JKH42"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Porsche 911", "sku": "BL252"}, {"name": "Triumph Scrambler", "sku": "JKH31"}], "32": [{"name": "1971 Dodge Challenger", "sku": "JKH42"}, {"name": "Chevy Stock Car", "sku": "JKH33"}], "33": [{"name": "1971 Dodge Challenger", "sku": "JKH42"}, {"name": "Rescue Helicopter", "sku": "JKH39"}], "34": [{"name": "Chevy Stock Car", "sku": "JKH33"}], "35": [{"name": "Rescue Helicopter", "sku": "JKH39"}], "36": [{"name": "Rescue Helicopter", "sku": "JKH39"}], "37": [{"name": "Chevy Stock Car", "sku": "JKH33"}], "38": [{"name": "Porsche 911", "sku": "BL252"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "Chevy Stock Car", "sku": "JKH33"}], "39": [{"name": "Chevy Stock Car", "sku": "JKH33"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Porsche 911", "sku": "BL252"}, {"name": "Triumph Scrambler", "sku": "JKH31"}], "40": [], "41": [{"name": "Chevy Stock Car", "sku": "JKH33"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Porsche 911", "sku": "BL252"}, {"name": "Triumph Scrambler", "sku": "JKH31"}], "42": [{"name": "Chevy Stock Car", "sku": "JKH33"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Porsche 911", "sku": "BL252"}, {"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "Rescue Helicopter", "sku": "JKH39"}], "43": [{"name": "Chevy Stock Car", "sku": "JKH33"}, {"name": "Rescue Helicopter", "sku": "JKH39"}, {"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "Porsche 911", "sku": "BL252"}, {"name": "Mustang Fastback", "sku": "JKH34"}], "44": [{"name": "Rescue Helicopter", "sku": "JKH39"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Triumph Scrambler", "sku": "JKH31"}], "45": [{"name": "Rescue Helicopter", "sku": "JKH39"}, {"name": "Chevy Stock Car", "sku": "JKH33"}, {"name": "Land Rover 6x6 Distressed", "sku": "BL250"}, {"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "Polaris RZR", "sku": "BL251"}]};
 // ── DIALOGUES (from Script V3, 04/14/2026 Playmation) ─────────
-const SCRIPT_DIALOGUES = {"01": "Charmaine (V.O.): (narration) Just as Charmaine starts off to claim the mountain treasure, the volcano erupts!", "02": "Charmaine (V.O.): I have to rescue that ancient treasure before the volcano destroys it!", "04": "", "05": "Charmaine (V.O.): (as the truck) Vroom! (then) Everyone needs their toughest vehicle for this adventure.", "06": "Aimee (V.O.): That's the treasure? / Sean (V.O.): That's sooo close to the exploding volcano? / Charmaine (V.O.): Yep. So there's not a second to waste.", "07": "", "08": "Charmaine (V.O.): Follow me!", "09": "Charmaine (V.O.): (narration) Charmaine leads the crew up the narrow volcano mountain pass to the treasure.", "10": "Charmaine (V.O.): WhooOA! This shaking volcano is making the road tough.", "11": "Charmaine (V.O.): (narration) Everyone stay to the outside to avoid the lava. / Crosby (V.O.): Lava!", "12": "Sean (V.O.): We need to get that treasure and get off this mountain fast.", "13": "Aimee (V.O.): If we need to go fast, let's make this a race!", "14": "Aimee (V.O.): Welcome to the Volcano Treasure Rally Race! Go!", "15": "Charmaine (V.O.): Aimee what are you doing? / Aimee (V.O.): I'm winning the race to the treasure. See ya at the top.", "16": "Charmaine (V.O.): Aimee this is suppose to be a treasure adventure. / Aimee (V.O.): Yeah, a fast treasure adventure!", "17": "Aimee (V.O.): That volcano looks pretty dangerous. A race might actually keep us safe.", "18": "Charmaine (V.O.): Okay. New plan. First person to get the treasure to the bottom of the mountain wins!", "19": "Ted (V.O.): (playing announcer) The volcano is hot, but the racing is even hotter. It's neck and neck with big stakes. Aimee is in the lead and going strong.", "20": "Ted (V.O.): (playing announcer) Hold on race fans. Charmaine speeds up and passes Aimee on the inside!", "21": "Ted (V.O.): (playing announcer) What's this? Aimee peels off the main road! Where's she going? Whoa! She took a shortcut and jumps over Charmaine!", "22": "Ted (V.O.): (playing announcer) Aimee has snagged the treasure! / Aimee (V.O.): (to Charmaine) Hey, there Charmaine. What took ya so long? I'd love to stay and chat, but I've got a race to win. See ya at the bottom. / Charmaine (V.O.): Aimee, you can't take shortcuts!", "23": "Charmaine (V.O.): It's no fun if you change the rules all the time.", "24": "Aimee (V.O.): (genuine) I'm sorry, Charmaine. (teasing) I guess I should have just beat you fair and square. / Charmaine (V.O.): Oh, you are on!", "25": "Sean (V.O.): Whatever we're gonna do, we'd better do it quickly. The volcano just exploded!", "26": "Ted (V.O.): (as announcer) There is a new contestant in the race, flowing lava! / Charmaine (V.O.): Let's race!", "27": "Charmaine (V.O.): Stay safe everyone. And let us know if you see anything dangerous.", "28": "Aimee (V.O.): Boulder!", "29": "Charmaine (V.O.): Thanks, Aimee! / Ted (V.O.): Everyone narrowly avoids crashing into the giant boulder. Even me!", "30": "Ted (V.O.): Charmaine and Aimee are neck and neck. Charmaine - Aimee - Aimee - Charmaine - Aimee - lava! / Charmaine (V.O.): Lava! Jump!", "31": "Ted (V.O.): (as announcer) This just in. I made it over the lava! / Aimee (V.O.): (teasing) And into last place. / ALL (V.O.): (group giggles)", "32": "Charmaine (V.O.): (narration) With quick thinking, Charmaine takes a sharp left onto the old fire road. / Aimee (V.O.): Hey! Where's Charmaine going?", "33": "Charmaine (V.O.): (narration) She hops in the old Rescue Helicopter and lifts off. (as herself) Time to take this race to the air!", "34": "Ted (V.O.): (as announcer) Oh no, Aimee hits some falling debris and sends that treasure up for grabs!", "35": "Charmaine (V.O.): Yes! I caught the treasure. / Ted (V.O.): (narration) Yes, but from the air Charmaine spots a new danger.", "36": "Charmaine (V.O.): Aimee, the main road is blocked by a lava pool, you have to turn right now!", "37": "Aimee (V.O.): AaaHHH! / Charmaine (V.O.): Everyone follow Aimee! / Ted (V.O.): (as announcer) In a bizarre twist, one of the racers is now directing the race... from the air!", "38": "Crosby / Sean / Ted (V.O.): AaaHHH!", "39": "Aimee (V.O.): Thanks, Charmaine!", "40": "Charmaine (V.O.): Don't thank me yet. The bridge at the end of the trail is broken! You'll have to jump it.", "41": "Aimee (V.O.): Whoo-hoo! / Sean (V.O.): Yahoo! / Crosby (V.O.): Oh boy! / Ted (V.O.): Don't look down!", "42": "Charmaine (V.O.): Yes! Way to go! / Ted (V.O.): (as announcer) At the finish line, it's Aimee for the win, then Sean, then Crosby, then me. Wait. How did I come in last place? Sure, I was mostly talking, but I was still going really fast. Last place! Me? / All (except Ted) (V.O.): Ted! / Ted (V.O.): Oh well, at least everyone is safe and the treasure saved! Whew!", "43": "Charmaine (V.O.): You definitely earned that race trophy today, Aimee. / Aimee (V.O.): And you recovered the treasure. We both win. / Ted (V.O.): Um, Charmaine. You're gonna fly us all out of here, right?", "44": "Charmaine (V.O.): Now that's an adventure!", "45": "Sean (V.O.): Nothing can stop the... / All (V.O.): MATCHBOX CREW!"};
+const SCRIPT_DIALOGUES = {"01": "Charmaine (V.O.): (narration) The volcano erupts just as Charmaine starts off to claim the ancient mountain treasure!", "02": "Charmaine (V.O.): I have to rescue that ancient treasure before the volcano destroys it!", "04": "", "05": "Charmaine (V.O.): (as the truck) Vroom! (then) Everyone needs their toughest vehicle for this adventure.", "06": "Aimee (V.O.): The chest is way up there at the top? / Sean (V.O.): That's sooo close to the exploding volcano? / Charmaine (V.O.): Yep. So there's not a second to waste.", "07": "", "08": "Charmaine (V.O.): Follow me!", "09": "Charmaine (V.O.): (narration) Charmaine leads the crew up the rocky volcano mountain pass.", "10": "Charmaine (V.O.): WhooOA! Keep both hands on the wheel, everyone! The rumbling volcano is turning this road into a bounce house!", "11": "Charmaine (V.O.): (narration) Everyone stay to the outside to avoid the lava. / Crosby (V.O.): Lava! Like molten rock that'll melt my tires? Uh, yeah. Avoiding that is a great idea.", "12": "Sean (V.O.): We need to grab that treasure and get off this mountain fast.", "13": "Aimee (V.O.): Fast? Oh, I can go fast, Sean. Orrr... we can go fast. Let's have a race!", "14": "Aimee (V.O.): (narration) Instead of rough, off-road vehicles, everyone is in sports cars and race cars... but they have off-road tires. (as Announcer) Welcome to the Volcano Treasure Rally Race! Go!", "15": "Charmaine (V.O.): Aimee what are you doing? / Aimee (V.O.): Racing to the treasure. See ya at the top.", "16": "Charmaine (V.O.): Aimee this is suppose to be a treasure adventure. / Aimee (V.O.): Yeah, a fast, off-road adventure!", "17": "Sean (V.O.): That volcano looks pretty dangerous. / Charmaine (V.O.): It's so dangerous. The whole mountain is shaking. / Crosby (V.O.): That's right! And, there's like cracks opening up here, and rocks falling, and smoke and lava. / Sean (V.O.): A race might actually keep us ahead of all that danger.", "18": "Charmaine (V.O.): Okay. New plan. First person to get the treasure to the bottom of the mountain wins!", "19": "Ted (V.O.): (playing announcer) The volcano is hot, but the racing is even hotter. It's neck and neck with big stakes. Aimee is in the lead and going strong.", "20": "Ted (V.O.): (playing announcer) Hold on race fans. Charmaine speeds up and passes Aimee on the inside!", "21": "Ted (V.O.): (playing announcer) What's this? Aimee peels off the main road! Where's she going? Whoa! She took a shortcut and jumps over Charmaine!", "22": "Ted (V.O.): (playing announcer) Aimee has snagged the treasure chest! / Aimee (V.O.): (to Charmaine) Hey there, Charmaine. What took ya so long? / Charmaine (V.O.): Aimee, you can't take a bunch of shortcuts! / Aimee (V.O.): I'd love to stay and chat, but I've got a race to win. See ya at the bottom.", "23": "Charmaine (V.O.): It's no fun if you change the rules all the time.", "24": "Aimee (V.O.): (genuine) I'm sorry, Charmaine. No more shortcuts. / Charmaine (V.O.): But this race is really fun! / Aimee (V.O.): It is! (teasing) I look forward to beating you fair and square. / Charmaine (V.O.): Oh, you are on!", "25": "Sean (V.O.): Whatever we're gonna do, we'd better do it quickly. The volcano just exploded again!", "26": "Ted (V.O.): (as announcer) There is a new contestant in the race, flowing lava! / Charmaine (V.O.): This race is shifting into high gear. Floor it!", "27": "Charmaine (V.O.): Stay safe everyone. And let us know if you see anything dangerous. / Crosby (V.O.): Everything I see is dangerous, Charmaine. I'll let you know if I see anything that's not dangerous!", "28": "Ted (V.O.): (narration) Suddenly, Aimee sees something very dangerous. (prompting Aimee) It's a...? / Aimee (V.O.): Boulder! / Ted (V.O.): Oh no, a boulder!", "29": "Charmaine (V.O.): Thanks, Aimee! / Ted (V.O.): Everyone narrowly avoids crashing into the giant boulder. Even your fast and fearless announcer...me!", "30": "Ted (V.O.): Charmaine and Aimee are neck and neck. Charmaine - Aimee - Aimee - Charmaine - Aimee - lava! / Charmaine (V.O.): Lava! Jump!", "31": "Ted (V.O.): (as announcer) This just in. I made it over the lava! / Aimee (V.O.): (teasing) And into last place. / ALL (V.O.): (group giggles)", "32": "Charmaine (V.O.): (narration) With quick thinking, Charmaine takes a sharp left onto the old fire road. / Aimee (V.O.): Hey! Where's Charmaine going?", "33": "Charmaine (V.O.): (narration) She hops in the old Rescue Helicopter and lifts off. (as herself) Time to take this race to the air!", "34": "Ted (V.O.): (as announcer) Oh no, Aimee hits some falling debris and sends that treasure up for grabs!", "35": "Charmaine (V.O.): Yes! I caught the treasure. / Ted (V.O.): (narration) Incredible! But, from the air Charmaine spots a new danger.", "36": "Charmaine (V.O.): Aimee, the main road is blocked by a huge river of lava, you have to turn right now!", "37": "Aimee (V.O.): AaaHHH! / Charmaine (V.O.): Everyone follow Aimee! / Ted (V.O.): (as announcer) In a bizarre twist, one of the racers is now directing the race... and it's not me!", "38": "Crosby / Sean / Ted (V.O.): AaaHHH!", "39": "Aimee (V.O.): Thanks, Charmaine!", "40": "Charmaine (V.O.): Don't thank me yet. The bridge at the end of the trail is broken! You'll have to jump it.", "41": "Aimee (V.O.): Whoo-hoo! / Sean (V.O.): Yahoo! / Crosby (V.O.): Oh boy! / Ted (V.O.): Don't look down!", "42": "Charmaine (V.O.): Yes! Way to go! / Ted (V.O.): (as announcer) At the finish line, it's Aimee for the win, then Sean, then Crosby, then me. Wait. How did I come in last place? Sure, I was mostly talking, but I was still going really fast. Last place! Me? / All (except Ted) (V.O.): Ted! / Ted (V.O.): Oh well, at least everyone is safe and the treasure saved! Whew!", "43": "Charmaine (V.O.): You definitely earned that race trophy today, Aimee. / Aimee (V.O.): And you recovered the treasure. We both win. / Ted (V.O.): Um, Charmaine. You're gonna fly us all out of here, right?", "44": "Charmaine (V.O.): Now that's an adventure!", "45": "Sean (V.O.): Nothing can stop the... / All (V.O.): MATCHBOX CREW!"};
 // ── ADDRESSED IN COLOR (draft from MATTEL feedback) ───────────
 const ADDRESSED = {};
 
@@ -974,7 +974,7 @@ const PANELS = [
     "num": "01",
     "label": "01",
     "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
-    "dialogue": "Charmaine (V.O.): (narration) Just as Charmaine starts off to claim the mountain treasure, the volcano erupts!",
+    "dialogue": "Charmaine (V.O.): (narration) The volcano erupts just as Charmaine starts off to claim the ancient mountain treasure!",
     "chars": []
   },
   {
@@ -1002,7 +1002,7 @@ const PANELS = [
     "num": "06",
     "label": "06",
     "scene": "REAL WORLD · SMALLEY'S GARAGE",
-    "dialogue": "Aimee (V.O.): That's the treasure? / Sean (V.O.): That's sooo close to the exploding volcano? / Charmaine (V.O.): Yep. So there's not a second to waste.",
+    "dialogue": "Aimee (V.O.): The chest is way up there at the top? / Sean (V.O.): That's sooo close to the exploding volcano? / Charmaine (V.O.): Yep. So there's not a second to waste.",
     "chars": []
   },
   {
@@ -1023,63 +1023,63 @@ const PANELS = [
     "num": "09",
     "label": "09",
     "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
-    "dialogue": "Charmaine (V.O.): (narration) Charmaine leads the crew up the narrow volcano mountain pass to the treasure.",
+    "dialogue": "Charmaine (V.O.): (narration) Charmaine leads the crew up the rocky volcano mountain pass.",
     "chars": []
   },
   {
     "num": "10",
     "label": "10",
     "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
-    "dialogue": "Charmaine (V.O.): WhooOA! This shaking volcano is making the road tough.",
+    "dialogue": "Charmaine (V.O.): WhooOA! Keep both hands on the wheel, everyone! The rumbling volcano is turning this road into a bounce house!",
     "chars": []
   },
   {
     "num": "11",
     "label": "11",
     "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
-    "dialogue": "Charmaine (V.O.): (narration) Everyone stay to the outside to avoid the lava. / Crosby (V.O.): Lava!",
+    "dialogue": "Charmaine (V.O.): (narration) Everyone stay to the outside to avoid the lava. / Crosby (V.O.): Lava! Like molten rock that'll melt my tires? Uh, yeah. Avoiding that is a great idea.",
     "chars": []
   },
   {
     "num": "12",
     "label": "12",
     "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
-    "dialogue": "Sean (V.O.): We need to get that treasure and get off this mountain fast.",
+    "dialogue": "Sean (V.O.): We need to grab that treasure and get off this mountain fast.",
     "chars": []
   },
   {
     "num": "13",
     "label": "13",
     "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
-    "dialogue": "Aimee (V.O.): If we need to go fast, let's make this a race!",
+    "dialogue": "Aimee (V.O.): Fast? Oh, I can go fast, Sean. Orrr... we can go fast. Let's have a race!",
     "chars": []
   },
   {
     "num": "14",
     "label": "14",
     "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
-    "dialogue": "Aimee (V.O.): Welcome to the Volcano Treasure Rally Race! Go!",
+    "dialogue": "Aimee (V.O.): (narration) Instead of rough, off-road vehicles, everyone is in sports cars and race cars... but they have off-road tires. (as Announcer) Welcome to the Volcano Treasure Rally Race! Go!",
     "chars": []
   },
   {
     "num": "15",
     "label": "15",
     "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
-    "dialogue": "Charmaine (V.O.): Aimee what are you doing? / Aimee (V.O.): I'm winning the race to the treasure. See ya at the top.",
+    "dialogue": "Charmaine (V.O.): Aimee what are you doing? / Aimee (V.O.): Racing to the treasure. See ya at the top.",
     "chars": []
   },
   {
     "num": "16",
     "label": "16",
     "scene": "REAL WORLD · SMALLEY'S GARAGE",
-    "dialogue": "Charmaine (V.O.): Aimee this is suppose to be a treasure adventure. / Aimee (V.O.): Yeah, a fast treasure adventure!",
+    "dialogue": "Charmaine (V.O.): Aimee this is suppose to be a treasure adventure. / Aimee (V.O.): Yeah, a fast, off-road adventure!",
     "chars": []
   },
   {
     "num": "17",
     "label": "17",
     "scene": "REAL WORLD · SMALLEY'S GARAGE",
-    "dialogue": "Aimee (V.O.): That volcano looks pretty dangerous. A race might actually keep us safe.",
+    "dialogue": "Sean (V.O.): That volcano looks pretty dangerous. / Charmaine (V.O.): It's so dangerous. The whole mountain is shaking. / Crosby (V.O.): That's right! And, there's like cracks opening up here, and rocks falling, and smoke and lava. / Sean (V.O.): A race might actually keep us ahead of all that danger.",
     "chars": []
   },
   {
@@ -1114,7 +1114,7 @@ const PANELS = [
     "num": "22",
     "label": "22",
     "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
-    "dialogue": "Ted (V.O.): (playing announcer) Aimee has snagged the treasure! / Aimee (V.O.): (to Charmaine) Hey, there Charmaine. What took ya so long? I'd love to stay and chat, but I've got a race to win. See ya at the bottom. / Charmaine (V.O.): Aimee, you can't take shortcuts!",
+    "dialogue": "Ted (V.O.): (playing announcer) Aimee has snagged the treasure chest! / Aimee (V.O.): (to Charmaine) Hey there, Charmaine. What took ya so long? / Charmaine (V.O.): Aimee, you can't take a bunch of shortcuts! / Aimee (V.O.): I'd love to stay and chat, but I've got a race to win. See ya at the bottom.",
     "chars": []
   },
   {
@@ -1128,42 +1128,42 @@ const PANELS = [
     "num": "24",
     "label": "24",
     "scene": "REAL WORLD · SMALLEY'S GARAGE",
-    "dialogue": "Aimee (V.O.): (genuine) I'm sorry, Charmaine. (teasing) I guess I should have just beat you fair and square. / Charmaine (V.O.): Oh, you are on!",
+    "dialogue": "Aimee (V.O.): (genuine) I'm sorry, Charmaine. No more shortcuts. / Charmaine (V.O.): But this race is really fun! / Aimee (V.O.): It is! (teasing) I look forward to beating you fair and square. / Charmaine (V.O.): Oh, you are on!",
     "chars": []
   },
   {
     "num": "25",
     "label": "25",
     "scene": "REAL WORLD · SMALLEY'S GARAGE",
-    "dialogue": "Sean (V.O.): Whatever we're gonna do, we'd better do it quickly. The volcano just exploded!",
+    "dialogue": "Sean (V.O.): Whatever we're gonna do, we'd better do it quickly. The volcano just exploded again!",
     "chars": []
   },
   {
     "num": "26",
     "label": "26",
     "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
-    "dialogue": "Ted (V.O.): (as announcer) There is a new contestant in the race, flowing lava! / Charmaine (V.O.): Let's race!",
+    "dialogue": "Ted (V.O.): (as announcer) There is a new contestant in the race, flowing lava! / Charmaine (V.O.): This race is shifting into high gear. Floor it!",
     "chars": []
   },
   {
     "num": "27",
     "label": "27",
     "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
-    "dialogue": "Charmaine (V.O.): Stay safe everyone. And let us know if you see anything dangerous.",
+    "dialogue": "Charmaine (V.O.): Stay safe everyone. And let us know if you see anything dangerous. / Crosby (V.O.): Everything I see is dangerous, Charmaine. I'll let you know if I see anything that's not dangerous!",
     "chars": []
   },
   {
     "num": "28",
     "label": "28",
     "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
-    "dialogue": "Aimee (V.O.): Boulder!",
+    "dialogue": "Ted (V.O.): (narration) Suddenly, Aimee sees something very dangerous. (prompting Aimee) It's a...? / Aimee (V.O.): Boulder! / Ted (V.O.): Oh no, a boulder!",
     "chars": []
   },
   {
     "num": "29",
     "label": "29",
     "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
-    "dialogue": "Charmaine (V.O.): Thanks, Aimee! / Ted (V.O.): Everyone narrowly avoids crashing into the giant boulder. Even me!",
+    "dialogue": "Charmaine (V.O.): Thanks, Aimee! / Ted (V.O.): Everyone narrowly avoids crashing into the giant boulder. Even your fast and fearless announcer...me!",
     "chars": []
   },
   {
@@ -1205,21 +1205,21 @@ const PANELS = [
     "num": "35",
     "label": "35",
     "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
-    "dialogue": "Charmaine (V.O.): Yes! I caught the treasure. / Ted (V.O.): (narration) Yes, but from the air Charmaine spots a new danger.",
+    "dialogue": "Charmaine (V.O.): Yes! I caught the treasure. / Ted (V.O.): (narration) Incredible! But, from the air Charmaine spots a new danger.",
     "chars": []
   },
   {
     "num": "36",
     "label": "36",
     "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
-    "dialogue": "Charmaine (V.O.): Aimee, the main road is blocked by a lava pool, you have to turn right now!",
+    "dialogue": "Charmaine (V.O.): Aimee, the main road is blocked by a huge river of lava, you have to turn right now!",
     "chars": []
   },
   {
     "num": "37",
     "label": "37",
     "scene": "ADVENTURE WORLD · TREASURE MOUNTAIN",
-    "dialogue": "Aimee (V.O.): AaaHHH! / Charmaine (V.O.): Everyone follow Aimee! / Ted (V.O.): (as announcer) In a bizarre twist, one of the racers is now directing the race... from the air!",
+    "dialogue": "Aimee (V.O.): AaaHHH! / Charmaine (V.O.): Everyone follow Aimee! / Ted (V.O.): (as announcer) In a bizarre twist, one of the racers is now directing the race... and it's not me!",
     "chars": []
   },
   {

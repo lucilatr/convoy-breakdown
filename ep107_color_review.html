@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CVY26_001_107 — Color Review</title>
+<style>
+  /* ── VARIABLES ──────────────────────────────────────────────── */
+  :root {
+    --black: #0a0a0a;
+    --white: #ffffff;
+    --off-white: #f5f5f0;
+    --grey-light: #e8e8e4;
+    --grey-mid: #999;
+    --grey-dark: #333;
+    --accent: #e8002d;
+    --accent-dark: #b5001e;
+    --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --font-mono: 'Courier New', monospace;
+  }
+
+  /* ── RESET ──────────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    background: #e8e8e4;
+    color: var(--black);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ── SCREEN NAV BAR ─────────────────────────────────────────── */
+  #topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: var(--black);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 24px;
+    gap: 16px;
+    border-bottom: 2px solid var(--accent);
+  }
+  #topbar .tb-title {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--white);
+  }
+  #topbar .tb-title span { color: var(--accent); }
+  #topbar .tb-controls { display: flex; gap: 10px; }
+  .tb-btn {
+    background: var(--accent);
+    color: var(--white);
+    border: none;
+    padding: 7px 16px;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .tb-btn:hover { background: var(--accent-dark); }
+  .tb-btn.secondary {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.25);
+    color: rgba(255,255,255,0.7);
+  }
+  .tb-btn.secondary:hover { border-color: var(--white); color: var(--white); background: transparent; }
+
+  /* ── PAGE WRAPPER ───────────────────────────────────────────── */
+  #doc-wrapper {
+    padding-top: 60px;
+  }
+
+  /* ── SHARED PAGE STYLES ─────────────────────────────────────── */
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    background: var(--white);
+    margin: 24px auto;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ── COVER PAGE ─────────────────────────────────────────────── */
+  .cover {
+    background: var(--white);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0;
+  }
+  .cover-stripe {
+    background: var(--accent);
+    height: 10px;
+    width: 100%;
+  }
+  .cover-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 48px 56px;
+    gap: 24px;
+    border-bottom: 1px solid var(--grey-light);
+  }
+  .cover-eyebrow {
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .cover-title {
+    font-size: 42px;
+    font-weight: 900;
+    color: var(--black);
+    line-height: 1.05;
+    letter-spacing: -1px;
+    text-transform: uppercase;
+  }
+  .cover-title span { color: var(--accent); }
+  .cover-subtitle {
+    font-size: 18px;
+    font-weight: 300;
+    color: var(--grey-mid);
+    letter-spacing: 1px;
+  }
+  .cover-divider {
+    width: 48px;
+    height: 2px;
+    background: var(--accent);
+  }
+  .cover-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 32px;
+    padding: 32px 56px 48px;
+  }
+  .cover-meta-item { display: flex; flex-direction: column; gap: 2px; }
+  .cover-meta-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--grey-mid);
+    font-weight: 600;
+  }
+  .cover-meta-value {
+    font-size: 12px;
+    color: var(--grey-dark);
+    font-weight: 500;
+  }
+  .cover-meta-value[contenteditable="true"] {
+    outline: none;
+    border-bottom: 1px dashed var(--grey-light);
+    min-width: 80px;
+    display: inline-block;
+  }
+  .cover-logo-area {
+    position: absolute;
+    bottom: 56px;
+    right: 56px;
+    text-align: right;
+  }
+  .cover-logo {
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 6px;
+    color: var(--grey-light);
+    text-transform: uppercase;
+  }
+  .cover-confidential {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--grey-mid);
+    margin-top: 4px;
+  }
+
+  /* ── SECTION HEADER PAGE ────────────────────────────────────── */
+  .section-page {
+    background: var(--off-white);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 64px 56px;
+    min-height: 160px;
+  }
+  .section-page.compact { min-height: unset; padding: 28px 40px 0; }
+  .section-eyebrow {
+    font-size: 9px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .section-title {
+    font-size: 28px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+    color: var(--black);
+  }
+  .section-rule {
+    width: 100%;
+    height: 1px;
+    background: var(--grey-light);
+    margin: 0 40px;
+  }
+
+  /* ── CHARACTER LINEUP PAGE ──────────────────────────────────── */
+  .lineup-page {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .lineup-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    background: var(--black);
+    border-bottom: 2px solid var(--accent);
+    padding: 14px 28px;
+    flex-shrink: 0;
+  }
+  .lineup-header-title {
+    font-size: 14px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--white);
+  }
+  .lineup-header-ep {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+  }
+  .lineup-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--grey-light);
+  }
+  .char-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    padding: 16px 20px 14px;
+    gap: 10px;
+  }
+
+  .char-img-wrap {
+    width: 100%;
+    background: var(--off-white);
+    overflow: visible;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .char-img-wrap > img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .char-img-placeholder {
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--grey-mid);
+    text-transform: uppercase;
+    text-align: center;
+    padding: 32px;
+  }
+  /* Franja inferior: texto izquierda + pin derecha */
+  .char-bottom {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    border-top: 1px solid var(--grey-light);
+    padding-top: 10px;
+    margin-top: 8px;
+  }
+  .char-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .char-name {
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--black);
+  }
+  .char-role {
+    font-size: 9.5px;
+    color: var(--grey-mid);
+    letter-spacing: 0.3px;
+  }
+  .char-vehicle {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  /* Wardrobe pin — polaroid a la derecha */
+  .char-wardrobe-pin {
+    width: 32%;
+    flex-shrink: 0;
+    background: var(--white);
+    padding: 5px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    transform: rotate(3deg);
+  }
+  .char-wardrobe-pin img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* ── PANEL PAGE ─────────────────────────────────────────────── */
+  .panel-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 297mm;
+  }
+  .panel-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 20px;
+    background: var(--black);
+    border-bottom: 2px solid var(--accent);
+    flex-shrink: 0;
+  }
+  .panel-page-header .ph-ep {
+    font-size: 8px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+  }
+  .panel-page-header .ph-title {
+    font-size: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+  }
+  .panel-page-header .ph-num {
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: var(--accent);
+  }
+
+  /* SPACER between header and image */
+  .panel-spacer {
+    height: 14mm;
+    flex-shrink: 0;
+    background: var(--white);
+  }
+
+  /* IMAGE: full width with 1cm side margins + border frame */
+  .panel-img-col {
+    width: calc(100% - 2cm);
+    margin: 0 1cm;
+    background: var(--black);
+    border: 1px solid #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    aspect-ratio: 16 / 9;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .panel-img-col img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+  .panel-img-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 24px;
+    color: #555;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+  }
+  .panel-img-placeholder .pip-icon {
+    width: 64px;
+    height: 48px;
+    border: 2px dashed currentColor;
+    border-radius: 2px;
+    position: relative;
+  }
+  .panel-img-placeholder .pip-icon::after {
+    content: '';
+    position: absolute;
+    bottom: 8px; left: 8px; right: 8px;
+    height: 2px;
+    background: currentColor;
+    box-shadow: 0 -6px 0 currentColor;
+  }
+  .panel-img-placeholder .pip-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: var(--font-mono);
+    color: #555;
+  }
+
+  /* INFO SECTION: below image */
+  .panel-info-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* top info row: 2 columns */
+  .panel-info-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    flex: 1;
+  }
+
+  /* left col: panel num + scene + visual */
+  .panel-info-main {
+    padding: 14px 20px 14px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-right: 1px solid var(--grey-light);
+  }
+
+  /* right col: dialogue + chars */
+  .panel-info-side {
+    padding: 14px 22px 14px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .panel-num-badge {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .panel-num {
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--black);
+    letter-spacing: -1px;
+  }
+  .panel-num-sub {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--grey-mid);
+    letter-spacing: 1px;
+  }
+
+  .info-block { display: flex; flex-direction: column; gap: 4px; }
+  .info-label {
+    font-size: 7.5px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--grey-mid);
+  }
+  .info-value {
+    font-size: 10.5px;
+    line-height: 1.55;
+    color: var(--grey-dark);
+  }
+
+  /* editable fields */
+  .editable {
+    outline: none;
+    border-bottom: 1px dashed var(--grey-light);
+    min-height: 18px;
+    padding: 2px 0;
+    color: var(--grey-dark);
+    font-size: 10.5px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+  }
+  .editable:empty::before {
+    content: attr(data-placeholder);
+    color: #ccc;
+    font-style: italic;
+    pointer-events: none;
+  }
+  .editable:focus {
+    border-bottom-color: var(--accent);
+    border-bottom-style: solid;
+  }
+
+  /* dialogue block */
+  .dialogue-block {
+    background: var(--off-white);
+    border-left: 3px solid var(--accent);
+    padding: 10px 12px;
+    border-radius: 0 2px 2px 0;
+  }
+  .dialogue-block .info-label { color: var(--accent); }
+  .dialogue-block .editable {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    line-height: 1.6;
+    border-bottom-color: transparent;
+  }
+  .dialogue-block .editable:focus { border-bottom-color: var(--accent); }
+
+  /* chars in scene */
+  .chars-in-scene {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 2px;
+  }
+  .char-tag {
+    font-size: 7.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: var(--grey-light);
+    padding: 2px 7px;
+    border-radius: 2px;
+    color: var(--grey-dark);
+  }
+  .char-tag.villain { background: #fdecea; color: var(--accent); }
+
+  /* notes row: bottom strip */
+  .panel-notes-row {
+    border-top: 1px solid var(--grey-light);
+    padding: 8px 22px 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+  .panel-notes-row .info-label { margin-bottom: 2px; }
+  .panel-notes-row .editable {
+    font-size: 10px;
+    border-bottom-color: transparent;
+  }
+  .panel-notes-row .editable:focus { border-bottom-color: var(--accent); }
+  .notes-col { flex: 1; }
+
+  /* ── WARDROBE PAGE ──────────────────────────────────────────── */
+  .wardrobe-page {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+  }
+  .wardrobe-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    background: var(--grey-light);
+    padding: 0;
+  }
+  .wardrobe-card {
+    background: var(--white);
+    display: flex;
+    flex-direction: column;
+    padding: 16px 12px 14px;
+    gap: 10px;
+  }
+  .wardrobe-img-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--off-white);
+    overflow: hidden;
+  }
+  .wardrobe-img-wrap img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .wardrobe-info {
+    border-top: 1px solid var(--grey-light);
+    padding-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .wardrobe-name {
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--black);
+  }
+  .wardrobe-label {
+    font-size: 8px;
+    color: var(--grey-mid);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  /* ── STORYBOARD PAGE ────────────────────────────────────────── */
+  .storyboard-page {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+  }
+  .sb-header {
+    background: var(--black);
+    border-bottom: 2px solid var(--accent);
+    padding: 18px 24px 14px;
+    flex-shrink: 0;
+  }
+  .sb-eyebrow {
+    font-size: 8px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 4px;
+  }
+  .sb-title {
+    font-size: 22px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+    color: var(--white);
+    line-height: 1;
+  }
+  .sb-title span { color: var(--accent); }
+  .sb-subtitle {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.35);
+    margin-top: 5px;
+    text-transform: uppercase;
+  }
+  .sb-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+    padding: 14px;
+    align-content: start;
+  }
+  .sb-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .sb-img-wrap {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: var(--grey-light);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .sb-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .sb-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    font-family: var(--font-mono);
+    color: #bbb;
+    letter-spacing: 1px;
+  }
+  .sb-label {
+    font-size: 6.5px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--grey-mid);
+    text-align: center;
+    line-height: 1;
+  }
+
+  /* ── PRINT STYLES ───────────────────────────────────────────── */
+  @media print {
+    body { background: white; font-size: 11px; }
+    #topbar { display: none !important; }
+    #doc-wrapper { padding-top: 0; }
+
+    .page {
+      width: 100%;
+      min-height: 100vh;
+      margin: 0;
+      box-shadow: none;
+      page-break-after: always;
+      break-after: page;
+    }
+    .page:last-child { page-break-after: avoid; break-after: avoid; }
+
+    .cover { min-height: 100vh; }
+    .lineup-page { min-height: 100vh; }
+
+    .panel-page {
+      min-height: 100vh;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .panel-img-col { aspect-ratio: 16/9; }
+    .panel-page-header { background: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+    /* Spacer: forzar visibilidad en print */
+    .panel-spacer {
+      height: 14mm !important;
+      min-height: 14mm !important;
+      display: block !important;
+      flex-shrink: 0 !important;
+    }
+
+    /* Lineup: exactamente una página A4, sin overflow */
+    .lineup-page {
+      height: 297mm;
+      overflow: hidden;
+    }
+    .lineup-grid {
+      overflow: hidden;
+    }
+    .char-card {
+      overflow: hidden;
+      min-height: 0;
+    }
+    .char-img-wrap {
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .char-img-wrap > img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: top;
+    }
+
+    .editable:empty::before { color: #ddd; }
+
+    /* Ocultar bloque Caveats si no hay texto escrito */
+    .caveats-block:has(.editable:empty) { display: none; }
+
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── TOP BAR (screen only) ───────────────────────────────────────── -->
+<div id="topbar">
+  <div class="tb-title">CVY26_001 <span>·</span> EP101 <span>·</span> Color Review</div>
+  <div class="tb-controls">
+    <button class="tb-btn secondary" onclick="toggleEditing()">Toggle Editing</button>
+    <button class="tb-btn" onclick="window.print()">Export PDF</button>
+  </div>
+</div>
+
+<div id="doc-wrapper">
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     COVER PAGE
+═══════════════════════════════════════════════════════════════════ -->
+<div class="page cover">
+  <div class="cover-stripe"></div>
+  <div class="cover-body">
+    <div class="cover-eyebrow">Matchbox Crew</div>
+    <div class="cover-title">Color<br><span>Review</span></div>
+    <div class="cover-subtitle">Episode 107 — Highway Heroes!</div>
+    <div class="cover-divider"></div>
+  </div>
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Project Code</div>
+      <div class="cover-meta-value">CVY26_001</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Episode</div>
+      <div class="cover-meta-value">107 — Highway Heroes!</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Document Type</div>
+      <div class="cover-meta-value">Color Review Package</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Total Panels</div>
+      <div class="cover-meta-value">46</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Version</div>
+      <div class="cover-meta-value" contenteditable="true" data-placeholder="V1">V1</div>
+    </div>
+  </div>
+  <div class="cover-logo-area">
+    <div class="cover-logo">Convoy</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     CHARACTER LINEUP PAGE — EP107 (Highway Heroes)
+═══════════════════════════════════════════════════════════════════ -->
+<style>
+  /* EP102: cuadros de vestuario Adventure World +10% (32% -> 35.2%) */
+  .lineup-page .char-wardrobe-pin { width: 35.2%; }
+</style>
+<div class="page lineup-page">
+  <div class="lineup-header">
+    <div class="lineup-header-title">Character Lineup</div>
+    <div class="lineup-header-ep">Episode 107 · Cast · Highway Heroes</div>
+  </div>
+
+  <div class="lineup-grid">
+
+    <!-- SEAN -->
+    <div class="char-card">
+      <div class="char-img-wrap">
+        <img src="./MATCHBOX-SEAN-turn1.jpg" alt="Sean" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="char-img-placeholder" style="display:none">Sean — Turn 1</div>
+      </div>
+      <div class="char-bottom">
+        <div class="char-info">
+          <div class="char-name">Sean</div>
+          <div class="char-role">Lead — The Spy Kid</div>
+          <div class="char-vehicle">Land Rover 6x6 · #JKH28</div>
+        </div>
+        <div class="char-wardrobe-pin"><img src="./wardrobe/107/SEAN_EP107.png" alt="Sean wardrobe"></div>
+
+      </div>
+    </div>
+
+    <!-- TED -->
+    <div class="char-card">
+      <div class="char-img-wrap">
+        <img src="./MATCHBOX-TED-turn1.jpg" alt="Ted" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="char-img-placeholder" style="display:none">Ted — Turn 1</div>
+      </div>
+      <div class="char-bottom">
+        <div class="char-info">
+          <div class="char-name">Ted</div>
+          <div class="char-role">Crew Leader</div>
+          <div class="char-vehicle">Triumph Scrambler · #JKH31</div>
+          <div class="char-vehicle">Blaze Blaster III · #JHN10</div>
+        </div>
+        <div class="char-wardrobe-pin">
+          <img src="./wardrobe/107/TED_EP107.png" alt="Ted wardrobe">
+        </div>
+      </div>
+    </div>
+
+    <!-- CHARMAINE -->
+    <div class="char-card">
+      <div class="char-img-wrap">
+        <img src="./MATCHBOX-CHARMAINErevisedHAIR.jpg" alt="Charmaine" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="char-img-placeholder" style="display:none">Charmaine — Turn 1</div>
+      </div>
+      <div class="char-bottom">
+        <div class="char-info">
+          <div class="char-name">Charmaine</div>
+          <div class="char-role">Tech &amp; Air Support</div>
+          <div class="char-vehicle">Rescue Helicopter · #JKH39</div>
+        </div>
+        <div class="char-wardrobe-pin">
+          <img src="./wardrobe/107/CHARMAINE_EP107.png" alt="Charmaine wardrobe">
+        </div>
+      </div>
+    </div>
+
+    <!-- AIMEE -->
+    <div class="char-card">
+      <div class="char-img-wrap">
+        <img src="./MATCHBOX-AIMEE-turn1.jpg" alt="Aimee" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="char-img-placeholder" style="display:none">Aimee — Turn 1</div>
+      </div>
+      <div class="char-bottom">
+        <div class="char-info">
+          <div class="char-name">Aimee</div>
+          <div class="char-role">Speed &amp; Driving Expert</div>
+          <div class="char-vehicle">Mercedes Sprinter Ambulance · #JKH35</div>
+        </div>
+        <div class="char-wardrobe-pin">
+          <img src="./wardrobe/107/AIMEE_EP107.png" alt="Aimee wardrobe">
+        </div>
+      </div>
+    </div>
+
+    <!-- CROSBY -->
+    <div class="char-card">
+      <div class="char-img-wrap">
+        <img src="./MATCHBOX-CROSBY-turn1.jpg" alt="Crosby" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="char-img-placeholder" style="display:none">Crosby — Turn 1</div>
+      </div>
+      <div class="char-bottom">
+        <div class="char-info">
+          <div class="char-name">Crosby</div>
+          <div class="char-role">Engineering &amp; Heavy Machinery</div>
+          <div class="char-vehicle">F-650 Rollback · #JKH49</div>
+          <div class="char-vehicle">Blaze Blaster III · #JHN10</div>
+        </div>
+        <div class="char-wardrobe-pin">
+          <img src="./wardrobe/107/CROSBY_EP107.png" alt="Crosby wardrobe">
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /lineup-grid -->
+</div><!-- /lineup-page -->
+
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     PANELS
+     Image path: COLOR_URLS map below. URLs come from refineria.onrender.com.
+═══════════════════════════════════════════════════════════════════ -->
+
+<script>
+// ── CONFIGURATION ──────────────────────────────────────────────
+// Color images are served directly from refineria.onrender.com (Valen's app).
+// If a URL changes (regenerated final), refresh by running:
+//   curl -s 'https://refineria.onrender.com/api/projects/convoy/episodes/ep101/finals' | node scripts/build_color_urls.js
+const COLOR_URLS = {"01": "https://refineria.onrender.com/uploads/generated/e18e8756-6d4d-4203-9413-e63579b23906.jpg", "02": "https://refineria.onrender.com/uploads/generated/619812a1-d040-4379-895e-b2f0d96750ad.jpg", "04": "https://refineria.onrender.com/uploads/generated/efce8b1a-d6be-4de7-b163-acb985e6c359.png", "05": "https://refineria.onrender.com/uploads/generated/94489697-5b13-4564-893d-a719a810bfdd.jpg", "06": "https://refineria.onrender.com/uploads/generated/135cbfd7-8cd8-4bd8-9cc0-f09f20a53c67.jpg", "07": "https://refineria.onrender.com/uploads/generated/ba3c2281-3e65-4ece-a591-9e1bb8343f5e.png", "08": "https://refineria.onrender.com/uploads/generated/08c907be-c6c4-44f1-9104-b06e8f32bb38.png", "09": "https://refineria.onrender.com/uploads/generated/81e39f4a-a30f-45e5-9799-8ad2d19c11f4.jpeg", "10": "https://refineria.onrender.com/uploads/generated/563deb32-4998-4e96-ab52-9673890ddad4.png", "11": "https://refineria.onrender.com/uploads/generated/04086d10-048e-4557-b202-7b275ee222b9.png", "12": "https://refineria.onrender.com/uploads/generated/702fc922-25f3-4a08-8415-f2a6027b3f42.png", "13": "https://refineria.onrender.com/uploads/generated/a7e093b4-d966-4110-84d1-511dbccfe6e0.jpeg", "14": "https://refineria.onrender.com/uploads/generated/757e4b5f-53c9-439c-87dc-d4367c5e45d6.jpeg", "15": "https://refineria.onrender.com/uploads/generated/fa154f06-c93b-4b7c-b4d3-18223790a519.jpeg", "16": "https://refineria.onrender.com/uploads/generated/811a5dae-cc14-486c-be9a-0eda8457dd02.jpg", "17": "https://refineria.onrender.com/uploads/generated/5fe890fc-56c7-4c19-95d7-60d44b983cac.png", "18": "https://refineria.onrender.com/uploads/generated/8bd8f269-b4b4-40f0-ba3a-1d6cee5f95ae.png", "19": "https://refineria.onrender.com/uploads/generated/f1970ffd-1a39-4e3e-afeb-59be9b663c2f.png", "20": "https://refineria.onrender.com/uploads/generated/2b387b31-a3c3-4938-95dc-cbfef26176da.png", "21": "https://refineria.onrender.com/uploads/generated/a46e521e-3f91-4dbf-90d9-4b4d73c7b089.jpeg", "22": "https://refineria.onrender.com/uploads/generated/c390b7b2-8c7d-4628-abee-9ba1a7bd47c6.jpeg", "23": "https://refineria.onrender.com/uploads/generated/2a9a82b1-db81-4d4f-99ff-50c138203477.jpg", "24": "https://refineria.onrender.com/uploads/generated/1178d411-372f-4164-9848-59b217094591.png", "25": "https://refineria.onrender.com/uploads/generated/dfe5c96a-7164-485f-a9cc-fe4f7a1990f6.jpg", "26": "https://refineria.onrender.com/uploads/generated/a0409a55-7434-4cc3-aa9a-5cad77631ab4.png", "27": "https://refineria.onrender.com/uploads/generated/73a78cdd-1f46-4d6a-b190-7d2f00e32d2e.png", "28": "https://refineria.onrender.com/uploads/generated/43e83d71-5f06-45c6-980e-f71cf1e2d67b.png", "29": "https://refineria.onrender.com/uploads/generated/bfecbe59-a418-44ba-a6ba-55c894ae22c3.jpg", "30": "https://refineria.onrender.com/uploads/generated/81ac2c35-b080-49e0-8876-c258443e7a68.jpg", "31": "https://refineria.onrender.com/uploads/generated/9a089ad7-ef25-4db7-bd76-de1c328caddc.png", "32": "https://refineria.onrender.com/uploads/generated/5605dd21-fd8b-4b5e-b900-75eee7651e73.png", "33": "https://refineria.onrender.com/uploads/generated/ae4edc4f-1223-432f-b284-9989034d4f0e.png", "34": "https://refineria.onrender.com/uploads/generated/5583567c-762e-4da2-942d-867cf6bfe8ff.png", "35": "https://refineria.onrender.com/uploads/generated/21a75167-82c2-4319-9d88-667f0b3294e9.jpeg", "36": "https://refineria.onrender.com/uploads/generated/0c03bb49-8059-4dd3-9a46-a1bb7e3f4e49.png", "37": "https://refineria.onrender.com/uploads/generated/5692229d-bddb-4141-be56-e4805e03715b.png", "38": "https://refineria.onrender.com/uploads/generated/e9399e21-8860-466c-920d-d35ce08b6574.jpeg", "39": "https://refineria.onrender.com/uploads/generated/f1dbb6b8-f58a-4c63-8887-25cd8a7ad66a.jpg", "40": "https://refineria.onrender.com/uploads/generated/2d87550e-3680-4b22-affd-9a45108587a4.png", "41": "https://refineria.onrender.com/uploads/generated/b1bddefc-4de6-4fcd-8013-1e89c6c3321b.png", "42": "https://refineria.onrender.com/uploads/generated/47015491-11df-4866-b43d-423f5c16c829.png", "43": "https://refineria.onrender.com/uploads/generated/cf17a204-e9d5-48a4-bc80-cafd1d09884b.png", "44": "https://refineria.onrender.com/uploads/generated/10a2f974-c78b-47b1-9bfe-b0da9ce1289b.jpg", "45": "https://refineria.onrender.com/uploads/generated/22678d46-d183-43b8-9ea6-fb4cd8ab2fb4.jpg", "46": "https://refineria.onrender.com/uploads/generated/8e6b9009-df5e-412a-ba5f-3556b2089561.jpg", "47": "https://refineria.onrender.com/uploads/generated/cb104092-7e14-44a2-9a62-bcbecb16ce21.png"};
+// ── VEHICLES IN PANEL (with toy numbers) ──────────────────────
+const VEHICLES_IN_PANEL = {"01": [{"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "F-650 Rollback", "sku": "JKH49"}, {"name": "Dodge Durango", "sku": "HFP46"}], "02": [{"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "F-650 Rollback", "sku": "JKH49"}, {"name": "Dodge Durango", "sku": "HFP46"}], "04": [{"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Blaze Blaster III", "sku": "JHN10"}, {"name": "Mercedes Sprinter Ambulance", "sku": "JKH35"}, {"name": "F-650 Rollback", "sku": "JKH49"}, {"name": "Rescue Helicopter", "sku": "JKH39"}], "05": [{"name": "Dodge Durango", "sku": "HFP46"}, {"name": "F-650 Rollback", "sku": "JKH49"}, {"name": "2020 Nissan Nismo", "sku": "JKH44"}], "06": [{"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "F-650 Rollback", "sku": "JKH49"}, {"name": "Dodge Durango", "sku": "HFP46"}, {"name": "2020 Nissan Nismo", "sku": "JKH44"}], "07": [{"name": "Dodge Durango", "sku": "HFP46"}, {"name": "Land Rover 6x6", "sku": "JKH28"}], "08": [{"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Dodge Durango", "sku": "HFP46"}], "09": [{"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Dodge Durango", "sku": "HFP46"}], "10": [{"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Dodge Durango", "sku": "HFP46"}], "11": [{"name": "Land Rover 6x6", "sku": "JKH28"}], "12": [{"name": "Land Rover 6x6", "sku": "JKH28"}], "13": [{"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Dodge Durango", "sku": "HFP46"}, {"name": "F-650 Rollback", "sku": "JKH49"}], "14": [{"name": "F-650 Rollback", "sku": "JKH49"}], "15": [{"name": "F-650 Rollback", "sku": "JKH49"}], "16": [{"name": "F-650 Rollback", "sku": "JKH49"}], "17": [{"name": "F-650 Rollback", "sku": "JKH49"}], "18": [{"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "Rescue Helicopter", "sku": "JKH39"}, {"name": "Blaze Blaster III", "sku": "JHN10"}, {"name": "Mercedes Sprinter Ambulance", "sku": "JKH35"}, {"name": "Land Rover 6x6", "sku": "JKH28"}], "19": [{"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "Mercedes Sprinter Ambulance", "sku": "JKH35"}, {"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Blaze Blaster III", "sku": "JHN10"}], "20": [{"name": "F-650 Rollback", "sku": "JKH49"}, {"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Blaze Blaster III", "sku": "JHN10"}, {"name": "Triumph Scrambler", "sku": "JKH31"}], "21": [{"name": "F-650 Rollback", "sku": "JKH49"}, {"name": "Mercedes Sprinter Ambulance", "sku": "JKH35"}, {"name": "2020 Nissan Nismo", "sku": "JKH44"}], "22": [{"name": "Mercedes Sprinter Ambulance", "sku": "JKH35"}], "23": [{"name": "Rescue Helicopter", "sku": "JKH39"}, {"name": "F-650 Rollback", "sku": "JKH49"}, {"name": "Mercedes Actros Cab", "sku": "JKH48"}], "24": [{"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "F-650 Rollback", "sku": "JKH49"}], "25": [{"name": "F-650 Rollback", "sku": "JKH49"}, {"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Blaze Blaster III", "sku": "JHN10"}, {"name": "Mercedes Actros Cab", "sku": "JKH48"}], "26": [], "27": [{"name": "Mercedes Sprinter Ambulance", "sku": "JKH35"}, {"name": "2020 Nissan Nismo", "sku": "JKH44"}], "28": [{"name": "2020 Nissan Nismo", "sku": "JKH44"}, {"name": "Mercedes Sprinter Ambulance", "sku": "JKH35"}], "29": [{"name": "2020 Nissan Nismo", "sku": "JKH44"}, {"name": "Mercedes Sprinter Ambulance", "sku": "JKH35"}], "30": [{"name": "Rescue Helicopter", "sku": "JKH39"}, {"name": "F-650 Rollback", "sku": "JKH49"}], "31": [{"name": "Blaze Blaster III", "sku": "JHN10"}, {"name": "F-650 Rollback", "sku": "JKH49"}], "32": [{"name": "Blaze Blaster III", "sku": "JHN10"}, {"name": "F-650 Rollback", "sku": "JKH49"}], "33": [{"name": "Rescue Helicopter", "sku": "JKH39"}, {"name": "F-650 Rollback", "sku": "JKH49"}], "34": [{"name": "F-650 Rollback", "sku": "JKH49"}, {"name": "Rescue Helicopter", "sku": "JKH39"}], "35": [{"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Blaze Blaster III", "sku": "JHN10"}, {"name": "F-650 Rollback", "sku": "JKH49"}], "36": [{"name": "Mercedes Sprinter Ambulance", "sku": "JKH35"}, {"name": "Land Rover 6x6", "sku": "JKH28"}], "37": [{"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "F-650 Rollback", "sku": "JKH49"}], "38": [{"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "F-650 Rollback", "sku": "JKH49"}], "39": [{"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "F-650 Rollback", "sku": "JKH49"}], "40": [{"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "F-650 Rollback", "sku": "JKH49"}], "41": [{"name": "Mercedes Sprinter Ambulance", "sku": "JKH35"}], "42": [{"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "F-650 Rollback", "sku": "JKH49"}], "43": [{"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Rescue Helicopter", "sku": "JKH39"}], "44": [{"name": "Rescue Helicopter", "sku": "JKH39"}, {"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "F-650 Rollback", "sku": "JKH49"}], "45": [{"name": "Rescue Helicopter", "sku": "JKH39"}, {"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "Blaze Blaster III", "sku": "JHN10"}, {"name": "Mercedes Sprinter Ambulance", "sku": "JKH35"}], "46": [{"name": "Mercedes Sprinter Ambulance", "sku": "JKH35"}], "47": [{"name": "Rescue Helicopter", "sku": "JKH39"}, {"name": "Mercedes Sprinter Ambulance", "sku": "JKH35"}, {"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "Blaze Blaster III", "sku": "JHN10"}]};
+// ── DIALOGUES (from Script V3, 04/14/2026 Playmation) ─────────
+const SCRIPT_DIALOGUES = {"01": "Sean (V.O.): (narration) Launching out of a sand dune, criminal super-spy Von Steele surprises Sean and Crosby as they transport a new super secret high-tech car. (as Sean) Watch out Crosby, Von Steele is coming for you!", "02": "Sean (V.O.): (narration) The sand makes Sean spin out! (as Sean) Whoooa! (then) Hang on Crosby, I'm coming. This is gonna be a wild chase.", "04": "GFX: Character names splash over each image. SFX: fire engine siren, ambulance siren, horn honk, helicopter rotor.", "05": "Crosby (V.O.): (cars) vroom. Sean (V.O.): Von Steele is gaining on the transport truck. In the middle of the desert, there's no escape.", "06": "Aimee (V.O.): If Von Steele gets that high-tech car there's no telling what trouble he'll cause. Sean (V.O.): That's why we've got to stop him right now! Crosby (V.O.): Bad news, Sean! The transport truck's engine is struggling and overheating because it's like two hundred degrees in this desert.", "07": "Sean (V.O.): Don't worry Crosby. I'm almost there. (then) Give it up, Von Steele. We're not gonna let you get your hands on that car!", "08": "Sean (V.O.): (as Von Steele) Your Matchbox Crew is no match me, Sean! Eat my dust! (as Sean) You can't outrun me, Von Steele. (as Von Steele) Maybe not, but I can outdrive you.", "09": "Sean (V.O.): (narration) Von Steele forces Sean onto a side road full of rocky terrain and off-road hazards.", "10": "Sean (V.O.): Sean tries to keep up with Von Steele as they weave through massive sand dunes.", "11": "Sean (V.O.): (narration) Sean rounds a sand dune expecting to see Von Steele, but yikes! It's date palm trees and he's headed right at 'em!", "12": "Sean (V.O.): Sean swerves and jumps a sand dune to get back onto the highway.", "13": "Ted (V.O.): (narration) But he sees Von Steele's Durango on the side of the road. And the truck driver is next to it. Crosby (V.O.): (urgent) Sean... Sean! He went that way. He's sneaky, and mean, and he's got an eyepatch, and really bad breath, and... Oh yeah. He's driving my truck!", "14": "Ted (V.O.): (narration) Von Steele stole the truck carrying the high-tech car. Sean (V.O.): There's no way I'm letting him get away this time.", "15": "Ted (V.O.): But, oh no! The brakes on the truck went out... on the cliffside mountain road.", "16": "Sean (V.O.): Wait! Ted, this is a spy mission where we stop Von Steele! Ted (V.O.): And rescue that runaway truck.", "17": "Sean (V.O.): And now there's also a huge mountain with a cliff? Ted (V.O.): Yeah. Tizi n'Tichka pass in Morocco. It's over a mile high with more than a hundred hairpin bends and turns. Crosby/Charmaine/Aimee (V.O.): (dramatic gasp) Sean (V.O.): How do you know about the... Whatever Pass? Ted (V.O.): Tizi n'Tichka. My abuela and I watch a lot of documentaries. And you'd better keep your eyes peeled, Sean. This road is veeery dangerous.", "18": "Ted (V.O.): The question is, can we catch Von Steele AND rescue the truck? Sean (V.O.): I've got the best crew in the world, we can do anything!", "19": "Ted (V.O.): We need to box him in. I'll get out in front of the truck. Sean (V.O.): Crosby and I will get on either side. Aimee (V.O.): And I'll bring up the rear.", "20": "Sean (V.O.): Whoa! Where did Von Steele learn how to drive! He's all over the place. Ted (V.O.): He's NOT driving. The cab is empty. NO ONE is driving! Sean (V.O.): What! Where did he go?", "21": "Sean (as Von Steele)(V.O.): I'm up here you bozos! Sean (V.O.): (narration) Von Steele hits the gas and jumps the high-tech car right off the speeding flatbed truck! Aimee (V.O.): Yikes! Ted (V.O.): Von Steele is Von STEALing that car! All (V.O.): (groans)", "22": "Aimee (V.O.): I'll chase down Von Steele. You guys stop that runaway truck.", "23": "Charmaine (V.O.): There is a massive semi headed your way!", "24": "Sean (V.O.): No way! Get back in your lane. Nngh! (narration) Sean bumps the truck to keep it from drifting into the wrong lane. (as Sean) Rrrgh! Whoa! That was super close!", "25": "Ted (V.O.): (narration) The two trucks miss each other by inches! Charmaine (V.O.): Nice driving Sean! Sean (V.O.): Thanks. But let's stop this truck. I don't wanna ever have to do that again!", "26": "Aimee (V.O.): (playful) Excuse me. Von Steele is escaping.", "27": "Aimee (V.O.): Let's see what this Ambulance can do!", "28": "Sean (as Von Steele)(V.O.): (evil laugh) Another perfect crime. Brilliant and flawless. Those fools will never catch me. Aimee (V.O.): Hi there!", "29": "Aimee (V.O.): (narration) Aimee speeds around Von Steele and uses the Ambulance to force him to stop. Sean (as Von Steele) (V.O.): (frustrated) Impossible! How... How did you catch me? Aimee (V.O.): (earnest) I'm not sure. I was just driving the way I always drive. Hey, maybe you'll get away next time. Ted (V.O.): No. He won't! All (V.O.): (aphorism) Everyone loses when they race Aimee! Aimee (V.O.): I didn't want to brag. (then) Anyway, I caught ya.", "30": "Charmaine (V.O.): (narration) From the air, the Rescue Helicopter spots a sharp turn in the road ahead. (as Charmaine) If we don't stop that truck now it's going to go over the cliff! / Sean (V.O.): We have to stop it! I know Von Steele took the car, but the high-tech designs and schematics are still in the cab. / Crosby (V.O.): And my adorable, priceless waving cat!", "31": "Crosby (V.O.): Maybe the ladder on this fire engine can slow it down.", "32": "Crosby (V.O.): Nope. (then) I'm out of ideas, and ladders. (distraught) Hang in there kitty!", "33": "Charmaine (V.O.): Never send a truck to do a helicopter's job. Ted (V.O.): It's working!", "34": "Sean (V.O.): (narration) But suddenly the tire hits a huge rock. Unhooking the helicopter and sending the truck into a spin!", "35": "Sean (V.O.): (narration) The massive out of control truck is now speeding down the highway... backwards! / Charmaine (V.O.): And careening towards a cliff! / Crosby (V.O.): And don't forget, it has the high-tech car designs and my toy Kittyyy!", "36": "Sean (V.O.): There's no way to stop this truck! Aimee (V.O.): Hey, if I can catch Von Steele-- Sean (V.O.): (as Von Steele) She barely caught me. Aimee (V.O.): I caught him because I was the better driver. The driver is more important than the car. You can stop that truck, Sean. I believe in you. Sean (V.O.): Thanks, Aimee. That truck might not have control over what happens next, but I do! Ted (V.O.): So, the fact that that truck doesn't have a driver is a good thing?", "37": "Sean (V.O.): (narration) Encouraged by his friends, Sean hooks the winch from his 6x6 to the front of the truck. / Aimee/Ted/Crosby/Charmaine (V.O.): You got this, Sean!", "38": "Sean (V.O.): Time to put my foot down! (narration) Sean slams on the brakes and the winch cable jerks taught.", "39": "Sean (V.O.): Ahh-ahh-ahh-ahh-ahh.", "40": "Ted (V.O.): (narration) The huge truck barely stops at the cliff's edge. / Sean (V.O.): Yes! And that's how you stop a runaway truck!", "41": "Aimee (V.O.): You did it! / Sean (as Von Steele)(V.O.): Ha! That truck is still moving.", "42": "Sean (V.O.): (narration) The truck is too heavy. It pulls the Rover towards the cliff's edge. (as Sean) I can't make it stop!", "43": "Charmaine (V.O.): Not so fast.", "44": "Sean (V.O.): (narration) The Rescue Helicopter and Land Rover 6x6, working together, pull the truck safely back on to the road. (as Sean) Thanks, Charmaine. / Charmaine (V.O.): I couldn't just leave you hanging. Good thing that winch is so strong. / Sean (V.O.): Yeah. I'll have to remember that trick.", "45": "Ted/Sean/Crosby (V.O.): Whoo-hoo! Way to go Charmaine. You saved the day! / Crosby (V.O.): And my waving cat! / Aimee (V.O.): (shouting) Hey! Hey! Hey, crew! Von Steele escaped and stole the Ambulance.", "46": "Sean (V.O.): Today was so much fun! We can catch Von Steele tomorrow.", "47": "Sean (V.O.): Nothing can stop the... / All (V.O.): MATCHBOX CREW!"};
+// ── ADDRESSED IN COLOR (draft from MATTEL feedback) ───────────
+const ADDRESSED = {};
+
+// ── ACTION DESCRIPTIONS (from script) ──────────────────────────
+const ACTIONS = {};
+
+// ── MATTEL FEEDBACK ────────────────────────────────────────────
+const MATTEL_FEEDBACK = {};
+
+// ── PANEL DATA ─────────────────────────────────────────────────
+const PANELS = [
+  {
+    "num": "01",
+    "label": "01",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Sean (V.O.): (narration) Launching out of a sand dune, criminal super-spy Von Steele surprises Sean and Crosby as they transport a new super secret high-tech car. (as Sean) Watch out Crosby, Von Steele is coming for you!",
+    "chars": []
+  },
+  {
+    "num": "02",
+    "label": "02",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Sean (V.O.): (narration) The sand makes Sean spin out! (as Sean) Whoooa! (then) Hang on Crosby, I'm coming. This is gonna be a wild chase.",
+    "chars": []
+  },
+  {
+    "num": "04",
+    "label": "04",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "GFX: Character names splash over each image. SFX: fire engine siren, ambulance siren, horn honk, helicopter rotor.",
+    "chars": []
+  },
+  {
+    "num": "05",
+    "label": "05",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Crosby (V.O.): (cars) vroom. Sean (V.O.): Von Steele is gaining on the transport truck. In the middle of the desert, there's no escape.",
+    "chars": []
+  },
+  {
+    "num": "06",
+    "label": "06",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Aimee (V.O.): If Von Steele gets that high-tech car there's no telling what trouble he'll cause. Sean (V.O.): That's why we've got to stop him right now! Crosby (V.O.): Bad news, Sean! The transport truck's engine is struggling and overheating because it's like two hundred degrees in this desert.",
+    "chars": []
+  },
+  {
+    "num": "07",
+    "label": "07",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Sean (V.O.): Don't worry Crosby. I'm almost there. (then) Give it up, Von Steele. We're not gonna let you get your hands on that car!",
+    "chars": []
+  },
+  {
+    "num": "08",
+    "label": "08",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Sean (V.O.): (as Von Steele) Your Matchbox Crew is no match me, Sean! Eat my dust! (as Sean) You can't outrun me, Von Steele. (as Von Steele) Maybe not, but I can outdrive you.",
+    "chars": []
+  },
+  {
+    "num": "09",
+    "label": "09",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Sean (V.O.): (narration) Von Steele forces Sean onto a side road full of rocky terrain and off-road hazards.",
+    "chars": []
+  },
+  {
+    "num": "10",
+    "label": "10",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Sean (V.O.): Sean tries to keep up with Von Steele as they weave through massive sand dunes.",
+    "chars": []
+  },
+  {
+    "num": "11",
+    "label": "11",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Sean (V.O.): (narration) Sean rounds a sand dune expecting to see Von Steele, but yikes! It's date palm trees and he's headed right at 'em!",
+    "chars": []
+  },
+  {
+    "num": "12",
+    "label": "12",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Sean (V.O.): Sean swerves and jumps a sand dune to get back onto the highway.",
+    "chars": []
+  },
+  {
+    "num": "13",
+    "label": "13",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Ted (V.O.): (narration) But he sees Von Steele's Durango on the side of the road. And the truck driver is next to it. Crosby (V.O.): (urgent) Sean... Sean! He went that way. He's sneaky, and mean, and he's got an eyepatch, and really bad breath, and... Oh yeah. He's driving my truck!",
+    "chars": []
+  },
+  {
+    "num": "14",
+    "label": "14",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Ted (V.O.): (narration) Von Steele stole the truck carrying the high-tech car. Sean (V.O.): There's no way I'm letting him get away this time.",
+    "chars": []
+  },
+  {
+    "num": "15",
+    "label": "15",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Ted (V.O.): But, oh no! The brakes on the truck went out... on the cliffside mountain road.",
+    "chars": []
+  },
+  {
+    "num": "16",
+    "label": "16",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Sean (V.O.): Wait! Ted, this is a spy mission where we stop Von Steele! Ted (V.O.): And rescue that runaway truck.",
+    "chars": []
+  },
+  {
+    "num": "17",
+    "label": "17",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Sean (V.O.): And now there's also a huge mountain with a cliff? Ted (V.O.): Yeah. Tizi n'Tichka pass in Morocco. It's over a mile high with more than a hundred hairpin bends and turns. Crosby/Charmaine/Aimee (V.O.): (dramatic gasp) Sean (V.O.): How do you know about the... Whatever Pass? Ted (V.O.): Tizi n'Tichka. My abuela and I watch a lot of documentaries. And you'd better keep your eyes peeled, Sean. This road is veeery dangerous.",
+    "chars": []
+  },
+  {
+    "num": "18",
+    "label": "18",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Ted (V.O.): The question is, can we catch Von Steele AND rescue the truck? Sean (V.O.): I've got the best crew in the world, we can do anything!",
+    "chars": []
+  },
+  {
+    "num": "19",
+    "label": "19",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Ted (V.O.): We need to box him in. I'll get out in front of the truck. Sean (V.O.): Crosby and I will get on either side. Aimee (V.O.): And I'll bring up the rear.",
+    "chars": []
+  },
+  {
+    "num": "20",
+    "label": "20",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Sean (V.O.): Whoa! Where did Von Steele learn how to drive! He's all over the place. Ted (V.O.): He's NOT driving. The cab is empty. NO ONE is driving! Sean (V.O.): What! Where did he go?",
+    "chars": []
+  },
+  {
+    "num": "21",
+    "label": "21",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Sean (as Von Steele)(V.O.): I'm up here you bozos! Sean (V.O.): (narration) Von Steele hits the gas and jumps the high-tech car right off the speeding flatbed truck! Aimee (V.O.): Yikes! Ted (V.O.): Von Steele is Von STEALing that car! All (V.O.): (groans)",
+    "chars": []
+  },
+  {
+    "num": "22",
+    "label": "22",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Aimee (V.O.): I'll chase down Von Steele. You guys stop that runaway truck.",
+    "chars": []
+  },
+  {
+    "num": "23",
+    "label": "23",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Charmaine (V.O.): There is a massive semi headed your way!",
+    "chars": []
+  },
+  {
+    "num": "24",
+    "label": "24",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Sean (V.O.): No way! Get back in your lane. Nngh! (narration) Sean bumps the truck to keep it from drifting into the wrong lane. (as Sean) Rrrgh! Whoa! That was super close!",
+    "chars": []
+  },
+  {
+    "num": "25",
+    "label": "25",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Ted (V.O.): (narration) The two trucks miss each other by inches! Charmaine (V.O.): Nice driving Sean! Sean (V.O.): Thanks. But let's stop this truck. I don't wanna ever have to do that again!",
+    "chars": []
+  },
+  {
+    "num": "26",
+    "label": "26",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Aimee (V.O.): (playful) Excuse me. Von Steele is escaping.",
+    "chars": []
+  },
+  {
+    "num": "27",
+    "label": "27",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Aimee (V.O.): Let's see what this Ambulance can do!",
+    "chars": []
+  },
+  {
+    "num": "28",
+    "label": "28",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Sean (as Von Steele)(V.O.): (evil laugh) Another perfect crime. Brilliant and flawless. Those fools will never catch me. Aimee (V.O.): Hi there!",
+    "chars": []
+  },
+  {
+    "num": "29",
+    "label": "29",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Aimee (V.O.): (narration) Aimee speeds around Von Steele and uses the Ambulance to force him to stop. Sean (as Von Steele) (V.O.): (frustrated) Impossible! How... How did you catch me? Aimee (V.O.): (earnest) I'm not sure. I was just driving the way I always drive. Hey, maybe you'll get away next time. Ted (V.O.): No. He won't! All (V.O.): (aphorism) Everyone loses when they race Aimee! Aimee (V.O.): I didn't want to brag. (then) Anyway, I caught ya.",
+    "chars": []
+  },
+  {
+    "num": "30",
+    "label": "30",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Charmaine (V.O.): (narration) From the air, the Rescue Helicopter spots a sharp turn in the road ahead. (as Charmaine) If we don't stop that truck now it's going to go over the cliff! / Sean (V.O.): We have to stop it! I know Von Steele took the car, but the high-tech designs and schematics are still in the cab. / Crosby (V.O.): And my adorable, priceless waving cat!",
+    "chars": []
+  },
+  {
+    "num": "31",
+    "label": "31",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Crosby (V.O.): Maybe the ladder on this fire engine can slow it down.",
+    "chars": []
+  },
+  {
+    "num": "32",
+    "label": "32",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Crosby (V.O.): Nope. (then) I'm out of ideas, and ladders. (distraught) Hang in there kitty!",
+    "chars": []
+  },
+  {
+    "num": "33",
+    "label": "33",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Charmaine (V.O.): Never send a truck to do a helicopter's job. Ted (V.O.): It's working!",
+    "chars": []
+  },
+  {
+    "num": "34",
+    "label": "34",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Sean (V.O.): (narration) But suddenly the tire hits a huge rock. Unhooking the helicopter and sending the truck into a spin!",
+    "chars": []
+  },
+  {
+    "num": "35",
+    "label": "35",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Sean (V.O.): (narration) The massive out of control truck is now speeding down the highway... backwards! / Charmaine (V.O.): And careening towards a cliff! / Crosby (V.O.): And don't forget, it has the high-tech car designs and my toy Kittyyy!",
+    "chars": []
+  },
+  {
+    "num": "36",
+    "label": "36",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Sean (V.O.): There's no way to stop this truck! Aimee (V.O.): Hey, if I can catch Von Steele-- Sean (V.O.): (as Von Steele) She barely caught me. Aimee (V.O.): I caught him because I was the better driver. The driver is more important than the car. You can stop that truck, Sean. I believe in you. Sean (V.O.): Thanks, Aimee. That truck might not have control over what happens next, but I do! Ted (V.O.): So, the fact that that truck doesn't have a driver is a good thing?",
+    "chars": []
+  },
+  {
+    "num": "37",
+    "label": "37",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Sean (V.O.): (narration) Encouraged by his friends, Sean hooks the winch from his 6x6 to the front of the truck. / Aimee/Ted/Crosby/Charmaine (V.O.): You got this, Sean!",
+    "chars": []
+  },
+  {
+    "num": "38",
+    "label": "38",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Sean (V.O.): Time to put my foot down! (narration) Sean slams on the brakes and the winch cable jerks taught.",
+    "chars": []
+  },
+  {
+    "num": "39",
+    "label": "39",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Sean (V.O.): Ahh-ahh-ahh-ahh-ahh.",
+    "chars": []
+  },
+  {
+    "num": "40",
+    "label": "40",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Ted (V.O.): (narration) The huge truck barely stops at the cliff's edge. / Sean (V.O.): Yes! And that's how you stop a runaway truck!",
+    "chars": []
+  },
+  {
+    "num": "41",
+    "label": "41",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Aimee (V.O.): You did it! / Sean (as Von Steele)(V.O.): Ha! That truck is still moving.",
+    "chars": []
+  },
+  {
+    "num": "42",
+    "label": "42",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Sean (V.O.): (narration) The truck is too heavy. It pulls the Rover towards the cliff's edge. (as Sean) I can't make it stop!",
+    "chars": []
+  },
+  {
+    "num": "43",
+    "label": "43",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Charmaine (V.O.): Not so fast.",
+    "chars": []
+  },
+  {
+    "num": "44",
+    "label": "44",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Sean (V.O.): (narration) The Rescue Helicopter and Land Rover 6x6, working together, pull the truck safely back on to the road. (as Sean) Thanks, Charmaine. / Charmaine (V.O.): I couldn't just leave you hanging. Good thing that winch is so strong. / Sean (V.O.): Yeah. I'll have to remember that trick.",
+    "chars": []
+  },
+  {
+    "num": "45",
+    "label": "45",
+    "scene": "ADVENTURE WORLD · DESERT HIGHWAY",
+    "dialogue": "Ted/Sean/Crosby (V.O.): Whoo-hoo! Way to go Charmaine. You saved the day! / Crosby (V.O.): And my waving cat! / Aimee (V.O.): (shouting) Hey! Hey! Hey, crew! Von Steele escaped and stole the Ambulance.",
+    "chars": []
+  },
+  {
+    "num": "46",
+    "label": "46",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Sean (V.O.): Today was so much fun! We can catch Von Steele tomorrow.",
+    "chars": []
+  },
+  {
+    "num": "47",
+    "label": "47",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Sean (V.O.): Nothing can stop the... / All (V.O.): MATCHBOX CREW!",
+    "chars": []
+  }
+];
+
+const VILLAIN = ['Von Steele'];
+
+function imgSrc(num) {
+  return COLOR_URLS[num.padStart(2,'0')] || '';
+}
+
+function renderPanels() {
+  const container = document.getElementById('panels-container');
+  container.innerHTML = '';
+
+  PANELS.forEach(p => {
+    const src = imgSrc(p.num);
+
+    const chars = p.chars.map(c =>
+      `<span class="char-tag">${c}</span>`
+    ).join('');
+
+    container.innerHTML += `
+    <div class="page panel-page">
+      <!-- HEADER -->
+      <div class="panel-page-header">
+        <span class="ph-ep">CVY26_001_107</span>
+        <span class="ph-title">Color Review · Highway Heroes!</span>
+        <span class="ph-num">PANEL ${p.label}</span>
+      </div>
+
+      <!-- SPACER -->
+      <div class="panel-spacer"></div>
+
+      <!-- IMAGE: full width -->
+      <div class="panel-img-col">
+        ${false ? `
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#111;">
+          <div style="font-size:80px;font-weight:900;letter-spacing:12px;color:rgba(255,255,255,0.08);transform:rotate(-35deg);text-transform:uppercase;user-select:none;">PENDING</div>
+        </div>` : `
+        <img src="${src}" alt="Panel ${p.label}"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="panel-img-placeholder" style="display:none">
+          <div class="pip-icon"></div>
+          <div class="pip-label">Panel ${p.label}<br>Color</div>
+        </div>`}
+      </div>
+
+      <!-- INFO: below image -->
+      <div class="panel-info-section">
+        <div class="panel-info-row">
+
+          <!-- LEFT: num + scene + visual -->
+          <div class="panel-info-main">
+            <div class="panel-num-badge">
+              <div class="panel-num">${p.label.replace(/[A-Z–]/g,'')}</div>
+              ${p.label.match(/[A-Z–]/) ? `<div class="panel-num-sub">${p.label}</div>` : ''}
+              ${p.scene ? `<div class="panel-num-sub" style="color:var(--accent);font-size:8px;letter-spacing:2px;text-transform:uppercase">${p.scene}</div>` : ''}
+            </div>
+          </div>
+
+          <!-- RIGHT: dialogue + chars + notes -->
+          <div class="panel-info-side">
+            ${(() => {
+              const dlg = (SCRIPT_DIALOGUES[p.num] !== undefined ? SCRIPT_DIALOGUES[p.num] : p.dialogue) || '';
+              return dlg.trim() ? `<div class="dialogue-block">
+              <div class="info-label">Dialogue / VO</div>
+              <div class="editable" contenteditable="true">${dlg.replace(/\n/g,'<br>')}</div>
+            </div>` : '';
+            })()}
+
+            ${(VEHICLES_IN_PANEL[p.num] && VEHICLES_IN_PANEL[p.num].length) ? `
+            <div class="info-block">
+              <div class="info-label">Vehicles in Panel</div>
+              <div class="chars-in-scene" style="flex-direction:column;align-items:flex-start;gap:4px;">${VEHICLES_IN_PANEL[p.num].map(v => `<span class="char-tag" style="display:block;width:fit-content;">${v.name} <span style="opacity:0.7;font-weight:400">· #${v.sku}</span></span>`).join('')}</div>
+            </div>` : ''}
+
+            <div class="info-block caveats-block" style="margin-top:auto">
+              <div class="info-label">Caveats:</div>
+              <div class="editable caveat-field" contenteditable="true"
+                   data-panel="${p.num}"
+                   data-placeholder="Production notes for the client..."></div>
+            </div>
+          </div>
+
+        </div><!-- /panel-info-row -->
+
+
+      </div><!-- /panel-info-section -->
+    </div>`;
+  });
+}
+
+function renderStoryboard() {
+  const container = document.getElementById('panels-container');
+  const cells = PANELS.map(p => {
+    const src = imgSrc(p.num);
+    return `
+    <div class="sb-cell">
+      <div class="sb-img-wrap">
+        <img src="${src}" alt="Panel ${p.label}"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="sb-placeholder" style="display:none">${p.label}</div>
+      </div>
+      <div class="sb-label">${p.label}</div>
+    </div>`;
+  }).join('');
+
+  container.innerHTML += `
+  <div class="page storyboard-page">
+    <div class="sb-header">
+      <div class="sb-eyebrow">CVY26_001_107 · Color Review · Episode 107</div>
+      <div class="sb-title">Color <span>Overview</span></div>
+      <div class="sb-subtitle">Highway Heroes! · 46 Panels</div>
+    </div>
+    <div class="sb-grid">${cells}</div>
+  </div>`;
+}
+
+let editingOn = true;
+function toggleEditing() {
+  editingOn = !editingOn;
+  document.querySelectorAll('[contenteditable]').forEach(el => {
+    el.contentEditable = editingOn ? 'true' : 'false';
+  });
+}
+
+</script>
+
+<div id="panels-container"></div>
+<script>
+renderPanels();
+renderStoryboard();
+
+/* ── JSONBIN SYNC (color review uses _color suffix so it doesn't collide with line-art bin) ── */
+const REVIEW_BIN_ID  = '6a0a5ddf250b1311c3667973';
+const REVIEW_BIN_KEY = '$2a$10$G/S5QC8pq2vpHyiOEdxjp.rmJOR4deLMjyDvs1.Zq7W9dMQt9uqQq';
+const BIN_URL = 'https://api.jsonbin.io/v3/b/' + REVIEW_BIN_ID;
+
+async function loadAnnotations() {
+  try {
+    const res = await fetch(BIN_URL + '/latest', {
+      headers: { 'X-Master-Key': REVIEW_BIN_KEY, 'X-Bin-Meta': 'false' }
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    const caveats = data.caveats_color || {};
+    document.querySelectorAll('.caveat-field[data-panel]').forEach(el => {
+      const v = caveats[el.dataset.panel];
+      if (v) el.textContent = v;
+    });
+    const addressed = data.addressed_color || {};
+    document.querySelectorAll('.addressed-list[data-panel]').forEach(el => {
+      const v = addressed[el.dataset.panel];
+      if (v) el.innerHTML = v;
+    });
+  } catch(e) {}
+}
+
+let _saveTimer = null;
+function scheduleSync() {
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(saveAnnotations, 1500);
+}
+
+async function saveAnnotations() {
+  // Fetch existing to merge — don't wipe line-art caveats stored under `caveats`
+  let existing = {};
+  try {
+    const r = await fetch(BIN_URL + '/latest', { headers: { 'X-Master-Key': REVIEW_BIN_KEY, 'X-Bin-Meta': 'false' } });
+    if (r.ok) existing = await r.json();
+  } catch(e) {}
+  const caveats_color = {};
+  document.querySelectorAll('.caveat-field[data-panel]').forEach(el => {
+    const v = el.textContent.trim();
+    if (v) caveats_color[el.dataset.panel] = v;
+  });
+  const addressed_color = {};
+  document.querySelectorAll('.addressed-list[data-panel]').forEach(el => {
+    const v = el.innerHTML.trim();
+    if (v) addressed_color[el.dataset.panel] = v;
+  });
+  const payload = Object.assign({}, existing, { caveats_color, addressed_color });
+  try {
+    await fetch(BIN_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': REVIEW_BIN_KEY },
+      body: JSON.stringify(payload)
+    });
+  } catch(e) {}
+}
+
+// Escuchar cambios en caveats y addressed
+document.querySelectorAll('.caveat-field[data-panel], .addressed-list[data-panel]').forEach(el => {
+  el.addEventListener('input', scheduleSync);
+});
+
+// Cargar al abrir
+loadAnnotations();
+</script>
+
+<!-- THANKS PAGE -->
+<div class="page" style="display:flex;flex-direction:column;">
+  <div class="panel-page-header">
+    <span class="ph-ep">CVY26_001_107</span>
+    <span class="ph-title">Color Review · Highway Heroes!</span>
+    <span class="ph-num"></span>
+  </div>
+  <div style="flex:1;display:flex;justify-content:center;align-items:center;text-align:center;">
+    <div class="cover-title">THANKS<span style="color:var(--accent)">!</span></div>
+  </div>
+</div>
+
+</div><!-- /doc-wrapper -->
+</body>
+</html>

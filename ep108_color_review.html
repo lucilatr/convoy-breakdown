@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CVY26_001_108 — Color Review</title>
+<style>
+  /* ── VARIABLES ──────────────────────────────────────────────── */
+  :root {
+    --black: #0a0a0a;
+    --white: #ffffff;
+    --off-white: #f5f5f0;
+    --grey-light: #e8e8e4;
+    --grey-mid: #999;
+    --grey-dark: #333;
+    --accent: #e8002d;
+    --accent-dark: #b5001e;
+    --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --font-mono: 'Courier New', monospace;
+  }
+
+  /* ── RESET ──────────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    background: #e8e8e4;
+    color: var(--black);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ── SCREEN NAV BAR ─────────────────────────────────────────── */
+  #topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: var(--black);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 24px;
+    gap: 16px;
+    border-bottom: 2px solid var(--accent);
+  }
+  #topbar .tb-title {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--white);
+  }
+  #topbar .tb-title span { color: var(--accent); }
+  #topbar .tb-controls { display: flex; gap: 10px; }
+  .tb-btn {
+    background: var(--accent);
+    color: var(--white);
+    border: none;
+    padding: 7px 16px;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .tb-btn:hover { background: var(--accent-dark); }
+  .tb-btn.secondary {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.25);
+    color: rgba(255,255,255,0.7);
+  }
+  .tb-btn.secondary:hover { border-color: var(--white); color: var(--white); background: transparent; }
+
+  /* ── PAGE WRAPPER ───────────────────────────────────────────── */
+  #doc-wrapper {
+    padding-top: 60px;
+  }
+
+  /* ── SHARED PAGE STYLES ─────────────────────────────────────── */
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    background: var(--white);
+    margin: 24px auto;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ── COVER PAGE ─────────────────────────────────────────────── */
+  .cover {
+    background: var(--white);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0;
+  }
+  .cover-stripe {
+    background: var(--accent);
+    height: 10px;
+    width: 100%;
+  }
+  .cover-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 48px 56px;
+    gap: 24px;
+    border-bottom: 1px solid var(--grey-light);
+  }
+  .cover-eyebrow {
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .cover-title {
+    font-size: 42px;
+    font-weight: 900;
+    color: var(--black);
+    line-height: 1.05;
+    letter-spacing: -1px;
+    text-transform: uppercase;
+  }
+  .cover-title span { color: var(--accent); }
+  .cover-subtitle {
+    font-size: 18px;
+    font-weight: 300;
+    color: var(--grey-mid);
+    letter-spacing: 1px;
+  }
+  .cover-divider {
+    width: 48px;
+    height: 2px;
+    background: var(--accent);
+  }
+  .cover-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 32px;
+    padding: 32px 56px 48px;
+  }
+  .cover-meta-item { display: flex; flex-direction: column; gap: 2px; }
+  .cover-meta-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--grey-mid);
+    font-weight: 600;
+  }
+  .cover-meta-value {
+    font-size: 12px;
+    color: var(--grey-dark);
+    font-weight: 500;
+  }
+  .cover-meta-value[contenteditable="true"] {
+    outline: none;
+    border-bottom: 1px dashed var(--grey-light);
+    min-width: 80px;
+    display: inline-block;
+  }
+  .cover-logo-area {
+    position: absolute;
+    bottom: 56px;
+    right: 56px;
+    text-align: right;
+  }
+  .cover-logo {
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 6px;
+    color: var(--grey-light);
+    text-transform: uppercase;
+  }
+  .cover-confidential {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--grey-mid);
+    margin-top: 4px;
+  }
+
+  /* ── SECTION HEADER PAGE ────────────────────────────────────── */
+  .section-page {
+    background: var(--off-white);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 64px 56px;
+    min-height: 160px;
+  }
+  .section-page.compact { min-height: unset; padding: 28px 40px 0; }
+  .section-eyebrow {
+    font-size: 9px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .section-title {
+    font-size: 28px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+    color: var(--black);
+  }
+  .section-rule {
+    width: 100%;
+    height: 1px;
+    background: var(--grey-light);
+    margin: 0 40px;
+  }
+
+  /* ── CHARACTER LINEUP PAGE ──────────────────────────────────── */
+  .lineup-page {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .lineup-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    background: var(--black);
+    border-bottom: 2px solid var(--accent);
+    padding: 14px 28px;
+    flex-shrink: 0;
+  }
+  .lineup-header-title {
+    font-size: 14px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--white);
+  }
+  .lineup-header-ep {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+  }
+  .lineup-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--grey-light);
+  }
+  .char-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    padding: 16px 20px 14px;
+    gap: 10px;
+  }
+
+  .char-img-wrap {
+    width: 100%;
+    background: var(--off-white);
+    overflow: visible;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .char-img-wrap > img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .char-img-placeholder {
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--grey-mid);
+    text-transform: uppercase;
+    text-align: center;
+    padding: 32px;
+  }
+  /* Franja inferior: texto izquierda + pin derecha */
+  .char-bottom {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    border-top: 1px solid var(--grey-light);
+    padding-top: 10px;
+    margin-top: 8px;
+  }
+  .char-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .char-name {
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--black);
+  }
+  .char-role {
+    font-size: 9.5px;
+    color: var(--grey-mid);
+    letter-spacing: 0.3px;
+  }
+  .char-vehicle {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  /* Wardrobe pin — polaroid a la derecha */
+  .char-wardrobe-pin {
+    width: 32%;
+    flex-shrink: 0;
+    background: var(--white);
+    padding: 5px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    transform: rotate(3deg);
+  }
+  .char-wardrobe-pin img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* ── PANEL PAGE ─────────────────────────────────────────────── */
+  .panel-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 297mm;
+  }
+  .panel-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 20px;
+    background: var(--black);
+    border-bottom: 2px solid var(--accent);
+    flex-shrink: 0;
+  }
+  .panel-page-header .ph-ep {
+    font-size: 8px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+  }
+  .panel-page-header .ph-title {
+    font-size: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+  }
+  .panel-page-header .ph-num {
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: var(--accent);
+  }
+
+  /* SPACER between header and image */
+  .panel-spacer {
+    height: 14mm;
+    flex-shrink: 0;
+    background: var(--white);
+  }
+
+  /* IMAGE: full width with 1cm side margins + border frame */
+  .panel-img-col {
+    width: calc(100% - 2cm);
+    margin: 0 1cm;
+    background: var(--black);
+    border: 1px solid #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    aspect-ratio: 16 / 9;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .panel-img-col img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+  .panel-img-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 24px;
+    color: #555;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+  }
+  .panel-img-placeholder .pip-icon {
+    width: 64px;
+    height: 48px;
+    border: 2px dashed currentColor;
+    border-radius: 2px;
+    position: relative;
+  }
+  .panel-img-placeholder .pip-icon::after {
+    content: '';
+    position: absolute;
+    bottom: 8px; left: 8px; right: 8px;
+    height: 2px;
+    background: currentColor;
+    box-shadow: 0 -6px 0 currentColor;
+  }
+  .panel-img-placeholder .pip-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: var(--font-mono);
+    color: #555;
+  }
+
+  /* INFO SECTION: below image */
+  .panel-info-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* top info row: 2 columns */
+  .panel-info-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    flex: 1;
+  }
+
+  /* left col: panel num + scene + visual */
+  .panel-info-main {
+    padding: 14px 20px 14px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-right: 1px solid var(--grey-light);
+  }
+
+  /* right col: dialogue + chars */
+  .panel-info-side {
+    padding: 14px 22px 14px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .panel-num-badge {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .panel-num {
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--black);
+    letter-spacing: -1px;
+  }
+  .panel-num-sub {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--grey-mid);
+    letter-spacing: 1px;
+  }
+
+  .info-block { display: flex; flex-direction: column; gap: 4px; }
+  .info-label {
+    font-size: 7.5px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--grey-mid);
+  }
+  .info-value {
+    font-size: 10.5px;
+    line-height: 1.55;
+    color: var(--grey-dark);
+  }
+
+  /* editable fields */
+  .editable {
+    outline: none;
+    border-bottom: 1px dashed var(--grey-light);
+    min-height: 18px;
+    padding: 2px 0;
+    color: var(--grey-dark);
+    font-size: 10.5px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+  }
+  .editable:empty::before {
+    content: attr(data-placeholder);
+    color: #ccc;
+    font-style: italic;
+    pointer-events: none;
+  }
+  .editable:focus {
+    border-bottom-color: var(--accent);
+    border-bottom-style: solid;
+  }
+
+  /* dialogue block */
+  .dialogue-block {
+    background: var(--off-white);
+    border-left: 3px solid var(--accent);
+    padding: 10px 12px;
+    border-radius: 0 2px 2px 0;
+  }
+  .dialogue-block .info-label { color: var(--accent); }
+  .dialogue-block .editable {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    line-height: 1.6;
+    border-bottom-color: transparent;
+  }
+  .dialogue-block .editable:focus { border-bottom-color: var(--accent); }
+
+  /* chars in scene */
+  .chars-in-scene {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 2px;
+  }
+  .char-tag {
+    font-size: 7.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: var(--grey-light);
+    padding: 2px 7px;
+    border-radius: 2px;
+    color: var(--grey-dark);
+  }
+  .char-tag.villain { background: #fdecea; color: var(--accent); }
+
+  /* notes row: bottom strip */
+  .panel-notes-row {
+    border-top: 1px solid var(--grey-light);
+    padding: 8px 22px 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+  .panel-notes-row .info-label { margin-bottom: 2px; }
+  .panel-notes-row .editable {
+    font-size: 10px;
+    border-bottom-color: transparent;
+  }
+  .panel-notes-row .editable:focus { border-bottom-color: var(--accent); }
+  .notes-col { flex: 1; }
+
+  /* ── WARDROBE PAGE ──────────────────────────────────────────── */
+  .wardrobe-page {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+  }
+  .wardrobe-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    background: var(--grey-light);
+    padding: 0;
+  }
+  .wardrobe-card {
+    background: var(--white);
+    display: flex;
+    flex-direction: column;
+    padding: 16px 12px 14px;
+    gap: 10px;
+  }
+  .wardrobe-img-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--off-white);
+    overflow: hidden;
+  }
+  .wardrobe-img-wrap img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .wardrobe-info {
+    border-top: 1px solid var(--grey-light);
+    padding-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .wardrobe-name {
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--black);
+  }
+  .wardrobe-label {
+    font-size: 8px;
+    color: var(--grey-mid);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  /* ── STORYBOARD PAGE ────────────────────────────────────────── */
+  .storyboard-page {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+  }
+  .sb-header {
+    background: var(--black);
+    border-bottom: 2px solid var(--accent);
+    padding: 18px 24px 14px;
+    flex-shrink: 0;
+  }
+  .sb-eyebrow {
+    font-size: 8px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 4px;
+  }
+  .sb-title {
+    font-size: 22px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+    color: var(--white);
+    line-height: 1;
+  }
+  .sb-title span { color: var(--accent); }
+  .sb-subtitle {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.35);
+    margin-top: 5px;
+    text-transform: uppercase;
+  }
+  .sb-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+    padding: 14px;
+    align-content: start;
+  }
+  .sb-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .sb-img-wrap {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: var(--grey-light);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .sb-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .sb-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    font-family: var(--font-mono);
+    color: #bbb;
+    letter-spacing: 1px;
+  }
+  .sb-label {
+    font-size: 6.5px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--grey-mid);
+    text-align: center;
+    line-height: 1;
+  }
+
+  /* ── PRINT STYLES ───────────────────────────────────────────── */
+  @media print {
+    body { background: white; font-size: 11px; }
+    #topbar { display: none !important; }
+    #doc-wrapper { padding-top: 0; }
+
+    .page {
+      width: 100%;
+      min-height: 100vh;
+      margin: 0;
+      box-shadow: none;
+      page-break-after: always;
+      break-after: page;
+    }
+    .page:last-child { page-break-after: avoid; break-after: avoid; }
+
+    .cover { min-height: 100vh; }
+    .lineup-page { min-height: 100vh; }
+
+    .panel-page {
+      min-height: 100vh;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .panel-img-col { aspect-ratio: 16/9; }
+    .panel-page-header { background: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+    /* Spacer: forzar visibilidad en print */
+    .panel-spacer {
+      height: 14mm !important;
+      min-height: 14mm !important;
+      display: block !important;
+      flex-shrink: 0 !important;
+    }
+
+    /* Lineup: exactamente una página A4, sin overflow */
+    .lineup-page {
+      height: 297mm;
+      overflow: hidden;
+    }
+    .lineup-grid {
+      overflow: hidden;
+    }
+    .char-card {
+      overflow: hidden;
+      min-height: 0;
+    }
+    .char-img-wrap {
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .char-img-wrap > img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: top;
+    }
+
+    .editable:empty::before { color: #ddd; }
+
+    /* Ocultar bloque Caveats si no hay texto escrito */
+    .caveats-block:has(.editable:empty) { display: none; }
+
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── TOP BAR (screen only) ───────────────────────────────────────── -->
+<div id="topbar">
+  <div class="tb-title">CVY26_001 <span>·</span> EP101 <span>·</span> Color Review</div>
+  <div class="tb-controls">
+    <button class="tb-btn secondary" onclick="toggleEditing()">Toggle Editing</button>
+    <button class="tb-btn" onclick="window.print()">Export PDF</button>
+  </div>
+</div>
+
+<div id="doc-wrapper">
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     COVER PAGE
+═══════════════════════════════════════════════════════════════════ -->
+<div class="page cover">
+  <div class="cover-stripe"></div>
+  <div class="cover-body">
+    <div class="cover-eyebrow">Matchbox Crew</div>
+    <div class="cover-title">Color<br><span>Review</span></div>
+    <div class="cover-subtitle">Episode 108 — City Spy Chase!</div>
+    <div class="cover-divider"></div>
+  </div>
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Project Code</div>
+      <div class="cover-meta-value">CVY26_001</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Episode</div>
+      <div class="cover-meta-value">108 — City Spy Chase!</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Document Type</div>
+      <div class="cover-meta-value">Color Review Package</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Total Panels</div>
+      <div class="cover-meta-value">45</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Version</div>
+      <div class="cover-meta-value" contenteditable="true" data-placeholder="V1">V1</div>
+    </div>
+  </div>
+  <div class="cover-logo-area">
+    <div class="cover-logo">Convoy</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     CHARACTER LINEUP PAGE — EP108 (City Spy Chase)
+═══════════════════════════════════════════════════════════════════ -->
+<style>
+  /* EP102: cuadros de vestuario Adventure World +10% (32% -> 35.2%) */
+  .lineup-page .char-wardrobe-pin { width: 35.2%; }
+</style>
+<div class="page lineup-page">
+  <div class="lineup-header">
+    <div class="lineup-header-title">Character Lineup</div>
+    <div class="lineup-header-ep">Episode 108 · Cast · City Spy Chase</div>
+  </div>
+
+  <div class="lineup-grid">
+
+    <!-- SEAN -->
+    <div class="char-card">
+      <div class="char-img-wrap">
+        <img src="./MATCHBOX-SEAN-turn1.jpg" alt="Sean" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="char-img-placeholder" style="display:none">Sean — Turn 1</div>
+      </div>
+      <div class="char-bottom">
+        <div class="char-info">
+          <div class="char-name">Sean</div>
+          <div class="char-role">Lead — The Spy Kid</div>
+          <div class="char-vehicle">Land Rover 6x6 · #JKH28</div>
+        </div>
+        <div class="char-wardrobe-pin"><img src="./wardrobe/108/SEAN_EP108.png" alt="Sean wardrobe"></div>
+
+      </div>
+    </div>
+
+    <!-- TED -->
+    <div class="char-card">
+      <div class="char-img-wrap">
+        <img src="./MATCHBOX-TED-turn1.jpg" alt="Ted" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="char-img-placeholder" style="display:none">Ted — Turn 1</div>
+      </div>
+      <div class="char-bottom">
+        <div class="char-info">
+          <div class="char-name">Ted</div>
+          <div class="char-role">Crew Leader</div>
+          <div class="char-vehicle">Triumph Scrambler · #JKH31</div>
+        </div>
+        <div class="char-wardrobe-pin">
+          <img src="./wardrobe/108/TED_EP108.png" alt="Ted wardrobe">
+        </div>
+      </div>
+    </div>
+
+    <!-- CHARMAINE -->
+    <div class="char-card">
+      <div class="char-img-wrap">
+        <img src="./MATCHBOX-CHARMAINErevisedHAIR.jpg" alt="Charmaine" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="char-img-placeholder" style="display:none">Charmaine — Turn 1</div>
+      </div>
+      <div class="char-bottom">
+        <div class="char-info">
+          <div class="char-name">Charmaine</div>
+          <div class="char-role">Tech &amp; Air Support</div>
+          <div class="char-vehicle">Rescue Helicopter · #JKH39</div>
+        </div>
+        <div class="char-wardrobe-pin">
+          <img src="./wardrobe/108/CHARMAINE_EP108.png" alt="Charmaine wardrobe">
+        </div>
+      </div>
+    </div>
+
+    <!-- AIMEE -->
+    <div class="char-card">
+      <div class="char-img-wrap">
+        <img src="./MATCHBOX-AIMEE-turn1.jpg" alt="Aimee" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="char-img-placeholder" style="display:none">Aimee — Turn 1</div>
+      </div>
+      <div class="char-bottom">
+        <div class="char-info">
+          <div class="char-name">Aimee</div>
+          <div class="char-role">Speed &amp; Driving Expert</div>
+          <div class="char-vehicle">Mustang Fastback · #JKH34</div>
+        </div>
+        <div class="char-wardrobe-pin">
+          <img src="./wardrobe/108/AIMEE_EP108.png" alt="Aimee wardrobe">
+        </div>
+      </div>
+    </div>
+
+    <!-- CROSBY -->
+    <div class="char-card">
+      <div class="char-img-wrap">
+        <img src="./MATCHBOX-CROSBY-turn1.jpg" alt="Crosby" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="char-img-placeholder" style="display:none">Crosby — Turn 1</div>
+      </div>
+      <div class="char-bottom">
+        <div class="char-info">
+          <div class="char-name">Crosby</div>
+          <div class="char-role">Engineering &amp; Heavy Machinery</div>
+          <div class="char-vehicle">Excavator · #JKH38</div>
+        </div>
+        <div class="char-wardrobe-pin">
+          <img src="./wardrobe/108/CROSBY_EP108.png" alt="Crosby wardrobe">
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /lineup-grid -->
+</div><!-- /lineup-page -->
+
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     PANELS
+     Image path: COLOR_URLS map below. URLs come from refineria.onrender.com.
+═══════════════════════════════════════════════════════════════════ -->
+
+<script>
+// ── CONFIGURATION ──────────────────────────────────────────────
+// Color images are served directly from refineria.onrender.com (Valen's app).
+// If a URL changes (regenerated final), refresh by running:
+//   curl -s 'https://refineria.onrender.com/api/projects/convoy/episodes/ep101/finals' | node scripts/build_color_urls.js
+const COLOR_URLS = {"01": "https://refineria.onrender.com/uploads/generated/d9111fc6-a514-4f1c-b43a-512a63751fb3.png", "02": "https://refineria.onrender.com/uploads/generated/667c054b-2e89-43a7-8794-fce5bb60a31c.png", "04": "https://refineria.onrender.com/uploads/generated/cf8fb4a8-013c-4395-9532-078ec98a55c4.png", "05": "https://refineria.onrender.com/uploads/generated/dbad67ef-0cc1-4d69-a84c-2761c3648c08.png", "06": "https://refineria.onrender.com/uploads/generated/800a943c-c156-48ad-8f3c-93789ea69333.png", "07": "https://refineria.onrender.com/uploads/generated/97d8ba7d-b0cf-4359-81a4-fbd8f6c303ea.png", "08": "https://refineria.onrender.com/uploads/generated/696b9feb-141a-49fa-bc56-23386503c840.png", "09": "https://refineria.onrender.com/uploads/generated/8d2383a9-4fa1-45b5-85ba-8b5b8676b390.png", "10": "https://refineria.onrender.com/uploads/generated/1f92344a-fc0e-438b-a6e5-77bbe62437b7.png", "11": "https://refineria.onrender.com/uploads/generated/0c65ad86-c92d-4744-a884-3f54cc241540.png", "12": "https://refineria.onrender.com/uploads/generated/1880a5a2-a94b-4661-8ad8-69c30e775877.png", "13": "https://refineria.onrender.com/uploads/generated/49c54656-69b9-4159-8416-6426bc4b2a0d.png", "14": "https://refineria.onrender.com/uploads/generated/67f73516-b710-427b-9825-e50ee16663a4.png", "15": "https://refineria.onrender.com/uploads/generated/9f757287-fb9d-4183-8ed6-6641ef91cdaa.png", "16": "https://refineria.onrender.com/uploads/generated/8e35ea85-6e1e-4b4f-8adc-e574181737ee.png", "17": "https://refineria.onrender.com/uploads/generated/65146e71-a8de-40af-aeba-03a4c014a155.png", "18": "https://refineria.onrender.com/uploads/generated/d21415df-1a0b-473f-b70c-369e00928f0f.png", "19": "https://refineria.onrender.com/uploads/generated/4e354d8c-404f-4e5e-b408-5902fe4c4d9f.png", "20": "https://refineria.onrender.com/uploads/generated/cc1e6e9a-b38f-4e53-a5f5-7a05c07f72e8.png", "21": "https://refineria.onrender.com/uploads/generated/1f2613ad-34c5-4491-9271-4146adad8e86.png", "22": "https://refineria.onrender.com/uploads/generated/6f272331-51e9-40af-bcc2-67f60e48052e.png", "23": "https://refineria.onrender.com/uploads/generated/993061e8-811d-4de6-b792-7ee555c76f93.png", "24": "https://refineria.onrender.com/uploads/generated/f6e3ea26-5999-4033-9b1d-f0dabe24e9b0.png", "25": "https://refineria.onrender.com/uploads/generated/31653dfa-fb5c-4e8e-9caf-7d7d62b2644a.png", "26": "https://refineria.onrender.com/uploads/generated/14ac2912-41b7-4a94-b9b8-25968cabe1e8.jpg", "27": "https://refineria.onrender.com/uploads/generated/8a46d0d4-d9ec-4624-b8d0-a9461598b4db.jpg", "28": "https://refineria.onrender.com/uploads/generated/fb12894a-c8cc-43f5-9011-2b5789790c9a.png", "29": "https://refineria.onrender.com/uploads/generated/2ea8cdbb-a7b3-4bdc-8222-ad25c094e904.png", "30": "https://refineria.onrender.com/uploads/generated/e13fe0f9-2fb9-4956-acaa-85fe37b828e2.png", "31": "https://refineria.onrender.com/uploads/generated/f7c10cca-2fde-482a-aff2-f8b29c27b4a5.png", "32": "https://refineria.onrender.com/uploads/generated/d56b2671-0488-4a01-a1a0-46f6735a4240.png", "33": "https://refineria.onrender.com/uploads/generated/5e9c4ed9-9713-46da-88a0-bd90cfb7f497.png", "34": "https://refineria.onrender.com/uploads/generated/61b87aaa-b8aa-4a26-9567-7dd747d50245.png", "35": "https://refineria.onrender.com/uploads/generated/1a3c8101-09ae-4b0d-bad2-7f3023297e98.png", "36": "https://refineria.onrender.com/uploads/generated/5b610f5e-43da-4a7e-b27d-2d533ed767a6.png", "37": "https://refineria.onrender.com/uploads/generated/af029d0e-3311-4b11-b39d-5ef741bc7825.png", "38": "https://refineria.onrender.com/uploads/generated/8503ab99-0a24-4858-abdb-bdf07f579820.png", "39": "https://refineria.onrender.com/uploads/generated/3a80f395-eaea-4997-8673-9d202bf9b338.png", "40": "https://refineria.onrender.com/uploads/generated/265c0079-a6ea-45b2-bd96-6f0d5eee8fd1.png", "41": "https://refineria.onrender.com/uploads/generated/4dc1e8de-8887-4263-ada9-9f587463bee0.png", "42": "https://refineria.onrender.com/uploads/generated/231ccc81-7f5f-4336-b79f-5ad54224b6b6.png", "43": "https://refineria.onrender.com/uploads/generated/4c52f59b-9d5a-4f0c-bcd6-b6cc14ca8d37.png", "44": "https://refineria.onrender.com/uploads/generated/5fa558da-2098-43cb-bf47-c664e02cd43a.png", "45": "https://refineria.onrender.com/uploads/generated/bfea6edd-9c6f-4069-ab17-0cfdd03aeeb4.png", "46": "https://refineria.onrender.com/uploads/generated/636747b8-e299-4073-a418-7cf31fda0bb2.png"};
+// ── VEHICLES IN PANEL (with toy numbers) ──────────────────────
+const VEHICLES_IN_PANEL = {"01": [{"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Triumph Scrambler", "sku": "JKH31"}], "02": [{"name": "Dodge Durango", "sku": "HFP46"}], "04": [{"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Excavator", "sku": "JKH38"}, {"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "Rescue Helicopter", "sku": "JKH39"}], "05": [], "06": [{"name": "Rescue Helicopter", "sku": "JKH39"}], "07": [{"name": "Dodge Durango", "sku": "HFP46"}], "08": [{"name": "Dodge Durango", "sku": "HFP46"}], "09": [{"name": "Rescue Helicopter", "sku": "JKH39"}, {"name": "Dodge Durango", "sku": "HFP46"}], "10": [{"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Mustang Fastback", "sku": "JKH34"}], "11": [{"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Dodge Durango", "sku": "HFP46"}], "12": [{"name": "Dodge Durango", "sku": "HFP46"}], "13": [{"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Dodge Durango", "sku": "HFP46"}], "14": [{"name": "Land Rover 6x6", "sku": "JKH28"}], "15": [], "16": [{"name": "F-650 Rollback", "sku": "JKH49"}], "17": [], "18": [{"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Dodge Durango", "sku": "HFP46"}], "19": [{"name": "Dodge Durango", "sku": "HFP46"}, {"name": "Excavator", "sku": "JKH38"}], "20": [{"name": "Rescue Helicopter", "sku": "JKH39"}, {"name": "Polaris RZR", "sku": "BL251"}], "21": [{"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "F-650 Rollback", "sku": "JKH49"}], "22": [{"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "Dodge Durango", "sku": "HFP46"}], "23": [{"name": "Excavator", "sku": "JKH38"}, {"name": "Dodge Durango", "sku": "HFP46"}], "24": [{"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Triumph Scrambler", "sku": "JKH31"}], "25": [], "26": [{"name": "F-650 Rollback", "sku": "JKH49"}, {"name": "Ford F-150", "sku": "JKH36"}], "27": [], "28": [{"name": "Excavator", "sku": "JKH38"}, {"name": "Dodge Durango", "sku": "HFP46"}], "29": [{"name": "F-650 Rollback", "sku": "JKH49"}, {"name": "Dodge Durango", "sku": "HFP46"}], "30": [{"name": "Ford F-150", "sku": "JKH36"}, {"name": "Dodge Durango", "sku": "HFP46"}], "31": [{"name": "Dodge Durango", "sku": "HFP46"}, {"name": "Polaris RZR", "sku": "BL251"}], "32": [{"name": "Rescue Helicopter", "sku": "JKH39"}, {"name": "Polaris RZR", "sku": "BL251"}], "33": [{"name": "Rescue Helicopter", "sku": "JKH39"}, {"name": "Polaris RZR", "sku": "BL251"}], "34": [], "35": [{"name": "Dodge Durango", "sku": "HFP46"}], "36": [{"name": "Dodge Durango", "sku": "HFP46"}], "37": [{"name": "Dodge Durango", "sku": "HFP46"}, {"name": "F-650 Rollback", "sku": "JKH49"}, {"name": "Ford F-150", "sku": "JKH36"}, {"name": "Land Rover 6x6", "sku": "JKH28"}], "38": [{"name": "Dodge Durango", "sku": "HFP46"}], "39": [{"name": "Dodge Durango", "sku": "HFP46"}, {"name": "Rescue Helicopter", "sku": "JKH39"}], "40": [{"name": "Rescue Helicopter", "sku": "JKH39"}], "41": [{"name": "Rescue Helicopter", "sku": "JKH39"}], "42": [{"name": "Dodge Durango", "sku": "HFP46"}, {"name": "Rescue Helicopter", "sku": "JKH39"}], "43": [{"name": "Dodge Durango", "sku": "HFP46"}, {"name": "Rescue Helicopter", "sku": "JKH39"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Excavator", "sku": "JKH38"}, {"name": "Triumph Scrambler", "sku": "JKH31"}], "44": [{"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "Excavator", "sku": "JKH38"}, {"name": "Rescue Helicopter", "sku": "JKH39"}, {"name": "Dodge Durango", "sku": "HFP46"}], "45": [], "46": [{"name": "Rescue Helicopter", "sku": "JKH39"}, {"name": "Mustang Fastback", "sku": "JKH34"}, {"name": "Land Rover 6x6", "sku": "JKH28"}, {"name": "Triumph Scrambler", "sku": "JKH31"}, {"name": "Excavator", "sku": "JKH38"}]};
+// ── DIALOGUES (from Script V3, 04/14/2026 Playmation) ─────────
+const SCRIPT_DIALOGUES = {"01": "Ted (V.O.): (narration) Sean and Aimee have finally found the Secret Mobile Hideout of criminal super-spy Von Steele. Aimee (V.O.): But why is Ted's motorcycle here?", "02": "Sean (V.O.): (narration) Von Steele kidnapped Ted to distract the Matchbox Crew. He floors it in his Durango and jumps off an escape ramp. Aimee (V.O.): Von Steele's getting away! Sean (V.O.): Not for long. We catch that criminal... today!", "04": "GFX: Name of each character splashes over the correlating character image.", "05": "Sean (V.O.): (narration) The Matchbox Crew has to catch Von Steele before he gets out of the city. (as Sean) Okay, there are four roads he could use to escape!", "06": "Aimee (V.O.): How can we know which way he's gonna choose? Sean (V.O.): We can't. We've got to split up. Once we find him, we surround him and bring him in.", "07": "Charmaine (V.O.): (narration) No one on the team has any idea where Von Steele is. Aimee (V.O.): What we do have are fast cars. Crosby (V.O.): And amazing driving skills. Ted (V.O.): And charming personalities.", "08": "Sean (V.O.): (as Von Steele) While those dodos are racing around the city, I'll sneak away using the old mountain pass.", "09": "Charmaine (V.O.): (narration) Charmaine can see every part of the city clear as day. (as Charmaine) I found him! Sean, Von Steele is trying to get away using the old mountain pass!", "10": "Sean (V.O.): Pretty sneaky plan Von Steele. (then) Thanks, Charmaine. I'm almost there. I'll cut him off. Aimee (V.O.): Not if I get there first.", "11": "Sean (V.O.): Sean and Aimee squeal to a stop, blocking the road to the mountain pass. Aimee (V.O.): Give it up, Von Steele. There's nowhere to go!", "12": "Sean (V.O.): (narration) Von Steele slams the Durango in reverse. The Crew won't catch him that easy. He's got plenty more tricks up his sleeve!", "13": "Sean (V.O.): Aimee and Sean race after him. Crosby (V.O.): But then a concrete barrier drops. Von Steele just barely escapes under it and Aimee and Sean have to slam on the brakes.", "14": "Sean (V.O.): Crosby, what are you doing? Crosby (V.O.): Hey there, Sean. The Construction Appreciation Parade is today! I have to set out the safety barriers.", "15": "Sean (V.O.): All of these barriers are gonna slow down the chase! Crosby (V.O.): Sorry, Sean. I gotta block off the parade route from downtown all the way to Smalley's Garage. It's my job.", "16": "Aimee (V.O.): Blocking off all those streets makes the city look like a maze! Sean (V.O.): Chasing Von Steele through a maze sounds pretty fun.", "17": "Charmaine (V.O.): While y'all are yapping, Von Steele is heading for the East side of the city! Sean (V.O.): A parade day maze chase it is! All (V.O.): (cheer)", "18": "Aimee (V.O.): I see him near Main Street and First! Crosby (V.O.): I'm right around the corner. I'll cut him off.", "19": "Crosby (V.O.): (narration) Von Steele stops inches from Crosby's Excavator! Sean (V.O.): (as Von Steele, as Ratso Rizzo) Whoa! Watch it with that thing. I'm escapin' here! I'm escapin' here!", "20": "Crosby (V.O.): Von Steele's henchmen stole one of the parade balloons and are using it to block the Helicopter's view of the city. Charmaine (V.O.): I can't see him at all anymore! Actually, I can't see anything!", "21": "Ted (V.O.): Don't worry. My motorcycle can fit in these narrow alleys. Crosby (V.O.): Suddenly Ted sees a giant flatbed backing up into the alley. Ted (V.O.): Okay. Sure. And then Ted uses the flat bed like a ramp. (as Ted) Whoo-hoo!", "22": "Ted (V.O.): (narration) Ted lands his motorcycle right in front of Von Steele, blocking his path. (as Ted) You're not getting away that easy Von Steele!", "23": "Crosby (V.O.): Von Steele quickly turns down a side street. (as Crosby) He's on 3rd Street, get him!", "24": "Sean/Aimee/Ted (V.O.): We can't! Sean (V.O.): With all of these barriers we have no idea how to get anywhere!", "25": "Sean (V.O.): There are like a million barriers, Crosby. How are we ever supposed to get to Von Steele?", "26": "Crosby (V.O.): Maybe you don't have to. We can make him come to us IF we move the barriers together.", "27": "Crosby (V.O.): I know the parade barriers like the back of my hand. We just have to move a few barriers so that Von Steele only has one place to go. Charmaine (V.O.): And I'll figure out a way to hold off his henchmen.", "28": "Crosby (V.O.): Crosby moves a barrier to force Von Steele to the left. Sean (V.O.): (as Von Steele) Ha! You can't stop me with barriers. I'm way too smart for that. I can out drive anything you throw at me.", "29": "Ted (V.O.): Ted slides a barrier off of his truck, blocking Von Steele. Sean (V.O.): (as Von Steele) Ha! Nice try. I'll just turn here.", "30": "Aimee (V.O.): Aimee blocks a side street to make Von Steele keep driving straight. Sean (V.O.): (as Von Steele) Hey! I did want to go that way, but you still can't catch me.", "31": "Crosby (V.O.): Von Steele ends up right where the team wants him. But, oh no, his henchmen are right there to protect him.", "32": "Charmaine (V.O.): Charmaine wants to help, but her helicopter is still being blocked by Von Steele's henchmen moving the giant parade balloon. Thankfully, she has a construction hook attached to her helicopter.", "33": "Charmaine (V.O.): Those henchmen think they are controlling the balloon. But, Charmaine hooks the balloon with her construction cable and now she's controlling them! (as Charmaine) Time to go for a ride!", "34": "Charmaine (V.O.): The Helicopter carries the henchmen away. All (V.O.): (as henchmen, through kid laughter) Hey hey hey! Let us down! WhooOA! I'm afraid of heights!", "35": "Sean (V.O.): (as Von Steele) I don't need those silly henchmen. I need something big... with lots and lots of horsepower.", "36": "Sean (V.O.): (narration) Von Steele spies his Secret Mobile Hideout at the end of the street and floors it. (as Von Steele) Yes! My massive, powerful, unstoppable Hideout Truck. All (V.O.): (gasp) Sean (V.O.): The back of the truck is opening up! Aimee (V.O.): If Von Steele reaches that truck he'll escape forever!", "37": "Ted (V.O.): Von Steele has too much of a lead. We'll never catch him! Aimee (V.O.): Outrunning me is unacceptable! Sean (V.O.): Stay with him Aimee! We need to keep him distracted.", "38": "Sean (V.O.): (as Von Steele) You fools! You led me right to my own Mobile Hideout. Now you'll never nab me! Crosby (V.O.): Little does Von Steele know, that's exactly where the crew wants him to go.", "39": "Sean (V.O.): (as Von Steele) Haha! I'm as good as gone! So long, nincompoops! (then) Whoa whoa whoa! What's happening? Crosby (V.O.): (narration) As Von Steele pulls into his Secret Hideout, he doesn't even realize that it's attached to Charmaine's helicopter.", "40": "Charmaine (V.O.): High above, Charmaine uses the giant parade balloons to lift up the Mobile Hideout with Von Steele in it! (as Charmaine) How's this for mobile?", "41": "Aimee (V.O.): (narration) Von Steele is trapped in his own Hideout, dangling above Smalley's Garage. Sean (V.O.): (as Von Steele) WhoOA! Who's driving this thing?", "42": "Charmaine (V.O.): (narration) Charmaine uses the huge parade balloons to position Von Steele over the Smalley's Garage Car Crusher. Aimee (V.O.): Enjoy your floating jail cell, Von Steele. Sean (V.O.): (as Von Steele) Put me down. This isn't fair! You stopped my unstoppable plan. Put me down! Do you hear me? Put me DOWN!", "43": "Crosby (V.O.): Okay. You asked for it. Charmaine, put him down. Sean (V.O.): (as Von Steele) Nooooooooo!", "44": "Sean (V.O.): (narration) Von Steele's Durango lands right in the Car Crusher. He's stuck, with no way to escape. Aimee (V.O.): Yes! Way to go, crew! We did it! We captured Von Steele-- Sean (V.O.): For now. Charmaine (V.O.): That car crusher makes a pretty good prison cell. Ted (V.O.): You okay in there, Von Steele? Want some crackers? A juice box? Sean (V.O.): (as Von Steele) (struggling) Ugh! Grrgh! Get me out of this thing! Crosby (V.O.): Sorry, Von Steele. You need a timeout to think about what you've done. If you're good, we'll get you down... in a few years. All (V.O.): (laughter)", "45": "Sean (V.O.): Thanks! That was fast thinking and great driving. So much fun! Aimee (V.O.): Wait, do you hear that? It's all the parade-goers from all over the city. (starting it) Matchbox Crew, Matchbox Crew... All (V.O.): Matchbox Crew! Matchbox Crew! Matchbox Crew!", "46": "Sean (V.O.): Nothing can stop the... / All (V.O.): MATCHBOX CREW!"};
+// ── ADDRESSED IN COLOR (draft from MATTEL feedback) ───────────
+const ADDRESSED = {};
+
+// ── ACTION DESCRIPTIONS (from script) ──────────────────────────
+const ACTIONS = {};
+
+// ── MATTEL FEEDBACK ────────────────────────────────────────────
+const MATTEL_FEEDBACK = {};
+
+// ── PANEL DATA ─────────────────────────────────────────────────
+const PANELS = [
+  {
+    "num": "01",
+    "label": "01",
+    "scene": "ADVENTURE WORLD · MATCHBOX CITY",
+    "dialogue": "Ted (V.O.): (narration) Sean and Aimee have finally found the Secret Mobile Hideout of criminal super-spy Von Steele. Aimee (V.O.): But why is Ted's motorcycle here?",
+    "chars": []
+  },
+  {
+    "num": "02",
+    "label": "02",
+    "scene": "ADVENTURE WORLD · MATCHBOX CITY",
+    "dialogue": "Sean (V.O.): (narration) Von Steele kidnapped Ted to distract the Matchbox Crew. He floors it in his Durango and jumps off an escape ramp. Aimee (V.O.): Von Steele's getting away! Sean (V.O.): Not for long. We catch that criminal... today!",
+    "chars": []
+  },
+  {
+    "num": "04",
+    "label": "04",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "GFX: Name of each character splashes over the correlating character image.",
+    "chars": []
+  },
+  {
+    "num": "05",
+    "label": "05",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Sean (V.O.): (narration) The Matchbox Crew has to catch Von Steele before he gets out of the city. (as Sean) Okay, there are four roads he could use to escape!",
+    "chars": []
+  },
+  {
+    "num": "06",
+    "label": "06",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Aimee (V.O.): How can we know which way he's gonna choose? Sean (V.O.): We can't. We've got to split up. Once we find him, we surround him and bring him in.",
+    "chars": []
+  },
+  {
+    "num": "07",
+    "label": "07",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Charmaine (V.O.): (narration) No one on the team has any idea where Von Steele is. Aimee (V.O.): What we do have are fast cars. Crosby (V.O.): And amazing driving skills. Ted (V.O.): And charming personalities.",
+    "chars": []
+  },
+  {
+    "num": "08",
+    "label": "08",
+    "scene": "ADVENTURE WORLD · MATCHBOX CITY",
+    "dialogue": "Sean (V.O.): (as Von Steele) While those dodos are racing around the city, I'll sneak away using the old mountain pass.",
+    "chars": []
+  },
+  {
+    "num": "09",
+    "label": "09",
+    "scene": "ADVENTURE WORLD · MATCHBOX CITY",
+    "dialogue": "Charmaine (V.O.): (narration) Charmaine can see every part of the city clear as day. (as Charmaine) I found him! Sean, Von Steele is trying to get away using the old mountain pass!",
+    "chars": []
+  },
+  {
+    "num": "10",
+    "label": "10",
+    "scene": "ADVENTURE WORLD · MATCHBOX CITY",
+    "dialogue": "Sean (V.O.): Pretty sneaky plan Von Steele. (then) Thanks, Charmaine. I'm almost there. I'll cut him off. Aimee (V.O.): Not if I get there first.",
+    "chars": []
+  },
+  {
+    "num": "11",
+    "label": "11",
+    "scene": "ADVENTURE WORLD · MATCHBOX CITY",
+    "dialogue": "Sean (V.O.): Sean and Aimee squeal to a stop, blocking the road to the mountain pass. Aimee (V.O.): Give it up, Von Steele. There's nowhere to go!",
+    "chars": []
+  },
+  {
+    "num": "12",
+    "label": "12",
+    "scene": "ADVENTURE WORLD · MATCHBOX CITY",
+    "dialogue": "Sean (V.O.): (narration) Von Steele slams the Durango in reverse. The Crew won't catch him that easy. He's got plenty more tricks up his sleeve!",
+    "chars": []
+  },
+  {
+    "num": "13",
+    "label": "13",
+    "scene": "ADVENTURE WORLD · MATCHBOX CITY",
+    "dialogue": "Sean (V.O.): Aimee and Sean race after him. Crosby (V.O.): But then a concrete barrier drops. Von Steele just barely escapes under it and Aimee and Sean have to slam on the brakes.",
+    "chars": []
+  },
+  {
+    "num": "14",
+    "label": "14",
+    "scene": "ADVENTURE WORLD · MATCHBOX CITY",
+    "dialogue": "Sean (V.O.): Crosby, what are you doing? Crosby (V.O.): Hey there, Sean. The Construction Appreciation Parade is today! I have to set out the safety barriers.",
+    "chars": []
+  },
+  {
+    "num": "15",
+    "label": "15",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Sean (V.O.): All of these barriers are gonna slow down the chase! Crosby (V.O.): Sorry, Sean. I gotta block off the parade route from downtown all the way to Smalley's Garage. It's my job.",
+    "chars": []
+  },
+  {
+    "num": "16",
+    "label": "16",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Aimee (V.O.): Blocking off all those streets makes the city look like a maze! Sean (V.O.): Chasing Von Steele through a maze sounds pretty fun.",
+    "chars": []
+  },
+  {
+    "num": "17",
+    "label": "17",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Charmaine (V.O.): While y'all are yapping, Von Steele is heading for the East side of the city! Sean (V.O.): A parade day maze chase it is! All (V.O.): (cheer)",
+    "chars": []
+  },
+  {
+    "num": "18",
+    "label": "18",
+    "scene": "ADVENTURE WORLD · PARADE ROUTE MAZE",
+    "dialogue": "Aimee (V.O.): I see him near Main Street and First! Crosby (V.O.): I'm right around the corner. I'll cut him off.",
+    "chars": []
+  },
+  {
+    "num": "19",
+    "label": "19",
+    "scene": "ADVENTURE WORLD · PARADE ROUTE MAZE",
+    "dialogue": "Crosby (V.O.): (narration) Von Steele stops inches from Crosby's Excavator! Sean (V.O.): (as Von Steele, as Ratso Rizzo) Whoa! Watch it with that thing. I'm escapin' here! I'm escapin' here!",
+    "chars": []
+  },
+  {
+    "num": "20",
+    "label": "20",
+    "scene": "ADVENTURE WORLD · PARADE ROUTE MAZE",
+    "dialogue": "Crosby (V.O.): Von Steele's henchmen stole one of the parade balloons and are using it to block the Helicopter's view of the city. Charmaine (V.O.): I can't see him at all anymore! Actually, I can't see anything!",
+    "chars": []
+  },
+  {
+    "num": "21",
+    "label": "21",
+    "scene": "ADVENTURE WORLD · PARADE ROUTE MAZE",
+    "dialogue": "Ted (V.O.): Don't worry. My motorcycle can fit in these narrow alleys. Crosby (V.O.): Suddenly Ted sees a giant flatbed backing up into the alley. Ted (V.O.): Okay. Sure. And then Ted uses the flat bed like a ramp. (as Ted) Whoo-hoo!",
+    "chars": []
+  },
+  {
+    "num": "22",
+    "label": "22",
+    "scene": "ADVENTURE WORLD · PARADE ROUTE MAZE",
+    "dialogue": "Ted (V.O.): (narration) Ted lands his motorcycle right in front of Von Steele, blocking his path. (as Ted) You're not getting away that easy Von Steele!",
+    "chars": []
+  },
+  {
+    "num": "23",
+    "label": "23",
+    "scene": "ADVENTURE WORLD · PARADE ROUTE MAZE",
+    "dialogue": "Crosby (V.O.): Von Steele quickly turns down a side street. (as Crosby) He's on 3rd Street, get him!",
+    "chars": []
+  },
+  {
+    "num": "24",
+    "label": "24",
+    "scene": "ADVENTURE WORLD · PARADE ROUTE MAZE",
+    "dialogue": "Sean/Aimee/Ted (V.O.): We can't! Sean (V.O.): With all of these barriers we have no idea how to get anywhere!",
+    "chars": []
+  },
+  {
+    "num": "25",
+    "label": "25",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Sean (V.O.): There are like a million barriers, Crosby. How are we ever supposed to get to Von Steele?",
+    "chars": []
+  },
+  {
+    "num": "26",
+    "label": "26",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Crosby (V.O.): Maybe you don't have to. We can make him come to us IF we move the barriers together.",
+    "chars": []
+  },
+  {
+    "num": "27",
+    "label": "27",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Crosby (V.O.): I know the parade barriers like the back of my hand. We just have to move a few barriers so that Von Steele only has one place to go. Charmaine (V.O.): And I'll figure out a way to hold off his henchmen.",
+    "chars": []
+  },
+  {
+    "num": "28",
+    "label": "28",
+    "scene": "ADVENTURE WORLD · PARADE ROUTE MAZE",
+    "dialogue": "Crosby (V.O.): Crosby moves a barrier to force Von Steele to the left. Sean (V.O.): (as Von Steele) Ha! You can't stop me with barriers. I'm way too smart for that. I can out drive anything you throw at me.",
+    "chars": []
+  },
+  {
+    "num": "29",
+    "label": "29",
+    "scene": "ADVENTURE WORLD · PARADE ROUTE MAZE",
+    "dialogue": "Ted (V.O.): Ted slides a barrier off of his truck, blocking Von Steele. Sean (V.O.): (as Von Steele) Ha! Nice try. I'll just turn here.",
+    "chars": []
+  },
+  {
+    "num": "30",
+    "label": "30",
+    "scene": "ADVENTURE WORLD · PARADE ROUTE MAZE",
+    "dialogue": "Aimee (V.O.): Aimee blocks a side street to make Von Steele keep driving straight. Sean (V.O.): (as Von Steele) Hey! I did want to go that way, but you still can't catch me.",
+    "chars": []
+  },
+  {
+    "num": "31",
+    "label": "31",
+    "scene": "ADVENTURE WORLD · PARADE ROUTE MAZE",
+    "dialogue": "Crosby (V.O.): Von Steele ends up right where the team wants him. But, oh no, his henchmen are right there to protect him.",
+    "chars": []
+  },
+  {
+    "num": "32",
+    "label": "32",
+    "scene": "ADVENTURE WORLD · PARADE ROUTE MAZE",
+    "dialogue": "Charmaine (V.O.): Charmaine wants to help, but her helicopter is still being blocked by Von Steele's henchmen moving the giant parade balloon. Thankfully, she has a construction hook attached to her helicopter.",
+    "chars": []
+  },
+  {
+    "num": "33",
+    "label": "33",
+    "scene": "ADVENTURE WORLD · PARADE ROUTE MAZE",
+    "dialogue": "Charmaine (V.O.): Those henchmen think they are controlling the balloon. But, Charmaine hooks the balloon with her construction cable and now she's controlling them! (as Charmaine) Time to go for a ride!",
+    "chars": []
+  },
+  {
+    "num": "34",
+    "label": "34",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Charmaine (V.O.): The Helicopter carries the henchmen away. All (V.O.): (as henchmen, through kid laughter) Hey hey hey! Let us down! WhooOA! I'm afraid of heights!",
+    "chars": []
+  },
+  {
+    "num": "35",
+    "label": "35",
+    "scene": "ADVENTURE WORLD · PARADE ROUTE MAZE",
+    "dialogue": "Sean (V.O.): (as Von Steele) I don't need those silly henchmen. I need something big... with lots and lots of horsepower.",
+    "chars": []
+  },
+  {
+    "num": "36",
+    "label": "36",
+    "scene": "ADVENTURE WORLD · PARADE ROUTE MAZE",
+    "dialogue": "Sean (V.O.): (narration) Von Steele spies his Secret Mobile Hideout at the end of the street and floors it. (as Von Steele) Yes! My massive, powerful, unstoppable Hideout Truck. All (V.O.): (gasp) Sean (V.O.): The back of the truck is opening up! Aimee (V.O.): If Von Steele reaches that truck he'll escape forever!",
+    "chars": []
+  },
+  {
+    "num": "37",
+    "label": "37",
+    "scene": "ADVENTURE WORLD · PARADE ROUTE MAZE",
+    "dialogue": "Ted (V.O.): Von Steele has too much of a lead. We'll never catch him! Aimee (V.O.): Outrunning me is unacceptable! Sean (V.O.): Stay with him Aimee! We need to keep him distracted.",
+    "chars": []
+  },
+  {
+    "num": "38",
+    "label": "38",
+    "scene": "ADVENTURE WORLD · PARADE ROUTE MAZE",
+    "dialogue": "Sean (V.O.): (as Von Steele) You fools! You led me right to my own Mobile Hideout. Now you'll never nab me! Crosby (V.O.): Little does Von Steele know, that's exactly where the crew wants him to go.",
+    "chars": []
+  },
+  {
+    "num": "39",
+    "label": "39",
+    "scene": "ADVENTURE WORLD · PARADE ROUTE MAZE",
+    "dialogue": "Sean (V.O.): (as Von Steele) Haha! I'm as good as gone! So long, nincompoops! (then) Whoa whoa whoa! What's happening? Crosby (V.O.): (narration) As Von Steele pulls into his Secret Hideout, he doesn't even realize that it's attached to Charmaine's helicopter.",
+    "chars": []
+  },
+  {
+    "num": "40",
+    "label": "40",
+    "scene": "ADVENTURE WORLD · PARADE ROUTE MAZE",
+    "dialogue": "Charmaine (V.O.): High above, Charmaine uses the giant parade balloons to lift up the Mobile Hideout with Von Steele in it! (as Charmaine) How's this for mobile?",
+    "chars": []
+  },
+  {
+    "num": "41",
+    "label": "41",
+    "scene": "ADVENTURE WORLD · PARADE ROUTE MAZE",
+    "dialogue": "Aimee (V.O.): (narration) Von Steele is trapped in his own Hideout, dangling above Smalley's Garage. Sean (V.O.): (as Von Steele) WhoOA! Who's driving this thing?",
+    "chars": []
+  },
+  {
+    "num": "42",
+    "label": "42",
+    "scene": "ADVENTURE WORLD · PARADE ROUTE MAZE",
+    "dialogue": "Charmaine (V.O.): (narration) Charmaine uses the huge parade balloons to position Von Steele over the Smalley's Garage Car Crusher. Aimee (V.O.): Enjoy your floating jail cell, Von Steele. Sean (V.O.): (as Von Steele) Put me down. This isn't fair! You stopped my unstoppable plan. Put me down! Do you hear me? Put me DOWN!",
+    "chars": []
+  },
+  {
+    "num": "43",
+    "label": "43",
+    "scene": "ADVENTURE WORLD · PARADE ROUTE MAZE",
+    "dialogue": "Crosby (V.O.): Okay. You asked for it. Charmaine, put him down. Sean (V.O.): (as Von Steele) Nooooooooo!",
+    "chars": []
+  },
+  {
+    "num": "44",
+    "label": "44",
+    "scene": "ADVENTURE WORLD · PARADE ROUTE MAZE",
+    "dialogue": "Sean (V.O.): (narration) Von Steele's Durango lands right in the Car Crusher. He's stuck, with no way to escape. Aimee (V.O.): Yes! Way to go, crew! We did it! We captured Von Steele-- Sean (V.O.): For now. Charmaine (V.O.): That car crusher makes a pretty good prison cell. Ted (V.O.): You okay in there, Von Steele? Want some crackers? A juice box? Sean (V.O.): (as Von Steele) (struggling) Ugh! Grrgh! Get me out of this thing! Crosby (V.O.): Sorry, Von Steele. You need a timeout to think about what you've done. If you're good, we'll get you down... in a few years. All (V.O.): (laughter)",
+    "chars": []
+  },
+  {
+    "num": "45",
+    "label": "45",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Sean (V.O.): Thanks! That was fast thinking and great driving. So much fun! Aimee (V.O.): Wait, do you hear that? It's all the parade-goers from all over the city. (starting it) Matchbox Crew, Matchbox Crew... All (V.O.): Matchbox Crew! Matchbox Crew! Matchbox Crew!",
+    "chars": []
+  },
+  {
+    "num": "46",
+    "label": "46",
+    "scene": "REAL WORLD · SMALLEY'S GARAGE",
+    "dialogue": "Sean (V.O.): Nothing can stop the... / All (V.O.): MATCHBOX CREW!",
+    "chars": []
+  }
+];
+
+const VILLAIN = ['Von Steele'];
+
+function imgSrc(num) {
+  return COLOR_URLS[num.padStart(2,'0')] || '';
+}
+
+function renderPanels() {
+  const container = document.getElementById('panels-container');
+  container.innerHTML = '';
+
+  PANELS.forEach(p => {
+    const src = imgSrc(p.num);
+
+    const chars = p.chars.map(c =>
+      `<span class="char-tag">${c}</span>`
+    ).join('');
+
+    container.innerHTML += `
+    <div class="page panel-page">
+      <!-- HEADER -->
+      <div class="panel-page-header">
+        <span class="ph-ep">CVY26_001_108</span>
+        <span class="ph-title">Color Review · City Spy Chase!</span>
+        <span class="ph-num">PANEL ${p.label}</span>
+      </div>
+
+      <!-- SPACER -->
+      <div class="panel-spacer"></div>
+
+      <!-- IMAGE: full width -->
+      <div class="panel-img-col">
+        ${false ? `
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#111;">
+          <div style="font-size:80px;font-weight:900;letter-spacing:12px;color:rgba(255,255,255,0.08);transform:rotate(-35deg);text-transform:uppercase;user-select:none;">PENDING</div>
+        </div>` : `
+        <img src="${src}" alt="Panel ${p.label}"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="panel-img-placeholder" style="display:none">
+          <div class="pip-icon"></div>
+          <div class="pip-label">Panel ${p.label}<br>Color</div>
+        </div>`}
+      </div>
+
+      <!-- INFO: below image -->
+      <div class="panel-info-section">
+        <div class="panel-info-row">
+
+          <!-- LEFT: num + scene + visual -->
+          <div class="panel-info-main">
+            <div class="panel-num-badge">
+              <div class="panel-num">${p.label.replace(/[A-Z–]/g,'')}</div>
+              ${p.label.match(/[A-Z–]/) ? `<div class="panel-num-sub">${p.label}</div>` : ''}
+              ${p.scene ? `<div class="panel-num-sub" style="color:var(--accent);font-size:8px;letter-spacing:2px;text-transform:uppercase">${p.scene}</div>` : ''}
+            </div>
+          </div>
+
+          <!-- RIGHT: dialogue + chars + notes -->
+          <div class="panel-info-side">
+            ${(() => {
+              const dlg = (SCRIPT_DIALOGUES[p.num] !== undefined ? SCRIPT_DIALOGUES[p.num] : p.dialogue) || '';
+              return dlg.trim() ? `<div class="dialogue-block">
+              <div class="info-label">Dialogue / VO</div>
+              <div class="editable" contenteditable="true">${dlg.replace(/\n/g,'<br>')}</div>
+            </div>` : '';
+            })()}
+
+            ${(VEHICLES_IN_PANEL[p.num] && VEHICLES_IN_PANEL[p.num].length) ? `
+            <div class="info-block">
+              <div class="info-label">Vehicles in Panel</div>
+              <div class="chars-in-scene" style="flex-direction:column;align-items:flex-start;gap:4px;">${VEHICLES_IN_PANEL[p.num].map(v => `<span class="char-tag" style="display:block;width:fit-content;">${v.name} <span style="opacity:0.7;font-weight:400">· #${v.sku}</span></span>`).join('')}</div>
+            </div>` : ''}
+
+            <div class="info-block caveats-block" style="margin-top:auto">
+              <div class="info-label">Caveats:</div>
+              <div class="editable caveat-field" contenteditable="true"
+                   data-panel="${p.num}"
+                   data-placeholder="Production notes for the client..."></div>
+            </div>
+          </div>
+
+        </div><!-- /panel-info-row -->
+
+
+      </div><!-- /panel-info-section -->
+    </div>`;
+  });
+}
+
+function renderStoryboard() {
+  const container = document.getElementById('panels-container');
+  const cells = PANELS.map(p => {
+    const src = imgSrc(p.num);
+    return `
+    <div class="sb-cell">
+      <div class="sb-img-wrap">
+        <img src="${src}" alt="Panel ${p.label}"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="sb-placeholder" style="display:none">${p.label}</div>
+      </div>
+      <div class="sb-label">${p.label}</div>
+    </div>`;
+  }).join('');
+
+  container.innerHTML += `
+  <div class="page storyboard-page">
+    <div class="sb-header">
+      <div class="sb-eyebrow">CVY26_001_108 · Color Review · Episode 108</div>
+      <div class="sb-title">Color <span>Overview</span></div>
+      <div class="sb-subtitle">City Spy Chase! · 45 Panels</div>
+    </div>
+    <div class="sb-grid">${cells}</div>
+  </div>`;
+}
+
+let editingOn = true;
+function toggleEditing() {
+  editingOn = !editingOn;
+  document.querySelectorAll('[contenteditable]').forEach(el => {
+    el.contentEditable = editingOn ? 'true' : 'false';
+  });
+}
+
+</script>
+
+<div id="panels-container"></div>
+<script>
+renderPanels();
+renderStoryboard();
+
+/* ── JSONBIN SYNC (color review uses _color suffix so it doesn't collide with line-art bin) ── */
+const REVIEW_BIN_ID  = '6a0a5ddf250b1311c3667973';
+const REVIEW_BIN_KEY = '$2a$10$G/S5QC8pq2vpHyiOEdxjp.rmJOR4deLMjyDvs1.Zq7W9dMQt9uqQq';
+const BIN_URL = 'https://api.jsonbin.io/v3/b/' + REVIEW_BIN_ID;
+
+async function loadAnnotations() {
+  try {
+    const res = await fetch(BIN_URL + '/latest', {
+      headers: { 'X-Master-Key': REVIEW_BIN_KEY, 'X-Bin-Meta': 'false' }
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    const caveats = data.caveats_color || {};
+    document.querySelectorAll('.caveat-field[data-panel]').forEach(el => {
+      const v = caveats[el.dataset.panel];
+      if (v) el.textContent = v;
+    });
+    const addressed = data.addressed_color || {};
+    document.querySelectorAll('.addressed-list[data-panel]').forEach(el => {
+      const v = addressed[el.dataset.panel];
+      if (v) el.innerHTML = v;
+    });
+  } catch(e) {}
+}
+
+let _saveTimer = null;
+function scheduleSync() {
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(saveAnnotations, 1500);
+}
+
+async function saveAnnotations() {
+  // Fetch existing to merge — don't wipe line-art caveats stored under `caveats`
+  let existing = {};
+  try {
+    const r = await fetch(BIN_URL + '/latest', { headers: { 'X-Master-Key': REVIEW_BIN_KEY, 'X-Bin-Meta': 'false' } });
+    if (r.ok) existing = await r.json();
+  } catch(e) {}
+  const caveats_color = {};
+  document.querySelectorAll('.caveat-field[data-panel]').forEach(el => {
+    const v = el.textContent.trim();
+    if (v) caveats_color[el.dataset.panel] = v;
+  });
+  const addressed_color = {};
+  document.querySelectorAll('.addressed-list[data-panel]').forEach(el => {
+    const v = el.innerHTML.trim();
+    if (v) addressed_color[el.dataset.panel] = v;
+  });
+  const payload = Object.assign({}, existing, { caveats_color, addressed_color });
+  try {
+    await fetch(BIN_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': REVIEW_BIN_KEY },
+      body: JSON.stringify(payload)
+    });
+  } catch(e) {}
+}
+
+// Escuchar cambios en caveats y addressed
+document.querySelectorAll('.caveat-field[data-panel], .addressed-list[data-panel]').forEach(el => {
+  el.addEventListener('input', scheduleSync);
+});
+
+// Cargar al abrir
+loadAnnotations();
+</script>
+
+<!-- THANKS PAGE -->
+<div class="page" style="display:flex;flex-direction:column;">
+  <div class="panel-page-header">
+    <span class="ph-ep">CVY26_001_108</span>
+    <span class="ph-title">Color Review · City Spy Chase!</span>
+    <span class="ph-num"></span>
+  </div>
+  <div style="flex:1;display:flex;justify-content:center;align-items:center;text-align:center;">
+    <div class="cover-title">THANKS<span style="color:var(--accent)">!</span></div>
+  </div>
+</div>
+
+</div><!-- /doc-wrapper -->
+</body>
+</html>

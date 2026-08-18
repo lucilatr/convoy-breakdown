@@ -84,8 +84,22 @@ for _n, _ids in VEH_SET.items():
 
 # ── Altas/bajas por panel (revision de la usuaria) ──
 SKU2NAME = {v['sku']: v['name'] for v in CAT.values()}
-VEH_ADD = {}     # sumar estos SKU (dedupe por sku)
-VEH_REMOVE = {}  # quitar estos SKU
+# sumar estos SKU (dedupe por sku)
+VEH_ADD = {
+    '12': ['JKH28', 'JKH34'],                          # + Land Rover 6x6, + Mustang Fastback
+    '13': ['JKH38'],                                   # + Excavator
+    '14': ['JKH38'],                                   # + Excavator
+    '17': ['JKH39'],                                   # + Rescue Helicopter
+    '22': ['HFP46'],                                   # + Dodge Durango
+    '45': ['JKH28', 'JKH34', 'JKH31', 'JKH38', 'JKH39'],  # + Rover, Mustang, Triumph, Excavator, Heli
+}
+# quitar estos SKU
+VEH_REMOVE = {
+    '22': ['JKH31'],                                   # - Triumph Scrambler
+    '23': ['HFP46'],                                   # - Dodge Durango
+    '42': ['JKH39'],                                   # - Rescue Helicopter
+    '44': ['HFP46'],                                   # - Dodge Durango
+}
 for _n, _skus in VEH_REMOVE.items():
     if _n in VEHICLES_IN_PANEL:
         VEHICLES_IN_PANEL[_n] = [v for v in VEHICLES_IN_PANEL[_n] if v['sku'] not in _skus]
